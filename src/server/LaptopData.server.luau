@@ -10,7 +10,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local DataStoreService  = game:GetService("DataStoreService")
 
 local GameConfig  = require(ReplicatedStorage:WaitForChild("Shared"):WaitForChild("GameConfig"))
-local TIER_TITLES = GameConfig.FeedStitch.tierTitles
+local TIER_TITLES = GameConfig.Talkogram.tierTitles
 
 -- ── Remote setup ──────────────────────────────────────────────────────────
 
@@ -42,6 +42,17 @@ local RequestInventory = makeRemoteFunction("RequestInventory")
 local PurchaseTool     = makeRemote("PurchaseTool")
 local SubmitJobResult  = makeRemote("SubmitJobResult")
 
+local AbandonJob = makeRemote("AbandonJob")
+
+-- Teleport events (fired by LocationManager; listed here so the folder is complete)
+makeRemote("TeleportToLocation")
+makeRemote("TeleportToHub")
+makeRemote("LocationFull")
+
+-- ── LocationManager ───────────────────────────────────────────────────────
+-- Required after remotes are created so LocationManager can WaitForChild on them.
+local LocationManager = require(script.Parent:WaitForChild("LocationManager", 10) or error("[LaptopData] LocationManager ModuleScript not found in ServerScriptService — did Rojo sync?"))
+
 -- ── DataStore ─────────────────────────────────────────────────────────────
 
 local FeedStore = DataStoreService:GetDataStore("TalkogramFeed")
@@ -57,8 +68,9 @@ local _extraComments = {}
 local STUB_JOBS = {
 	{
 		id        = 1,
-		name      = "Dining Chair Refresh",
+		name      = "Two Seater Sofa",
 		details   = "Replace worn seat padding and tacking",
+		tier      = "Starter",
 		pay       = 120,
 		followers = 8,
 		prestige  = false,
@@ -69,6 +81,7 @@ local STUB_JOBS = {
 		id        = 2,
 		name      = "Velvet Loveseat",
 		details   = "Full re-upholster with client fabric",
+		tier      = "Mid",
 		pay       = 340,
 		followers = 25,
 		prestige  = false,
@@ -79,6 +92,7 @@ local STUB_JOBS = {
 		id        = 3,
 		name      = "Ottoman Suite",
 		details   = "Prestige: 3-piece foam & stitch chain",
+		tier      = "Premium",
 		pay       = 800,
 		followers = 60,
 		prestige  = true,
@@ -89,6 +103,7 @@ local STUB_JOBS = {
 		id        = 4,
 		name      = "Bar Stool Set ×4",
 		details   = "Matching staple-gun finish required",
+		tier      = "Mid",
 		pay       = 210,
 		followers = 14,
 		prestige  = false,
@@ -99,6 +114,7 @@ local STUB_JOBS = {
 		id        = 5,
 		name      = "Antique Armchair",
 		details   = "Delicate fabric — Fragile modifier",
+		tier      = "Premium",
 		pay       = 560,
 		followers = 38,
 		prestige  = false,
@@ -287,7 +303,13 @@ RequestPost.OnServerInvoke = function(_player, postId)
 end
 
 AcceptJob.OnServerEvent:Connect(function(player, jobId)
-	print("[LaptopData] AcceptJob from", player.Name, "jobId =", jobId)
+	local job = findJobById(jobId)
+	if not job then
+		warn("[LaptopData] AcceptJob: unknown jobId", jobId)
+		return
+	end
+	local ok = LocationManager.Assign(player, job)
+	if not ok then return end  -- LocationFull already fired inside Assign
 end)
 
 -- Client fires this after MinigameRunner completes; triggers auto-post creation.
@@ -316,11 +338,17 @@ SubmitJobResult.OnServerEvent:Connect(function(player, jobId, result)
 
 	savePost(post)
 	print("[LaptopData] Auto-post by", player.Name, "—", post.title)
+	LocationManager.Release(player)
+end)
+
+AbandonJob.OnServerEvent:Connect(function(player)
+	LocationManager.Release(player)
+	print("[LaptopData] Job abandoned by", player.Name)
 end)
 
 PostComment.OnServerEvent:Connect(function(player, postId, text)
 	if type(text) ~= "string" then return end
-	text = text:sub(1, GameConfig.FeedStitch.commentMaxLength)
+	text = text:sub(1, GameConfig.Talkogram.commentMaxLength)
 	if text == "" then return end
 	local key = tostring(postId)
 	if not _extraComments[key] then

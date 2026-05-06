@@ -99,12 +99,6 @@ return {
 	-- =========================================================
 	Followers = {
 		baseGainPerJob = 10,
-		photoBonus = {
-			centeringMin = 0.10,
-			centeringMax = 0.25,
-			lightAngleMin = 0.05,
-			lightAngleMax = 0.15,
-		},
 		minigameBonus = {
 			Pass    = 0.00,
 			Good    = 0.10,
@@ -134,18 +128,63 @@ return {
 	},
 
 	-- =========================================================
-	-- FEEDSTITCH
+	-- TALKOGRAM
 	-- =========================================================
-	FeedStitch = {
-		commentMaxLength   = 80,
-		commentsPerPlayer  = 3,
-		popularLikeCount   = 5,    -- likes needed for "Popular" tag
-		bestPostIntervalSec = 2 * 60 * 60,  -- 2 hours
+	Talkogram = {
+		commentMaxLength    = 80,
+		commentsPerPlayer   = 3,
+		popularLikeCount    = 5,           -- likes needed for "Popular" tag
+		bestPostIntervalSec = 2 * 60 * 60, -- 2 hours
 		tierTitles = {
-			Perfect = "Just nailed a perfect %s! ✨",
-			Good    = "Knocked out a solid %s!",
-			Pass    = "Got through a %s.",
-			Fail    = "Struggled with a %s today...",
+			Perfect = "Absolutely nailed this %s. Client loved it.",
+			Good    = "Pretty happy with how this %s turned out.",
+			Pass    = "Just finished a %s — not my best, but done!",
+		},
+	},
+
+	-- =========================================================
+	-- CLIENT LOCATION SYSTEM
+	-- =========================================================
+	Locations = {
+		slotCount = 6,  -- slots per location type; matches 6-player server cap
+		byTier = {      -- append names to any list to add more locations; no logic changes needed
+			Starter  = {"StudioApartment"},
+			Mid      = {"RegularHouse"},
+			Premium  = {"LuxuryHome"},
+			Prestige = {"SupercarGarage"},
+		},
+		furnitureModelKey = {  -- maps STUB_JOBS id → ServerStorage folder name
+			[1] = "TwoSofa",
+			[2] = "VelvetLoveseat",
+			[3] = "Ottoman",
+			[4] = "BarStool",
+			[5] = "Armchair",
+		},
+		fabricColors = {
+			Color3.fromRGB(30,  50,  120),
+			Color3.fromRGB(120, 30,  50),
+			Color3.fromRGB(240, 230, 200),
+			Color3.fromRGB(50,  90,  60),
+			Color3.fromRGB(90,  90,  110),
+			Color3.fromRGB(190, 155, 100),
+			Color3.fromRGB(165, 110, 130),
+			Color3.fromRGB(60,  60,  60),
+			Color3.fromRGB(200, 180, 150),
+			Color3.fromRGB(100, 140, 160),
+		},
+		frameColors = {
+			Color3.fromRGB(180, 140, 90),
+			Color3.fromRGB(80,  50,  30),
+			Color3.fromRGB(30,  30,  30),
+			Color3.fromRGB(240, 240, 235),
+			Color3.fromRGB(140, 100, 60),
+		},
+		wallColors = {
+			Color3.fromRGB(245, 245, 240),
+			Color3.fromRGB(220, 210, 195),
+			Color3.fromRGB(200, 215, 225),
+			Color3.fromRGB(210, 225, 205),
+			Color3.fromRGB(230, 220, 210),
 		},
 	},
 }

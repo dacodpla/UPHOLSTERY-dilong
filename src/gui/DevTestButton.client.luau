@@ -15,10 +15,12 @@ if not RunService:IsStudio() then
 	return
 end
 
-local MinigameRunner = require(Players.LocalPlayer:WaitForChild("PlayerScripts")
-	:WaitForChild("Client")
-	:WaitForChild("Minigames")
-	:WaitForChild("MinigameRunner"))
+local MinigameRunner = require(
+	game:GetService("ReplicatedStorage")
+		:WaitForChild("Shared")
+		:WaitForChild("Minigames")
+		:WaitForChild("MinigameRunner")
+)
 
 -- ── Build the dev panel ──────────────────────────────────────────────────────
 

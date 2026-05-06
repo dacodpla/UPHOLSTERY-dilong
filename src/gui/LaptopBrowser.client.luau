@@ -18,13 +18,6 @@ local player    = Players.LocalPlayer
 local PlayerGui = player:WaitForChild("PlayerGui")
 local LaptopGui = PlayerGui:WaitForChild("LaptopGui")
 
-local MinigameRunner = require(
-	ReplicatedStorage
-		:WaitForChild("Shared")
-		:WaitForChild("Minigames")
-		:WaitForChild("MinigameRunner")
-)
-
 -- ── Remote references ─────────────────────────────────────────────────────
 local Remotes = ReplicatedStorage:WaitForChild("LaptopRemotes", 10)
 
@@ -151,10 +144,8 @@ local function populateJobs()
 	if type(jobs) ~= "table" then return end
 
 	local acceptRE  = getRemote("AcceptJob")
-	local submitRE  = getRemote("SubmitJobResult")
 
 	for _, job in ipairs(jobs) do
-		local jobCapture = job
 		local card = template:Clone()
 		card.Visible = true
 		card.Name    = "JobCard_" .. job.id
@@ -177,26 +168,8 @@ local function populateJobs()
 			local jobId = job.id
 			acceptBtn.Activated:Connect(function()
 				acceptRE:FireServer(jobId)
-
-				-- Close laptop so minigame renders over the world
 				LaptopGui.Enabled = false
-
-				-- Run the appropriate minigame(s) for this job
-				local minigameList = jobCapture.minigames or { "TackRemoval" }
-				local config       = { fragile = false, toolBonus = 0 }
-				local result
-
-				if jobCapture.prestige and #minigameList > 1 then
-					local results = MinigameRunner.RunChain(minigameList, config)
-					result = MinigameRunner.CollapseChainResult(results)
-				else
-					result = MinigameRunner.Run(minigameList[1], config)
-				end
-
-				-- Report result to server → creates the social post automatically
-				if submitRE then
-					submitRE:FireServer(jobId, result)
-				end
+				-- GameplayClient takes over: teleport → minigame → submit result
 			end)
 		end
 	end
