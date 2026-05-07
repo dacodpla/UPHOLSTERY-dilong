@@ -22,12 +22,14 @@ local MinigameRunner = require(
 
 -- ── Remotes ───────────────────────────────────────────────────────────────
 
-local Remotes            = ReplicatedStorage:WaitForChild("LaptopRemotes")
-local TeleportToLocation = Remotes:WaitForChild("TeleportToLocation")
-local TeleportToHub      = Remotes:WaitForChild("TeleportToHub")
-local LocationFull       = Remotes:WaitForChild("LocationFull")
-local SubmitJobResult    = Remotes:WaitForChild("SubmitJobResult")
-local AbandonJob         = Remotes:WaitForChild("AbandonJob")
+local Remotes                = ReplicatedStorage:WaitForChild("LaptopRemotes")
+local TeleportToLocation     = Remotes:WaitForChild("TeleportToLocation")
+local TeleportToHub          = Remotes:WaitForChild("TeleportToHub")
+local LocationFull           = Remotes:WaitForChild("LocationFull")
+local SubmitJobResult        = Remotes:WaitForChild("SubmitJobResult")
+local AbandonJob             = Remotes:WaitForChild("AbandonJob")
+local FurniturePieceRepaired = Remotes:WaitForChild("FurniturePieceRepaired")
+local StartMinigame          = Remotes:WaitForChild("StartMinigame")
 
 -- ── Dev HUD ───────────────────────────────────────────────────────────────
 
@@ -56,8 +58,12 @@ hudCorner.Parent       = hudLabel
 
 -- ── State ─────────────────────────────────────────────────────────────────
 
-local _currentResult = nil  -- set after minigame completes; sent to server on door exit
-local _jobHighlight  = nil  -- client-side Highlight adorning the furniture clone
+local _pieceResults  = {}   -- [pieceIndex] = result string once that piece is repaired
+local _repairedCount = 0    -- how many pieces have been repaired this job
+local _totalPieces   = 0    -- total pieces for the current job
+local _highlights    = {}   -- Highlight instances indexed by piece number
+local _currentJob    = nil  -- job table for the current active assignment
+local _multiPiece    = false
 
 -- ── Helpers ───────────────────────────────────────────────────────────────
 
@@ -79,99 +85,119 @@ local function moveCharacter(cframe)
 	end
 end
 
-local function clearHighlight()
-	if _jobHighlight then
-		_jobHighlight:Destroy()
-		_jobHighlight = nil
+local function clearAllHighlights()
+	for _, hl in ipairs(_highlights) do
+		if hl and hl.Parent then hl:Destroy() end
 	end
+	_highlights = {}
 end
 
 -- ── Remote handlers ───────────────────────────────────────────────────────
 
-TeleportToLocation.OnClientEvent:Connect(function(cframe, job, furnitureClone)
-	_currentResult = nil
-	clearHighlight()
+TeleportToLocation.OnClientEvent:Connect(function(cframe, job, cloneList)
+	-- Reset per-job state
+	_pieceResults  = {}
+	_repairedCount = 0
+	_totalPieces   = #(cloneList or {})
+	_currentJob    = job
+	_multiPiece    = _totalPieces > 1
+	clearAllHighlights()
 	moveCharacter(cframe)
-	showHUD("📍 " .. (job.name or "?") .. "  |  walk to the furniture to begin")
 
-	-- Highlight the furniture so the player can find it easily (client-side only)
-	if furnitureClone and furnitureClone.Parent then
-		_jobHighlight = Instance.new("Highlight")
-		_jobHighlight.Adornee             = furnitureClone
-		_jobHighlight.FillColor           = Color3.fromRGB(255, 210, 60)
-		_jobHighlight.FillTransparency    = 0.75
-		_jobHighlight.OutlineColor        = Color3.fromRGB(255, 210, 60)
-		_jobHighlight.OutlineTransparency = 0
-		_jobHighlight.Parent              = player.PlayerGui
+	if _multiPiece then
+		showHUD("📍 " .. (job.name or "?") .. "  |  repair all " .. _totalPieces .. " pieces, then use the door")
+	else
+		showHUD("📍 " .. (job.name or "?") .. "  |  walk to the furniture to begin")
 	end
 
-	local slotModel = furnitureClone and furnitureClone.Parent
-
-	-- Find the prompts added by LocationManager (replicated from server)
-	local repairPrompt, doorPrompt
-
-	if furnitureClone then
-		for _, desc in ipairs(furnitureClone:GetDescendants()) do
-			if desc:IsA("ProximityPrompt") and desc.Name == "RepairPrompt" then
-				repairPrompt = desc
-				break
-			end
+	-- Highlight every piece (Highlight adorns the Model so it works even before parts replicate)
+	for i, clone in ipairs(cloneList or {}) do
+		if clone and clone.Parent then
+			local hl = Instance.new("Highlight")
+			hl.Adornee             = clone
+			hl.FillColor           = Color3.fromRGB(255, 210, 60)
+			hl.FillTransparency    = 0.75
+			hl.OutlineColor        = Color3.fromRGB(255, 210, 60)
+			hl.OutlineTransparency = 0
+			hl.Parent              = player.PlayerGui
+			_highlights[i]         = hl
 		end
 	end
 
-	if slotModel then
+	-- DoorPrompt is dynamic (added by server) so search after a short replication delay
+	local slotModel = cloneList and cloneList[1] and cloneList[1].Parent
+	task.spawn(function()
+		task.wait(0.5)
+		if not slotModel then return end
 		for _, desc in ipairs(slotModel:GetDescendants()) do
 			if desc:IsA("ProximityPrompt") and desc.Name == "DoorPrompt" then
-				doorPrompt = desc
-				break
+				desc.Triggered:Connect(function()
+					if _repairedCount > 0 then
+						local resultList = {}
+						for idx = 1, _totalPieces do
+							if _pieceResults[idx] then
+								table.insert(resultList, _pieceResults[idx])
+							end
+						end
+						local finalResult = #resultList == 1
+							and resultList[1]
+							or MinigameRunner.CollapseChainResult(resultList)
+						SubmitJobResult:FireServer(_currentJob.id, finalResult)
+					else
+						AbandonJob:FireServer()
+					end
+					_pieceResults  = {}
+					_repairedCount = 0
+				end)
+				return
 			end
 		end
+		warn("[GameplayClient] DoorPrompt not found after wait — player cannot exit this slot")
+	end)
+end)
+
+-- Server fires this when a RepairPrompt is triggered (avoids client-side replication race)
+StartMinigame.OnClientEvent:Connect(function(pieceIndex)
+	if not _currentJob then return end
+	if _pieceResults[pieceIndex] ~= nil then return end  -- already repaired
+
+	if _highlights[pieceIndex] then
+		_highlights[pieceIndex]:Destroy()
+		_highlights[pieceIndex] = nil
 	end
 
-	-- Player walks to furniture and triggers the minigame
-	if repairPrompt then
-		repairPrompt.Triggered:Connect(function()
-			if _currentResult ~= nil then return end  -- already completed
-			repairPrompt.Enabled = false
-			clearHighlight()
+	showHUD("🔧 " .. (_currentJob.name or "?") .. "  |  repair in progress...")
 
-			showHUD("🔧 " .. (job.name or "?") .. "  |  repair in progress...")
+	local config = { fragile = false, toolBonus = 0 }
+	local result
 
-			local config = { fragile = false, toolBonus = 0 }
-			local result
-
-			if #job.minigames > 1 then
-				local results = MinigameRunner.RunChain(job.minigames, config)
-				result = MinigameRunner.CollapseChainResult(results)
-			else
-				result = MinigameRunner.Run(job.minigames[1], config)
-			end
-
-			_currentResult = result
-			showHUD("✅ " .. (job.name or "?") .. "  |  " .. tostring(result) .. "  ·  use the door to leave")
-		end)
+	if not _multiPiece then
+		-- Single piece: run the full minigame chain
+		if #_currentJob.minigames > 1 then
+			local results = MinigameRunner.RunChain(_currentJob.minigames, config)
+			result = MinigameRunner.CollapseChainResult(results)
+		else
+			result = MinigameRunner.Run(_currentJob.minigames[1], config)
+		end
 	else
-		warn("[GameplayClient] RepairPrompt not found — minigame cannot start")
+		-- Multi-piece: run just this piece's assigned minigame
+		local minigameName = _currentJob.minigames[pieceIndex] or _currentJob.minigames[1]
+		result = MinigameRunner.Run(minigameName, config)
 	end
 
-	-- Player uses the door to finish or abandon
-	if doorPrompt then
-		doorPrompt.Triggered:Connect(function()
-			if _currentResult then
-				SubmitJobResult:FireServer(job.id, _currentResult)
-			else
-				AbandonJob:FireServer()
-			end
-			_currentResult = nil
-			-- TeleportToHub fires from server after LocationManager.Release
-		end)
+	_pieceResults[pieceIndex] = result
+	_repairedCount += 1
+	FurniturePieceRepaired:FireServer(pieceIndex)
+
+	if _repairedCount >= _totalPieces then
+		showHUD("✅ " .. (_currentJob.name or "?") .. "  |  all done!  ·  use the door to leave")
 	else
-		warn("[GameplayClient] DoorPrompt not found — player cannot exit this slot")
+		showHUD("✅ Piece " .. pieceIndex .. " done  ·  " .. (_totalPieces - _repairedCount) .. " left — keep going!")
 	end
 end)
 
 TeleportToHub.OnClientEvent:Connect(function(cframe)
-	clearHighlight()
+	clearAllHighlights()
 	moveCharacter(cframe)
 	task.wait(0.5)
 	hideHUD()

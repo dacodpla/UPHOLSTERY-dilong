@@ -24,22 +24,26 @@ local Players           = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ServerStorage     = game:GetService("ServerStorage")
 
-local GameConfig  = require(ReplicatedStorage:WaitForChild("Shared"):WaitForChild("GameConfig"))
-local Locations   = GameConfig.Locations
+local GameConfig         = require(ReplicatedStorage:WaitForChild("Shared"):WaitForChild("GameConfig"))
+local Locations          = GameConfig.Locations
+local PlayerHouseManager = require(script.Parent:WaitForChild("PlayerHouseManager", 10)
+	or error("[LocationManager] PlayerHouseManager not found in ServerScriptService"))
 
 -- ── Remotes (created by LaptopData before this module is required) ────────
 
-local remotesFolder      = ReplicatedStorage:WaitForChild("LaptopRemotes")
-local TeleportToLocation = remotesFolder:WaitForChild("TeleportToLocation")
-local TeleportToHub      = remotesFolder:WaitForChild("TeleportToHub")
-local LocationFull       = remotesFolder:WaitForChild("LocationFull")
+local remotesFolder          = ReplicatedStorage:WaitForChild("LaptopRemotes")
+local TeleportToLocation     = remotesFolder:WaitForChild("TeleportToLocation")
+local TeleportToHub          = remotesFolder:WaitForChild("TeleportToHub")
+local LocationFull           = remotesFolder:WaitForChild("LocationFull")
+local FurniturePieceRepaired = remotesFolder:WaitForChild("FurniturePieceRepaired")
+local StartMinigame          = remotesFolder:WaitForChild("StartMinigame")
 
 -- ── Internal state ────────────────────────────────────────────────────────
 
 -- _pool[locationName][slotIndex] = player.UserId (occupied) or nil (free)
 local _pool = {}
 
--- _playerAssignment[player] = { locationName, slotIndex, slotModel, clone }
+-- _playerAssignment[player] = { locationName, slotIndex, slotModel, clones, fixedClones, furnitureKeys, doorPrompt }
 local _playerAssignment = {}
 
 -- ── Pool initialisation ───────────────────────────────────────────────────
@@ -59,7 +63,16 @@ end
 -- ── Helpers ───────────────────────────────────────────────────────────────
 
 local NEUTRAL_COLOR = Color3.fromRGB(163, 162, 165)
-local VARIANT_NAMES = {"Damaged_A", "Damaged_B", "Damaged_C"}
+
+local function getDamagedVariants(typeFolder)
+	local variants = {}
+	for _, child in ipairs(typeFolder:GetChildren()) do
+		if child.Name ~= "Default" then
+			table.insert(variants, child)
+		end
+	end
+	return variants
+end
 
 local function pickRandom(tbl)
 	return tbl[math.random(#tbl)]
@@ -118,12 +131,31 @@ local function resetSlotColors(slotModel)
 	end
 end
 
-local function getHubCFrame()
-	local spawn = workspace:FindFirstChildWhichIsA("SpawnLocation")
-	if spawn then
-		return spawn.CFrame + Vector3.new(0, 3, 0)
+local function placeFurnitureDefault(slotModel, furnitureKey, padIndex)
+	local furnitureFolder = ServerStorage:FindFirstChild("FurnitureModels")
+	local typeFolder = furnitureFolder and furnitureFolder:FindFirstChild(furnitureKey)
+	if not typeFolder then
+		warn("[LocationManager] FurnitureModels/" .. furnitureKey .. " not found for Default placement")
+		return nil
 	end
-	return CFrame.new(0, 5, 0)
+	local defaultModel = typeFolder:FindFirstChild("Default")
+	if not defaultModel then
+		warn("[LocationManager] No 'Default' model in", furnitureKey)
+		return nil
+	end
+	local pad = slotModel:FindFirstChild("FurniturePad_" .. padIndex, true)
+	local fixedClone = defaultModel:Clone()
+	fixedClone.Parent = slotModel
+	if pad and pad:IsA("BasePart") then
+		local _, bbSize = fixedClone:GetBoundingBox()
+		fixedClone:PivotTo(
+			CFrame.new(pad.Position + Vector3.new(0, bbSize.Y / 2, 0)) * pad.CFrame.Rotation
+		)
+	end
+	for _, part in ipairs(fixedClone:GetDescendants()) do
+		if part:IsA("BasePart") then part.Anchored = true end
+	end
+	return fixedClone
 end
 
 -- ── LocationManager API ───────────────────────────────────────────────────
@@ -181,56 +213,63 @@ function LocationManager.Assign(player, job)
 		return false
 	end
 
-	-- Clone furniture model
-	local clone = nil
-	local modelKey = Locations.furnitureModelKey[job.id]
-	if modelKey then
-		local furnitureFolder = ServerStorage:FindFirstChild("FurnitureModels")
-		local typeFolder      = furnitureFolder and furnitureFolder:FindFirstChild(modelKey)
-		if typeFolder then
-			local variant = typeFolder:FindFirstChild(pickRandom(VARIANT_NAMES))
-			if variant then
-				clone = variant:Clone()
-				local pad = slotModel:FindFirstChild("FurniturePad", true)
+	-- Clone all furniture pieces listed in job.furniture onto numbered pads
+	local cloneList = {}
+	local furnitureFolder = ServerStorage:FindFirstChild("FurnitureModels")
+
+	for i, furnitureKey in ipairs(job.furniture or {}) do
+		local padName    = "FurniturePad_" .. i
+		local pad        = slotModel:FindFirstChild(padName, true)
+		local typeFolder = furnitureFolder and furnitureFolder:FindFirstChild(furnitureKey)
+
+		if not typeFolder then
+			warn("[LocationManager] FurnitureModels/" .. tostring(furnitureKey) .. " not found — skipping piece", i)
+		elseif not pad or not pad:IsA("BasePart") then
+			warn("[LocationManager] " .. padName .. " not found or not a BasePart in", slotModel.Name, "— skipping piece", i)
+		else
+			local variants = getDamagedVariants(typeFolder)
+			if #variants > 0 then
+				local clone = pickRandom(variants):Clone()
 				clone.Parent = slotModel
-				if pad and pad:IsA("BasePart") then
-					local _, bbSize = clone:GetBoundingBox()
-					local yOffset = bbSize.Y / 2
-					clone:PivotTo(
-						CFrame.new(pad.Position + Vector3.new(0, yOffset, 0)) * pad.CFrame.Rotation
-					)
-				else
-					warn("[LocationManager] FurniturePad not found or not a BasePart in", slotModel.Name, "— furniture will be misplaced")
-				end
+				local _, bbSize = clone:GetBoundingBox()
+				local yOffset = bbSize.Y / 2
+				clone:PivotTo(
+					CFrame.new(pad.Position + Vector3.new(0, yOffset, 0)) * pad.CFrame.Rotation
+				)
 				for _, part in ipairs(clone:GetDescendants()) do
 					if part:IsA("BasePart") then part.Anchored = true end
 				end
 				colorizeClone(clone)
+				table.insert(cloneList, clone)
 			else
-				warn("[LocationManager] No damage variants found in", modelKey)
+				warn("[LocationManager] No damage variants in", furnitureKey)
 			end
-		else
-			warn("[LocationManager] FurnitureModels/" .. tostring(modelKey) .. " not found in ServerStorage")
 		end
 	end
 
-	-- Add RepairPrompt to furniture clone so player can trigger the minigame
-	if clone then
-		local repairPart = clone.PrimaryPart
-		if not repairPart then
-			for _, desc in ipairs(clone:GetDescendants()) do
-				if desc:IsA("BasePart") then repairPart = desc break end
-			end
-		end
-		if repairPart then
+	-- RepairPrompt on FurniturePad_N — independent of furniture model structure
+	local repairPrompts = {}
+	for i = 1, #cloneList do
+		local padName = "FurniturePad_" .. i
+		local pad = slotModel:FindFirstChild(padName, true)
+		if pad and pad:IsA("BasePart") then
 			local rp = Instance.new("ProximityPrompt")
-			rp.Name                  = "RepairPrompt"
-			rp.ActionText            = "Repair"
-			rp.ObjectText            = job.name
+			rp.Name                = "RepairPrompt"
+			rp.ActionText          = "Repair"
+			rp.ObjectText          = job.name
 			rp.MaxActivationDistance = 10
-			rp.Parent                = repairPart
+			rp.RequiresLineOfSight = false
+			rp.Exclusivity         = Enum.ProximityPromptExclusivity.AlwaysShow
+			rp.Parent              = pad
+			repairPrompts[i]       = rp
+			rp.Triggered:Connect(function(triggeringPlayer)
+				if not _playerAssignment[triggeringPlayer] then return end
+				rp.Enabled = false
+				StartMinigame:FireClient(triggeringPlayer, i)
+			end)
+			print(("[LocationManager]   Piece %d RepairPrompt on %s"):format(i, padName))
 		else
-			warn("[LocationManager] No BasePart in furniture clone — RepairPrompt skipped")
+			warn(("[LocationManager]   %s not found — RepairPrompt piece %d skipped"):format(padName, i))
 		end
 	end
 
@@ -256,17 +295,20 @@ function LocationManager.Assign(player, job)
 
 	-- Store assignment
 	_playerAssignment[player] = {
-		locationName = chosenName,
-		slotIndex    = chosenIndex,
-		slotModel    = slotModel,
-		clone        = clone,
-		doorPrompt   = doorPromptInstance,
+		locationName  = chosenName,
+		slotIndex     = chosenIndex,
+		slotModel     = slotModel,
+		clones        = cloneList,
+		fixedClones   = {},
+		furnitureKeys = job.furniture or {},
+		repairPrompts = repairPrompts,
+		doorPrompt    = doorPromptInstance,
 	}
 
-	-- Teleport player (pass clone so client can attach highlight + find prompts)
+	-- Teleport player; send full clone list so client wires a prompt per piece
 	local spawnPad = slotModel:FindFirstChild("SpawnPad", true)
 	local cframe   = spawnPad and spawnPad.CFrame or slotModel:GetPivot()
-	TeleportToLocation:FireClient(player, cframe, job, clone)
+	TeleportToLocation:FireClient(player, cframe, job, cloneList)
 
 	print(("[LocationManager] Assigned %s → %s Slot_%d"):format(player.Name, chosenName, chosenIndex))
 	return true
@@ -276,9 +318,17 @@ function LocationManager.Release(player)
 	local assignment = _playerAssignment[player]
 	if not assignment then return end
 
-	-- Destroy furniture clone (also removes RepairPrompt inside it)
-	if assignment.clone and assignment.clone.Parent then
-		assignment.clone:Destroy()
+	-- Destroy any remaining damaged clones and all fixed (Default) clones
+	for _, clone in pairs(assignment.clones or {}) do
+		if clone and clone.Parent then clone:Destroy() end
+	end
+	for _, fixedClone in pairs(assignment.fixedClones or {}) do
+		if fixedClone and fixedClone.Parent then fixedClone:Destroy() end
+	end
+
+	-- Remove RepairPrompts (on pads, which persist — must be explicitly removed)
+	for _, rp in pairs(assignment.repairPrompts or {}) do
+		if rp and rp.Parent then rp:Destroy() end
 	end
 
 	-- Remove door prompt (persists on the slot which is NOT destroyed)
@@ -299,8 +349,8 @@ function LocationManager.Release(player)
 
 	_playerAssignment[player] = nil
 
-	-- Teleport back to hub
-	TeleportToHub:FireClient(player, getHubCFrame())
+	-- Teleport back to player's house
+	TeleportToHub:FireClient(player, PlayerHouseManager.GetHouseCFrame(player))
 
 	print(("[LocationManager] Released %s from %s Slot_%d"):format(
 		player.Name, assignment.locationName, assignment.slotIndex
@@ -313,8 +363,14 @@ Players.PlayerRemoving:Connect(function(player)
 	if _playerAssignment[player] then
 		-- Don't teleport — player is gone. Just clean up the slot.
 		local assignment = _playerAssignment[player]
-		if assignment.clone and assignment.clone.Parent then
-			assignment.clone:Destroy()
+		for _, clone in pairs(assignment.clones or {}) do
+			if clone and clone.Parent then clone:Destroy() end
+		end
+		for _, fixedClone in pairs(assignment.fixedClones or {}) do
+			if fixedClone and fixedClone.Parent then fixedClone:Destroy() end
+		end
+		for _, rp in pairs(assignment.repairPrompts or {}) do
+			if rp and rp.Parent then rp:Destroy() end
 		end
 		if assignment.doorPrompt and assignment.doorPrompt.Parent then
 			assignment.doorPrompt:Destroy()
@@ -328,6 +384,28 @@ Players.PlayerRemoving:Connect(function(player)
 		end
 		_playerAssignment[player] = nil
 		print(("[LocationManager] Cleaned up slot for disconnected player %s"):format(player.Name))
+	end
+end)
+
+-- ── FurniturePieceRepaired: swap damaged clone → Default model ────────────
+
+FurniturePieceRepaired.OnServerEvent:Connect(function(player, pieceIndex)
+	local assignment = _playerAssignment[player]
+	if not assignment then return end
+	if type(pieceIndex) ~= "number" then return end
+
+	local damagedClone = assignment.clones[pieceIndex]
+	if damagedClone and damagedClone.Parent then
+		damagedClone:Destroy()
+	end
+	assignment.clones[pieceIndex] = nil
+
+	local furnitureKey = assignment.furnitureKeys[pieceIndex]
+	if furnitureKey then
+		local fixedClone = placeFurnitureDefault(assignment.slotModel, furnitureKey, pieceIndex)
+		if fixedClone then
+			assignment.fixedClones[pieceIndex] = fixedClone
+		end
 	end
 end)
 

@@ -81,6 +81,10 @@ local function playBootSequence()
 	end
 
 	task.wait(BOOT_DURATION)
+
+	-- Abort if the GUI was closed while we were waiting (distance check / shutdown)
+	if not LaptopGui.Enabled then return end
+
 	showPage("OSScreen")
 
 	local osScreen = LaptopGui:FindFirstChild("OSScreen")

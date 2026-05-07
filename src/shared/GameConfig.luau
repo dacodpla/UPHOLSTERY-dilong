@@ -149,16 +149,9 @@ return {
 		slotCount = 6,  -- slots per location type; matches 6-player server cap
 		byTier = {      -- append names to any list to add more locations; no logic changes needed
 			Starter  = {"StudioApartment"},
-			Mid      = {"RegularHouse"},
+			Mid      = {"RegularHouse", "BigStudioApartment"},
 			Premium  = {"LuxuryHome"},
 			Prestige = {"SupercarGarage"},
-		},
-		furnitureModelKey = {  -- maps STUB_JOBS id → ServerStorage folder name
-			[1] = "TwoSofa",
-			[2] = "VelvetLoveseat",
-			[3] = "Ottoman",
-			[4] = "BarStool",
-			[5] = "Armchair",
 		},
 		fabricColors = {
 			Color3.fromRGB(30,  50,  120),
@@ -186,5 +179,16 @@ return {
 			Color3.fromRGB(210, 225, 205),
 			Color3.fromRGB(230, 220, 210),
 		},
+	},
+
+	-- =========================================================
+	-- PLAYER HOUSE SYSTEM  (GDD §9 — House Prestige)
+	-- =========================================================
+	PlayerHouses = {
+		slotCount = 6,  -- one house per player slot; matches server cap
+		-- Follower thresholds to reach each tier (index = tier number)
+		tierThresholds = { 0, 2000, 10000, 50000 },
+		-- ServerStorage.HouseModels folder names per tier (used by future HousePrestigeManager)
+		tierModelKeys  = { "StarterFlat", "CornerHouse", "WorkshopVilla", "SkylinePenthouse" },
 	},
 }

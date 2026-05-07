@@ -48,6 +48,8 @@ local AbandonJob = makeRemote("AbandonJob")
 makeRemote("TeleportToLocation")
 makeRemote("TeleportToHub")
 makeRemote("LocationFull")
+makeRemote("FurniturePieceRepaired")
+makeRemote("StartMinigame")
 
 -- ── LocationManager ───────────────────────────────────────────────────────
 -- Required after remotes are created so LocationManager can WaitForChild on them.
@@ -69,13 +71,14 @@ local STUB_JOBS = {
 	{
 		id        = 1,
 		name      = "Two Seater Sofa",
-		details   = "Replace worn seat padding and tacking",
+		details   = "Replace worn seat padding and re-stitch the seam",
 		tier      = "Starter",
 		pay       = 120,
 		followers = 8,
 		prestige  = false,
-		imageId   = 0,   -- replace with real Roblox asset ID once uploaded
-		minigames = { "TackRemoval" },
+		imageId   = 0,
+		furniture = { "TwoSofa" },
+		minigames = { "TackRemoval", "SeamStitching" },
 	},
 	{
 		id        = 2,
@@ -86,17 +89,19 @@ local STUB_JOBS = {
 		followers = 25,
 		prestige  = false,
 		imageId   = 0,
+		furniture = { "VelvetLoveseat" },
 		minigames = { "SeamStitching" },
 	},
 	{
 		id        = 3,
 		name      = "Ottoman Suite",
-		details   = "Prestige: 3-piece foam & stitch chain",
+		details   = "Prestige: sofa + ottoman, full 3-game chain",
 		tier      = "Premium",
 		pay       = 800,
 		followers = 60,
 		prestige  = true,
 		imageId   = 0,
+		furniture = { "TwoSofa", "TwoSofa" },
 		minigames = { "TackRemoval", "FoamPadding", "StapleGunning" },
 	},
 	{
@@ -108,6 +113,7 @@ local STUB_JOBS = {
 		followers = 14,
 		prestige  = false,
 		imageId   = 0,
+		furniture = { "BarStool" },
 		minigames = { "StapleGunning" },
 	},
 	{
@@ -119,7 +125,20 @@ local STUB_JOBS = {
 		followers = 38,
 		prestige  = false,
 		imageId   = 0,
+		furniture = { "Armchair" },
 		minigames = { "FoamPadding" },
+	},
+	{
+		id        = 6,
+		name      = "Living Room Refresh",
+		details   = "Three-seater sofa + ottoman — full suite",
+		tier      = "Mid",
+		pay       = 480,
+		followers = 35,
+		prestige  = false,
+		imageId   = 0,
+		furniture = { "ThreeSofa", "Ottoman" },
+		minigames = { "TackRemoval", "FoamPadding" },
 	},
 }
 

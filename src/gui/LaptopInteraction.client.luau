@@ -1,79 +1,123 @@
 --[[
 	LaptopInteraction
-	Detects when the player uses the laptop prop in Workspace and triggers the
-	browser UI boot sequence.
+	Handles all Laptop models in Workspace (one per player house).
 
 	Requires:
-	  - A Part (or Model) named "Laptop" in Workspace
-	  - A BindableEvent named "LaptopOpened" inside LaptopGui (StarterGui)
-	    → LaptopBrowser listens to this event and starts the boot sequence
+	  - One or more Models named "Laptop" as direct children of Workspace,
+	    each containing a Part named "Screen" (with or without a ProximityPrompt)
+	  - A BindableEvent named "LaptopOpened" in PlayerGui
+	    → LaptopBrowser listens to this and starts the boot sequence
 ]]
 
-local Players      = game:GetService("Players")
-local UserInputService = game:GetService("UserInputService")
+local Players    = game:GetService("Players")
+local RunService = game:GetService("RunService")
 
 local player    = Players.LocalPlayer
 local PlayerGui = player:WaitForChild("PlayerGui")
 
--- Wait for LaptopGui and its BindableEvent (created in Studio)
-local LaptopGui    = PlayerGui:WaitForChild("LaptopGui", 15)
-local openedEvent  = PlayerGui:WaitForChild("LaptopOpened", 10)
+local LaptopGui   = PlayerGui:WaitForChild("LaptopGui", 15)
+local openedEvent = PlayerGui:WaitForChild("LaptopOpened", 10)
 
--- Wait for the laptop prop in workspace
-local laptopModel = workspace:WaitForChild("Laptop", 30)
-
-if not laptopModel or not openedEvent then
-	warn("[LaptopInteraction] Missing Laptop prop or LaptopOpened event — laptop UI disabled")
+if not openedEvent then
+	warn("[LaptopInteraction] LaptopOpened BindableEvent not found in PlayerGui — laptop UI disabled")
 	return
 end
 
--- Find or create the ProximityPrompt on the laptop's Screen part
-local screenPart = laptopModel:WaitForChild("Screen", 15)
-local prompt = screenPart and screenPart:FindFirstChildWhichIsA("ProximityPrompt")
-if not prompt and screenPart then
-	prompt = Instance.new("ProximityPrompt")
-	prompt.ActionText  = "Use"
-	prompt.ObjectText  = "Laptop"
-	prompt.HoldDuration = 0
-	prompt.MaxActivationDistance = 4
-	prompt.Parent = screenPart
+-- ── Track all laptop Screen parts for the distance check ─────────────────
+
+local _screenParts = {}  -- list of Screen BaseParts across all Laptop models
+local _isOpening   = false  -- debounce: prevent overlapping open requests
+
+local function setupLaptop(laptopModel)
+	local screenPart = laptopModel:FindFirstChild("Screen", true)  -- recursive
+	if not screenPart or not screenPart:IsA("BasePart") then
+		-- Screen hasn't streamed in yet — listen for it
+		local conn
+		conn = laptopModel.DescendantAdded:Connect(function(desc)
+			if desc.Name == "Screen" and desc:IsA("BasePart") then
+				conn:Disconnect()
+				setupLaptop(laptopModel)
+			end
+		end)
+		return
+	end
+
+	table.insert(_screenParts, screenPart)
+
+	local prompt = screenPart:FindFirstChildWhichIsA("ProximityPrompt")
+	if not prompt then
+		prompt = Instance.new("ProximityPrompt")
+		prompt.MaxActivationDistance = 4
+		prompt.Parent                = screenPart
+	end
+
+	-- Ensure consistent prompt settings regardless of what was placed in the model
+	prompt.ActionText            = "Use"
+	prompt.ObjectText            = "Laptop"
+	prompt.HoldDuration          = 0
+	prompt.RequiresLineOfSight   = false
+	prompt.Exclusivity           = Enum.ProximityPromptExclusivity.AlwaysShow
+
+	prompt.Triggered:Connect(function(triggeringPlayer)
+		if triggeringPlayer ~= player then return end
+		if _isOpening then return end  -- debounce: ignore rapid re-triggers
+		_isOpening = true
+		openedEvent:Fire()
+		-- Keep debounce active for the boot-sequence duration so overlapping
+		-- triggers can't start a second boot animation.
+		task.delay(2.5, function()
+			_isOpening = false
+		end)
+	end)
 end
 
-if not prompt then
-	warn("[LaptopInteraction] Could not attach ProximityPrompt to Laptop prop")
-	return
-end
-
--- Open laptop on prompt trigger
-prompt.Triggered:Connect(function(triggeringPlayer)
-	if triggeringPlayer ~= player then return end
-	openedEvent:Fire()
-end)
-
--- Also close the laptop if the player walks too far away while it's open
--- (optional quality-of-life: prevents floating OS screen)
-local function checkDistance()
-	local character = player.Character
-	if not character then return end
-	local root = character:FindFirstChild("HumanoidRootPart")
-	if not root then return end
-
-	local laptopPart = laptopModel:FindFirstChild("Screen", true)
-
-	if laptopPart then
-		local dist = (root.Position - laptopPart.Position).Magnitude
-		if dist > 14 and LaptopGui.Enabled then
-			LaptopGui.Enabled = false
-		end
+-- Hook up any Laptop already in Workspace
+for _, child in ipairs(workspace:GetChildren()) do
+	if child.Name == "Laptop" then
+		setupLaptop(child)
 	end
 end
 
--- Throttled distance check using heartbeat
+-- Also catch Laptops added after this script runs (streaming / late load)
+workspace.ChildAdded:Connect(function(child)
+	if child.Name == "Laptop" then
+		setupLaptop(child)
+	end
+end)
+
+-- ── Distance check: close UI if player walks away from ALL laptops ────────
+
+local function isNearAnyLaptop()
+	local character = player.Character
+	if not character then return true end  -- don't close during respawn
+	local root = character:FindFirstChild("HumanoidRootPart")
+	if not root then return true end
+
+	-- Clean up stale references while we iterate
+	local i = 1
+	while i <= #_screenParts do
+		if _screenParts[i].Parent then
+			i = i + 1
+		else
+			table.remove(_screenParts, i)
+		end
+	end
+
+	for _, screen in ipairs(_screenParts) do
+		if (root.Position - screen.Position).Magnitude <= 16 then
+			return true
+		end
+	end
+	return false
+end
+
 local _lastCheck = 0
-game:GetService("RunService").Heartbeat:Connect(function()
+RunService.Heartbeat:Connect(function()
 	local now = os.clock()
-	if now - _lastCheck >= 1.5 then
-		_lastCheck = now
-		checkDistance()
+	if now - _lastCheck < 1.5 then return end
+	_lastCheck = now
+
+	if LaptopGui and LaptopGui.Enabled and not isNearAnyLaptop() then
+		LaptopGui.Enabled = false
 	end
 end)
