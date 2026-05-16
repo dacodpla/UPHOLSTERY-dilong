@@ -181,6 +181,15 @@ local LocationManager = {}
 
 -- Returns a set of tier strings that have at least one registered location.
 -- Used by RadiantJobGenerator to avoid generating jobs for non-existent buildings.
+function LocationManager.GetLocationNames()
+	local names = {}
+	for name in pairs(_pool) do
+		table.insert(names, name)
+	end
+	table.sort(names)
+	return names
+end
+
 function LocationManager.GetAvailableTiers()
 	local tiers = {}
 	for tier, names in pairs(_locationsByTier) do
@@ -224,6 +233,21 @@ function LocationManager.Assign(player, job)
 	if #freeSlots == 0 then
 		LocationFull:FireClient(player)
 		return false
+	end
+
+	-- Admin-spawned jobs may request a specific location
+	if type(job.locationOverride) == "string" then
+		local filtered = {}
+		for _, slot in ipairs(freeSlots) do
+			if slot.name == job.locationOverride then
+				table.insert(filtered, slot)
+			end
+		end
+		if #filtered > 0 then
+			freeSlots = filtered
+		else
+			warn("[LocationManager] locationOverride '" .. job.locationOverride .. "' has no free slots — using tier fallback")
+		end
 	end
 
 	local chosen      = freeSlots[math.random(#freeSlots)]

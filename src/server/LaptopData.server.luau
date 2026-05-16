@@ -17,6 +17,12 @@ local DataStoreService  = game:GetService("DataStoreService")
 local GameConfig  = require(ReplicatedStorage:WaitForChild("Shared"):WaitForChild("GameConfig"))
 local TIER_TITLES = GameConfig.Talkogram.tierTitles
 
+local ADMINS = {
+	"beanzonyon",
+	"Matthewasiando",
+	-- add more names here
+}
+
 local RadiantJobGenerator = require(script.Parent:WaitForChild("RadiantJobGenerator", 10)
 	or error("[LaptopData] RadiantJobGenerator not found in ServerScriptService — did Rojo sync?"))
 
@@ -59,6 +65,8 @@ local SubmitJobResult  = makeRemote("SubmitJobResult")
 
 local AbandonJob      = makeRemote("AbandonJob")
 local JobBoardRefresh = makeRemote("JobBoardRefresh")
+local AdminSpawnJob        = makeRemote("AdminSpawnJob")
+local AdminRequestLocations = makeRemoteFunction("AdminRequestLocations")
 
 -- Teleport events (fired by LocationManager; listed here so the folder is complete)
 makeRemote("TeleportToLocation")
@@ -420,6 +428,35 @@ end
 
 PurchaseTool.OnServerEvent:Connect(function(player, toolName)
 	print("[LaptopData] PurchaseTool from", player.Name, "tool =", toolName)
+end)
+
+AdminRequestLocations.OnServerInvoke = function(_player)
+	return LocationManager.GetLocationNames()
+end
+
+AdminSpawnJob.OnServerEvent:Connect(function(player, tier, locationOverride)
+	-- Admin check disabled for testing — re-enable by uncommenting:
+	-- local ok = false
+	-- for _, name in ipairs(ADMINS) do
+	-- 	if player.Name == name then ok = true; break end
+	-- end
+	-- if not ok then return end
+
+	if type(tier) ~= "string" or not GameConfig.JobTierRarity[tier] then return end
+	if locationOverride ~= nil and type(locationOverride) ~= "string" then return end
+
+	local jobs = RadiantJobGenerator.Generate(1, { [tier] = true })
+	if #jobs == 0 then return end
+
+	local job = jobs[1]
+	job.id               = _nextJobId
+	_nextJobId           = _nextJobId + 1
+	job.locationOverride = locationOverride
+
+	table.insert(_globalJobPool, job)
+	JobBoardRefresh:FireAllClients()
+	print(("[AdminPanel] %s spawned %s job (location: %s)"):format(
+		player.Name, tier, locationOverride or "auto"))
 end)
 
 Players.PlayerRemoving:Connect(function(player)
