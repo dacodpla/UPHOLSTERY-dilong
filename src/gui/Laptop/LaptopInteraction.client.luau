@@ -59,7 +59,7 @@ local function setupLaptop(laptopModel)
 	-- Ensure consistent prompt settings regardless of what was placed in the model
 	prompt.ActionText            = "Use"
 	prompt.ObjectText            = "Laptop"
-	prompt.HoldDuration          = 0.5
+	prompt.HoldDuration          = 0
 	prompt.RequiresLineOfSight   = false
 	prompt.Exclusivity           = Enum.ProximityPromptExclusivity.AlwaysShow
 	prompt.Style                 = Enum.ProximityPromptStyle.Custom
