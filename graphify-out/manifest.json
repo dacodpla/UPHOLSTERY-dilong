@@ -1,0 +1,212 @@
+{
+  "C:\\UPHOLSTERY\\.claude\\settings.json": {
+    "mtime": 1780400346.7558556,
+    "ast_hash": "5d6ecd96cf065b16e8bb9fbf5d7d8f0d",
+    "semantic_hash": "5d6ecd96cf065b16e8bb9fbf5d7d8f0d"
+  },
+  "C:\\UPHOLSTERY\\.claude\\settings.local.json": {
+    "mtime": 1779192262.0920322,
+    "ast_hash": "c121d8d8a925ea9aca85d6bf2bd739e2",
+    "semantic_hash": "c121d8d8a925ea9aca85d6bf2bd739e2"
+  },
+  "C:\\UPHOLSTERY\\default.project.json": {
+    "mtime": 1779192151.0062604,
+    "ast_hash": "521f78e3ee358083362c79e39701e9d1",
+    "semantic_hash": "521f78e3ee358083362c79e39701e9d1"
+  },
+  "C:\\UPHOLSTERY\\src\\gui\\Gameplay\\AdminPanel.client.luau": {
+    "mtime": 1779326983.0697756,
+    "ast_hash": "b26d46aa54e119815e9fd4e783681b59",
+    "semantic_hash": "b26d46aa54e119815e9fd4e783681b59"
+  },
+  "C:\\UPHOLSTERY\\src\\gui\\Gameplay\\DevJobPanel.client.luau": {
+    "mtime": 1779192262.0973182,
+    "ast_hash": "eddf8f85533fc27b7252a295a62bd164",
+    "semantic_hash": "eddf8f85533fc27b7252a295a62bd164"
+  },
+  "C:\\UPHOLSTERY\\src\\gui\\Gameplay\\DevTestButton.client.luau": {
+    "mtime": 1779192262.0973182,
+    "ast_hash": "d3fcb7dbd20078fb26c5a63248f631e6",
+    "semantic_hash": "d3fcb7dbd20078fb26c5a63248f631e6"
+  },
+  "C:\\UPHOLSTERY\\src\\gui\\Gameplay\\GameplayClient.client.luau": {
+    "mtime": 1779454209.5579138,
+    "ast_hash": "88baeacea0d810d93757b89a249695b4",
+    "semantic_hash": "88baeacea0d810d93757b89a249695b4"
+  },
+  "C:\\UPHOLSTERY\\src\\gui\\Gameplay\\thisIs.client.luau": {
+    "mtime": 1779192262.098826,
+    "ast_hash": "fcf7c1ce2bd3a763ae0d7629c601f7ce",
+    "semantic_hash": "fcf7c1ce2bd3a763ae0d7629c601f7ce"
+  },
+  "C:\\UPHOLSTERY\\src\\gui\\Laptop\\AppsFrame.client.luau": {
+    "mtime": 1779197795.025044,
+    "ast_hash": "cc59e42667e065604cda9232157b2393",
+    "semantic_hash": "cc59e42667e065604cda9232157b2393"
+  },
+  "C:\\UPHOLSTERY\\src\\gui\\Laptop\\DesktopFrame.client.luau": {
+    "mtime": 1779242287.3685713,
+    "ast_hash": "b5b3b2f3b79f44d44cab841202752b0f",
+    "semantic_hash": "b5b3b2f3b79f44d44cab841202752b0f"
+  },
+  "C:\\UPHOLSTERY\\src\\gui\\Laptop\\LaptopBoot.client.luau": {
+    "mtime": 1779197719.5561497,
+    "ast_hash": "dca9d70cabc625d52e36c66a8bbb7a2a",
+    "semantic_hash": "dca9d70cabc625d52e36c66a8bbb7a2a"
+  },
+  "C:\\UPHOLSTERY\\src\\gui\\Laptop\\LaptopInteraction.client.luau": {
+    "mtime": 1779197702.6921873,
+    "ast_hash": "c93d99ec55e5b9b25bbb74f891c0a893",
+    "semantic_hash": "c93d99ec55e5b9b25bbb74f891c0a893"
+  },
+  "C:\\UPHOLSTERY\\src\\gui\\Laptop\\MoneyMaker_Tab.client.luau": {
+    "mtime": 1779453693.5102785,
+    "ast_hash": "d4193f51997cd2f106049a407e6d74f7",
+    "semantic_hash": "d4193f51997cd2f106049a407e6d74f7"
+  },
+  "C:\\UPHOLSTERY\\src\\gui\\Laptop\\Shop_Tab.client.luau": {
+    "mtime": 1779242287.3696873,
+    "ast_hash": "911dfaeeb931dd44bb72028feb4bf26f",
+    "semantic_hash": "911dfaeeb931dd44bb72028feb4bf26f"
+  },
+  "C:\\UPHOLSTERY\\src\\gui\\Laptop\\StarterLaptopState.client.luau": {
+    "mtime": 1779192262.102805,
+    "ast_hash": "c1869d2cbd0e2d7f06fd62fcf54d2980",
+    "semantic_hash": "c1869d2cbd0e2d7f06fd62fcf54d2980"
+  },
+  "C:\\UPHOLSTERY\\src\\gui\\System\\GameSettings.client.luau": {
+    "mtime": 1779192262.1038463,
+    "ast_hash": "16b00601eec3761ed40feca7ecb558b6",
+    "semantic_hash": "16b00601eec3761ed40feca7ecb558b6"
+  },
+  "C:\\UPHOLSTERY\\src\\gui\\System\\LoadingScreen.client.luau": {
+    "mtime": 1779192262.1052463,
+    "ast_hash": "b6df752cd7289eafe1d8dd0a6e45861b",
+    "semantic_hash": "b6df752cd7289eafe1d8dd0a6e45861b"
+  },
+  "C:\\UPHOLSTERY\\src\\gui\\System\\ProximityPromptStyle.client.luau": {
+    "mtime": 1779192262.1052463,
+    "ast_hash": "7c8067b8204602dcb14f23d4f1ef2ed0",
+    "semantic_hash": "7c8067b8204602dcb14f23d4f1ef2ed0"
+  },
+  "C:\\UPHOLSTERY\\src\\server\\GameSettings.server.luau": {
+    "mtime": 1779192262.1062467,
+    "ast_hash": "4ce1fdf0e08d03bbb9e27d95f7e86026",
+    "semantic_hash": "4ce1fdf0e08d03bbb9e27d95f7e86026"
+  },
+  "C:\\UPHOLSTERY\\src\\server\\LaptopPromptConfig.server.luau": {
+    "mtime": 1779192262.1102242,
+    "ast_hash": "75a87e9ed1cda058e35ed154cd3a349d",
+    "semantic_hash": "75a87e9ed1cda058e35ed154cd3a349d"
+  },
+  "C:\\UPHOLSTERY\\src\\server\\Laptop\\JobPool.luau": {
+    "mtime": 1779192262.1072614,
+    "ast_hash": "fb35df41d5a55f4d86a001f47a2593c2",
+    "semantic_hash": "fb35df41d5a55f4d86a001f47a2593c2"
+  },
+  "C:\\UPHOLSTERY\\src\\server\\Laptop\\LaptopData.server.luau": {
+    "mtime": 1779329631.1018605,
+    "ast_hash": "79542e730ba77b3edf9a46b594ddccfc",
+    "semantic_hash": "79542e730ba77b3edf9a46b594ddccfc"
+  },
+  "C:\\UPHOLSTERY\\src\\server\\Laptop\\LaptopRemotes.server.luau": {
+    "mtime": 1779329615.838141,
+    "ast_hash": "f4024c3c292043b3c4c90cbc7bedb5de",
+    "semantic_hash": "f4024c3c292043b3c4c90cbc7bedb5de"
+  },
+  "C:\\UPHOLSTERY\\src\\server\\Laptop\\TalkogramHandler.luau": {
+    "mtime": 1779192262.1087697,
+    "ast_hash": "ac19eec6c2fc5a242e0c7607090033b3",
+    "semantic_hash": "ac19eec6c2fc5a242e0c7607090033b3"
+  },
+  "C:\\UPHOLSTERY\\src\\server\\Leaderboard.server.luau": {
+    "mtime": 1779192262.111591,
+    "ast_hash": "95bf1d99fef0f4524fee19b28907dd2a",
+    "semantic_hash": "95bf1d99fef0f4524fee19b28907dd2a"
+  },
+  "C:\\UPHOLSTERY\\src\\server\\LocationManager.luau": {
+    "mtime": 1779454152.6654096,
+    "ast_hash": "b32a63ef4fa824ce811a56d85bf58035",
+    "semantic_hash": "b32a63ef4fa824ce811a56d85bf58035"
+  },
+  "C:\\UPHOLSTERY\\src\\server\\PlayerData\\PlayerData.server.luau": {
+    "mtime": 1779192262.1131625,
+    "ast_hash": "5a4ba839d61318610a25722ba477ba78",
+    "semantic_hash": "5a4ba839d61318610a25722ba477ba78"
+  },
+  "C:\\UPHOLSTERY\\src\\server\\PlayerHouseManager.luau": {
+    "mtime": 1779192262.1145394,
+    "ast_hash": "27386b385a1c0d921cf22119bb1b6231",
+    "semantic_hash": "27386b385a1c0d921cf22119bb1b6231"
+  },
+  "C:\\UPHOLSTERY\\src\\server\\RadiantJobGenerator.luau": {
+    "mtime": 1779242935.781115,
+    "ast_hash": "fb75d47231014c304ead4e35eb5e8016",
+    "semantic_hash": "fb75d47231014c304ead4e35eb5e8016"
+  },
+  "C:\\UPHOLSTERY\\src\\shared\\Data\\ShopData.luau": {
+    "mtime": 1779242287.3706899,
+    "ast_hash": "9e4f32a6c5958b40a47d03e3666163c1",
+    "semantic_hash": "9e4f32a6c5958b40a47d03e3666163c1"
+  },
+  "C:\\UPHOLSTERY\\src\\shared\\GameConfig.luau": {
+    "mtime": 1779242920.1866887,
+    "ast_hash": "de92f9c4419538fc559ff7c3f28ec41c",
+    "semantic_hash": "de92f9c4419538fc559ff7c3f28ec41c"
+  },
+  "C:\\UPHOLSTERY\\src\\shared\\Minigames\\FoamPadding.luau": {
+    "mtime": 1779198004.8373451,
+    "ast_hash": "9983331cd264866d77e7ce70bd62dda4",
+    "semantic_hash": "9983331cd264866d77e7ce70bd62dda4"
+  },
+  "C:\\UPHOLSTERY\\src\\shared\\Minigames\\MinigameRunner.luau": {
+    "mtime": 1779197895.1859705,
+    "ast_hash": "af91478957bf839ba31502bf920a4d72",
+    "semantic_hash": "af91478957bf839ba31502bf920a4d72"
+  },
+  "C:\\UPHOLSTERY\\src\\shared\\Minigames\\SeamStitching.luau": {
+    "mtime": 1779197940.3694348,
+    "ast_hash": "89f00eb41280ac57573bdd75e695cb76",
+    "semantic_hash": "89f00eb41280ac57573bdd75e695cb76"
+  },
+  "C:\\UPHOLSTERY\\src\\shared\\Minigames\\StapleGunning.luau": {
+    "mtime": 1779192262.1198728,
+    "ast_hash": "8c1eefa8f3326cfc7de814559191dc76",
+    "semantic_hash": "8c1eefa8f3326cfc7de814559191dc76"
+  },
+  "C:\\UPHOLSTERY\\src\\shared\\Minigames\\TackRemoval.luau": {
+    "mtime": 1779197915.757803,
+    "ast_hash": "52a33983460993b41921e247d57e160b",
+    "semantic_hash": "52a33983460993b41921e247d57e160b"
+  },
+  "C:\\UPHOLSTERY\\src\\shared\\SFXPlayer.luau": {
+    "mtime": 1779197384.3337505,
+    "ast_hash": "9ef02a03f1cd4a8faaacc04f2e79bd73",
+    "semantic_hash": "9ef02a03f1cd4a8faaacc04f2e79bd73"
+  },
+  "C:\\UPHOLSTERY\\CLAUDE.md": {
+    "mtime": 1780400346.7558556,
+    "ast_hash": "8a6643a420fdad6bfb583523bc6cef16",
+    "semantic_hash": "8a6643a420fdad6bfb583523bc6cef16"
+  },
+  "C:\\UPHOLSTERY\\README.md": {
+    "mtime": 1777727633.4123952,
+    "ast_hash": "aa149496158f89a0067169e13993b7c8",
+    "semantic_hash": "aa149496158f89a0067169e13993b7c8"
+  },
+  "C:\\UPHOLSTERY\\UPHOLSTERY_GDD_v8.txt": {
+    "mtime": 1780389129.9897218,
+    "ast_hash": "b70c770b7b491de78ea0d2b53e88ed1c",
+    "semantic_hash": "b70c770b7b491de78ea0d2b53e88ed1c"
+  },
+  "C:\\UPHOLSTERY\\explain.md": {
+    "mtime": 1779192262.0952518,
+    "ast_hash": "957b8e74145603b3b1ec67d0ce28a085",
+    "semantic_hash": "957b8e74145603b3b1ec67d0ce28a085"
+  },
+  "C:\\UPHOLSTERY\\UPHOLSTERY_GDD_v7.pdf": {
+    "mtime": 1779192262.0941954,
+    "ast_hash": "ee12d97157276c5714277717f8becbcc",
+    "semantic_hash": "ee12d97157276c5714277717f8becbcc"
+  }
+}

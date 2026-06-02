@@ -1,0 +1,952 @@
+================================================================================
+  UPHOLSTERY! — GAME DESIGN DOCUMENT
+  Version 8.1
+================================================================================
+
+
+TABLE OF CONTENTS
+-----------------
+  1.  Game Overview
+  2.  Core Gameplay Loop
+  3.  Job System
+  4.  Minigames
+  5.  Reputation System
+  6.  Toolbox — Pick 5 Perk System
+  7.  Economy
+  8.  Shop
+  9.  Talkogram                              [POST-LAUNCH]
+  10. Player Progression
+  11. Penalty System
+  12. Hot Jobs
+  13. Special Events
+  A.  System Interaction Map
+  B.  Balance Notes
+  C.  Release Scope
+
+
+================================================================================
+  1. GAME OVERVIEW
+================================================================================
+
+UPHOLSTERY! is a Roblox craft-simulation game where players run their own
+upholstery business. You accept client jobs, travel to their location, repair
+their furniture through skill-based minigames, and grow your reputation and
+following as a craftsperson.
+
+The fantasy is progression from unknown apprentice to sought-after elite
+craftsperson — where your reputation determines what clients reach out to you
+directly, your follower count reflects your public profile, your money funds
+better tools, and your skill determines whether you can actually deliver.
+
+
+DESIGN PILLARS
+--------------
+  Skill has a ceiling, loadout raises the floor.
+    Minigames are genuinely hard. Tools make them more manageable, not trivial.
+
+  Every job is a bet.
+    Accepting a high-tier job is a calculated risk. Fail it and you pay — in
+    rep, in wasted tools, in time.
+
+  Reputation is earned, not bought.
+    Money buys tools. Reputation comes from actually doing the work well.
+
+  The board is shared, the grind is personal.
+    All players compete for the same public jobs. Your Direct Offers are yours
+    alone.
+
+
+================================================================================
+  2. CORE GAMEPLAY LOOP
+================================================================================
+
+  Open laptop
+    -> Browse shared job board + check Direct Offers
+    -> Set Toolbox loadout for the job
+    -> Accept job
+    -> Teleport to client location
+    -> Complete minigame chain (repair the furniture)
+    -> Exit via door -> result submitted
+    -> Earn money + followers + rep  (or lose rep on fail)
+    -> Spend money on perk charges
+    -> Repeat with better loadout
+
+The loop has two distinct rhythms:
+
+  Short loop (per job):    Accept -> play -> earn. 3-8 minutes per tier.
+  Long loop (per session): Build rep -> unlock better Direct Offers -> earn
+                           more -> afford better perks -> take harder jobs.
+
+
+================================================================================
+  3. JOB SYSTEM
+================================================================================
+
+3.1  SHARED JOB BOARD
+---------------------
+All players on the server see the same job board. Jobs are generated
+server-side and refreshed every 15-30 seconds. This is first-come,
+first-served — if another player grabs a job before you click Accept,
+it disappears.
+
+There are NO reputation gates on the shared board. Any player can attempt
+any job they see. High-tier jobs being rare on the board is the natural
+filter, not an artificial lock.
+
+JOB TIERS AND BOARD RARITY
+
+  Tier        Pay Range           Difficulty  Fragile  Approx. Frequency
+  ----------  ------------------  ----------  -------  -------------------
+  Starter     $50    - $150       Easy        No       ~5 per refresh
+  Mid         $200   - $500       Medium      No       ~2.8 per refresh
+  Premium     $600   - $1,200     Hard        Yes      ~1.3 per refresh
+  Prestige    $1,500 - $3,000     Hard        Yes      ~0.6 per refresh
+  Exclusive   $3,500 - $7,000     Hard        Yes      ~0.2 per refresh
+  Elite       $7,500 - $15,000    Hard        Yes      ~1 per 14 refreshes
+
+Elite jobs are genuine lottery moments on the shared board, appearing
+roughly once every 8-16 minutes at best. They are not a reliable income
+source from the board — that comes from Direct Offers.
+
+Special is not a board tier. See Section 13.
+
+BOARD POOL SIZE
+  Solo server:    minimum 4 jobs
+  Full server:    up to 12 jobs
+  Scales at 1.5-2.5 jobs per player
+
+
+3.2  DIRECT OFFERS
+------------------
+Direct Offers are personal job invitations generated per-player based on
+reputation. They appear in a dedicated section of the MoneyMaker tab,
+separate from the shared board.
+
+  - Direct Offers do NOT draw from the shared pool — generated independently.
+  - Each offer has a 5-minute expiry timer. Ignore it and it is gone.
+  - Offer quality and frequency scale with reputation tier.
+  - Only the player they were sent to can accept them.
+
+Thematic justification: clients who have seen your Talkogram posts or were
+referred by past customers contact you directly. Higher reputation means
+better clients — and more of them.
+
+DIRECT OFFER TIERS BY REPUTATION
+
+  Rep Range    Offer Tier Range     Concurrent  Refresh Interval
+  -----------  -------------------  ----------  ----------------
+  0.0 - 0.9   None                 --          --
+  1.0 - 1.9   Mid - Premium        1           4 minutes
+  2.0 - 3.4   Premium - Exclusive  2           3 minutes
+  3.5 - 4.4   Exclusive - Elite    2           2.5 minutes
+  4.5 - 5.0   Elite - Special      3           2 minutes
+
+
+3.3  JOB STRUCTURE
+------------------
+Each job contains:
+  - Tier             determines pay range, difficulty, furniture count
+  - Furniture pieces 1-3 items depending on tier
+  - Minigame chain   one minigame per furniture piece (or chain for single-piece)
+  - Fragile modifier tightens all precision windows by 40% (multiplier: 0.6)
+  - Flavor text      one-line description that sets the scene
+
+PER-TIER JOB STRUCTURE
+
+  Tier       Furniture  Minigames  Difficulty  Fragile
+  ---------  ---------  ---------  ----------  -------
+  Starter    1          1          Easy        No
+  Mid        1-2        1-2        Medium      No
+  Premium    2          2-3        Hard        Yes
+  Prestige   2-3        3-4        Hard        Yes
+  Exclusive  2-3        4-5        Hard        Yes
+  Elite      3          5-6        Hard        Yes
+
+Special event jobs are defined per event — see Section 13.
+
+Higher tiers do not increase difficulty beyond Hard — instead they
+increase the number of minigames in the chain. Staying consistent
+across 6-8 minigames is the real challenge at Elite and Special.
+
+
+MINIGAME POOL BY TIER
+
+Each tier draws only from its available minigame pool. Higher tiers
+inherit all lower-tier minigames and add new ones.
+
+  Tier       Available Minigames
+  ---------  -------------------------------------------------------
+  Starter    Tack Removal, Staple Gunning, Seam Stitching,
+             Foam Padding
+  Mid        (same as Starter)
+  Premium    + Button Tufting                       [POST-LAUNCH]
+  Prestige   + Spring Tensioning                    [POST-LAUNCH]
+  Exclusive  + Webbing Weave                        [POST-LAUNCH]
+  Elite      + Corner Fold                          [POST-LAUNCH]
+
+Special events define their own minigame pool per event — see Section 13.
+
+Alpha launches with 4 base minigames. Post-launch updates introduce
+one new minigame per tier starting at Premium, each with matching
+tier-gated perks (see section 6.5).
+
+
+3.4  HOT JOBS
+-------------
+Hot Jobs are special board events appearing every 5-8 minutes. A 10-second
+countdown plays on the board before the job becomes claimable, alerting all
+players at the same time.
+
+  Pay multiplier:  3.0x normal tier pay
+  Follower bonus:  +75%
+  Visual:          Animated gold border on the job card
+
+The countdown creates shared anticipation — everyone on the server sees it
+and whoever clicks fastest wins. See section 12 for full Hot Job rules.
+
+
+================================================================================
+  4. MINIGAMES
+================================================================================
+
+All minigames share a common interface:
+  Start(container, config) -> GetResult() -> Cleanup()
+
+Results in ascending order:  FAIL -> PASS -> GOOD -> PERFECT
+
+In a minigame chain, the worst result across all games is the final result.
+
+
+4.1  TACK REMOVAL  (osu!-style timing)
+---------------------------------------
+Circular tacks appear on screen with a shrinking approach ring. Click the
+tack when the ring reaches the center. Miss timing = miss point.
+
+  Parameter          Easy    Medium  Hard
+  -----------------  ------  ------  ------
+  Tack count         4-7     8-14    12-18
+  Approach time      2.6s    2.0s    1.4s
+  Perfect threshold  65%     72%     82%
+  Good threshold     35%     42%     52%
+
+
+4.2  STAPLE GUNNING  (bar timing)
+-----------------------------------
+A bar moves horizontally across a track with nested Good and Perfect zones.
+Click when the bar is inside the zone. Bar speeds up with successive hits.
+
+  Parameter          Easy    Medium  Hard
+  -----------------  ------  ------  ------
+  Staple count       3-5     6-10    9-14
+  Bar speed          0.45    0.62    0.85
+  Good zone width    0.15    0.11    0.08
+  Perfect zone width 0.07    0.05    0.035
+  Speed ramp-up      0.040   0.040   0.060
+
+
+4.3  SEAM STITCHING  (free-drag path)
+---------------------------------------
+Player drags a needle along a zig-zag path. Deviation is tracked
+continuously. Green trail = on path, red trail = off path.
+
+  Parameter              Easy    Medium  Hard
+  ---------------------  ------  ------  ------
+  Segments               3-4     5-7     8-12
+  Time per segment       12s     9s      7s
+  Deviation tolerance    48      32      20
+  Perfect max deviation  35%     35%     35%
+  Good max deviation     70%     70%     70%
+
+
+4.4  FOAM PADDING  (grid puzzle)
+----------------------------------
+A RE4-inspired grid puzzle. Place Tetris-like foam pieces to fill a grid.
+Pieces can be rotated. Score based on grid coverage.
+
+  Parameter          Easy    Medium  Hard
+  -----------------  ------  ------  ------
+  Piece count        3       5       7
+  Time limit         65s     50s     35s
+  Perfect threshold  100%    100%    100%
+  Good threshold     67%     75%     80%
+
+
+4.5  BUTTON TUFTING  (memory sequence)  [POST-LAUNCH]
+-----------------------------------------------------
+A grid of buttons lights up in a sequence. Recreate the sequence by
+clicking the buttons in the same order. Wrong click = failed round.
+
+  Parameter          Easy    Medium  Hard
+  -----------------  ------  ------  ------
+  Sequence length    3       5       7
+  Display time (s)   2.4     1.8     1.2
+  Rounds             2       3       4
+
+
+4.6  SPRING TENSIONING  (hold / release)  [POST-LAUNCH]
+-------------------------------------------------------
+A needle rests on a pressure gauge. Hold a button to build tension;
+release when the needle lands in the green zone. Overshoot and the
+needle bounces past — you must wait for it to settle and try again.
+
+  Parameter           Easy    Medium  Hard
+  ------------------  ------  ------  ------
+  Green zone width    0.28    0.18    0.11
+  Needle drift speed  0.30    0.50    0.72
+  Attempts allowed    4       3       2
+
+
+4.7  WEBBING WEAVE  (logic puzzle)  [POST-LAUNCH]
+-------------------------------------------------
+Drag webbing strips across a frame in the correct over-under
+alternating pattern. Each strip must correctly pass over or under
+every crossing strip. Wrong placement highlights in red and must
+be re-placed.
+
+  Parameter       Easy    Medium  Hard
+  --------------  ------  ------  ------
+  Strip count     4       6       8
+  Time limit (s)  60      45      30
+
+
+4.8  CORNER FOLD  (ordered steps)  [POST-LAUNCH]
+------------------------------------------------
+Fold fabric corners by clicking fold lines in the correct order.
+Each fold reveals the next. Clicking a fold out of order resets
+the current corner.
+
+  Parameter               Easy    Medium  Hard
+  ----------------------  ------  ------  ------
+  Corners per piece       2       3       4
+  Hint visibility (s)     3.0     1.5     0.5
+  Time per corner (s)     20      14      9
+
+
+4.9  THE FRAGILE MODIFIER
+--------------------------
+When a job is marked Fragile, all precision windows across all minigames
+tighten by 40% (multiplier: 0.6). Applies to:
+
+  - Good/Perfect zone widths in StapleGunning
+  - Deviation tolerance in SeamStitching
+  - Snap tolerance in FoamPadding
+
+Fragile applies to all tiers Premium and above.
+The Fragile Specialist perk softens this modifier.
+
+
+================================================================================
+  5. REPUTATION SYSTEM
+================================================================================
+
+Reputation is a floating-point value from 0.0 to 5.0, starting at 0.0.
+It represents the player's professional standing as an upholsterer.
+
+Reputation is NOT a gate on the shared job board. It drives:
+  1. Direct Offer quality  — higher rep = better personal invitations
+  2. Toolbox slot progress — rep milestones unlock additional perk slots
+
+
+5.1  REPUTATION GAINS
+---------------------
+  Result   Change
+  -------  ------
+  Perfect  +0.20
+  Good     +0.10
+  Pass     +0.05
+  Fail     Scaled by tier (see section 11)
+  Abandon  Scaled by tier (see section 11)
+
+Rep cannot go below 0.0.
+
+
+5.2  REP MILESTONES
+-------------------
+  Rep    Milestone
+  -----  -------------------------------------------------
+  1.0    Direct Offers begin (Mid-Premium range)
+  1.5    4th Toolbox slot unlocked
+  2.0    Direct Offers upgrade (Premium-Exclusive)
+  3.0    5th Toolbox slot unlocked
+  3.5    Direct Offers upgrade (Exclusive-Elite)
+  4.5    Direct Offers upgrade (Elite-Special)
+  5.0    Max rep — cosmetic milestone, max Direct Offer quality
+
+
+================================================================================
+  6. TOOLBOX — PICK 5 PERK SYSTEM
+================================================================================
+
+The Toolbox is the player's loadout. It holds up to 5 perk slots, each filled
+with a single charged perk. Players configure it before accepting jobs.
+
+Perk charges are consumed on every job attempt, regardless of success or
+failure. Failing a job wastes your charges. This is intentional — it creates
+a real cost to overreaching.
+
+Example loadouts:
+  Specialist:   5x Curved Needle -> extreme SeamStitching ease, no economy perks
+  Profit build: 3x Premium Invoice (Bespoke) + Safety Net + Word of Mouth
+  Risk hedge:   2x Foam Press Kit + 2x Safety Net + Damage Waiver
+
+
+6.1  SLOT PROGRESSION
+---------------------
+  Slots  Condition
+  -----  -----------------
+  3      Starting
+  4      Reach rep 1.5
+  5      Reach rep 3.0
+
+Starting with 3 slots avoids overwhelming new players before they understand
+the system. Unlocking slots is a tangible, exciting rep milestone.
+
+
+6.2  PERK TIERS
+---------------
+Every perk comes in two tiers:
+
+  BOLT     Accessible, affordable, reliable. Lower effect, no conditions.
+           Available from the shop for in-game money.
+
+  BESPOKE  Stronger effect, often conditional. May require a rep threshold
+           to purchase or drop from job completions. Many have conditions
+           like "only on Good or better" that reward skilled play.
+
+Bespoke is not always strictly better. A conditional Bespoke perk used
+carelessly may underperform a reliable Bolt perk.
+
+
+6.3  PERK ACQUISITION
+---------------------
+  Source                   Perks Available
+  -----------------------  --------------------------------------------------
+  Shop (money)             All minigame tools, basic boosters — main spend
+  Job completion drops     Protection and board perks — reward for playing
+  Rep milestones           Rare and Bespoke perks — prestige unlocks
+
+The first time a player completes a Rare+ job, they receive a free Bolt
+perk as a tutorial reward that teaches the Toolbox system through play.
+
+
+6.4  FULL PERK LIST
+-------------------
+
+MINIGAME TOOLS — TACK REMOVAL
+
+  Name          Bolt                              Bespoke
+  ------------  --------------------------------  --------------------------------
+  Tack Magnet   Approach time +0.5s               +1.0s AND spawn gap wider
+  Sharp Eye     Tack count -2                     Tack count -3 AND 1 free miss
+
+
+MINIGAME TOOLS — STAPLE GUNNING
+
+  Name          Bolt                              Bespoke
+  ------------  --------------------------------  --------------------------------
+  Staple Guide  Zone widths +20%                  Zone widths +35% AND ramp-up -
+  Grip Wrap     Bar speed -0.10                   Bar speed -0.18 AND ramp-up -30%
+
+
+MINIGAME TOOLS — SEAM STITCHING
+
+  Name          Bolt                              Bespoke
+  ------------  --------------------------------  --------------------------------
+  Curved Needle Deviation tolerance +8            +16 AND auto-snaps to path start
+  Linen Thread  Perfect deviation threshold +0.05 +0.12 AND +1s per segment
+
+
+MINIGAME TOOLS — FOAM PADDING
+
+  Name           Bolt                             Bespoke
+  -------------  -------------------------------  --------------------------------
+  Foam Press Kit Piece count -1, time +8s         Piece count -2, time +15s
+  Layout Pins    Good ratio threshold -0.08        -0.15 AND 1 free rotation undo
+
+
+ECONOMIC PERKS
+
+  Name            Bolt                             Bespoke
+  --------------  -------------------------------  --------------------------------
+  Premium Invoice +5% pay on any completion        +12% pay on Good or better only
+  Rush Surcharge  +8% pay if done before 75% time  +18% same condition
+  Client Tip      +3% pay per furniture piece       +8% per piece
+
+
+FOLLOWER PERKS
+
+  Name            Bolt                             Bespoke
+  --------------  -------------------------------  --------------------------------
+  Portfolio Shot  +10% followers on completion     +25% followers on completion
+  Word of Mouth   +8% followers on Good or better  +20% followers on Good or better
+                                                   AND next Direct Offer refreshes
+                                                   immediately
+
+
+REPUTATION PERKS
+
+  Name             Bolt                             Bespoke
+  ---------------  -------------------------------  --------------------------------
+  Thank You Card   +0.03 rep on any completion      +0.08 rep on Perfect only
+  5-Star Review    +0.05 rep on Good/Perfect         +0.12 on Perfect AND fail -30%
+  Returning Client +0.04 rep on Direct Offer jobs   +0.10 AND next offer refreshes
+
+
+PROTECTION PERKS
+
+  Name               Bolt                             Bespoke
+  -----------------  -------------------------------  --------------------------------
+  Safety Net         Fail rep penalty -25%            -45% AND abandon penalty -20%
+  Damage Waiver      15% of job pay earned on fail    25% on fail AND 1 charge refunded
+  Apology Letter     Abandon penalty -0.05            -0.10 AND no rep loss if 1st 30s
+  Fragile Specialist Fragile multiplier 0.6 -> 0.72  0.6 -> 0.82 AND 1 free mistake
+
+
+BOARD & OFFER PERKS
+
+  Name            Bolt                             Bespoke
+  --------------  -------------------------------  --------------------------------
+  Client Referral Next offer guaranteed Prestige+  Next 3 Prestige+ AND top of range
+  Job Alert       Alert when Exclusive+ on board   Alert 5s before board refreshes
+  Watchlist       Mark 1 board job, alert if near  Mark 2 jobs AND 15s warning
+
+
+SITUATIONAL / WILDCARD PERKS
+
+  Name           Bolt                              Bespoke
+  -------------  --------------------------------  --------------------------------
+  Chain Bonus    +5% pay per furniture piece extra +10% per piece AND chain easier
+  Hot Job Hunter Hot Job 3.0x -> 3.5x             3.0x -> 4.0x AND cooldown -30%
+  Steady Hands   Minigame count at tier minimum   Minimum count AND fragile softened
+  Second Wind    After fail, next job rep loss /2  After fail, next job loss zeroed
+                                                   AND pay +10%
+
+
+6.5  TIER-GATED PERKS  [POST-LAUNCH]
+-------------------------------------
+Perks for post-launch minigames are purchasable only at the tier where
+that minigame first appears. The requiresTier field in ShopData gates
+them. Players doing lower-tier jobs have no use for them — the shop
+self-filters.
+
+MINIGAME TOOLS — BUTTON TUFTING  (requiresTier: Premium)
+
+  Name            Bolt                              Bespoke
+  --------------  --------------------------------  --------------------------------
+  Pattern Card    Display time +0.6s                +1.2s AND first 2 clicks pre-set
+  Grid Memory     Sequence length -1                -1 AND 1 free wrong click
+
+
+MINIGAME TOOLS — SPRING TENSIONING  (requiresTier: Prestige)
+
+  Name        Bolt                              Bespoke
+  ----------  --------------------------------  --------------------------------
+  Dampener    Needle drift speed -0.12          -0.22 AND +1 attempt allowed
+  Dead Zone   Green zone width +0.08            +0.18 AND only on first attempt
+
+
+MINIGAME TOOLS — WEBBING WEAVE  (requiresTier: Exclusive)
+
+  Name         Bolt                              Bespoke
+  -----------  --------------------------------  --------------------------------
+  Strip Guide  Next correct strip highlighted    Highlighted AND 1 free re-place
+  Loom Frame   Time limit +12s                   +22s AND wrong placement forgiven
+
+
+MINIGAME TOOLS — CORNER FOLD  (requiresTier: Elite)
+
+  Name           Bolt                              Bespoke
+  -------------  --------------------------------  --------------------------------
+  Crease Guide   Hint visibility +1.5s             +3.0s AND auto-fold first corner
+  Undo Stitch    1 fold undo per corner             2 undos AND time +5s per corner
+
+
+================================================================================
+  7. ECONOMY
+================================================================================
+
+7.1  PAY BY TIER
+----------------
+  Tier       Pay Range
+  ---------  -----------------
+  Starter    $50    - $150
+  Mid        $200   - $500
+  Premium    $600   - $1,200
+  Prestige   $1,500 - $3,000
+  Exclusive  $3,500 - $7,000
+  Elite      $7,500 - $15,000
+
+Special event pay is defined per event — see Section 13.
+
+Pay is generated at job creation. The player sees the exact amount on
+the job card before accepting.
+
+
+7.2  FOLLOWER GAINS BY TIER
+---------------------------
+Followers are the second progression currency alongside money. They are
+earned from job completions and are required — together with money — to
+upgrade the player's house.
+
+  Tier       Follower Range
+  ---------  --------------
+  Starter    6   - 15
+  Mid        18  - 35
+  Premium    45  - 80
+  Prestige   90  - 150
+  Exclusive  180 - 320
+  Elite      400 - 650
+
+Special event follower gains are defined per event — see Section 13.
+
+Bonuses on top:  Good result +10%,  Perfect result +25%
+
+Because followers require Good and Perfect results to earn quickly, they
+naturally reward skilled play. A player who only gets Pass results will
+fall behind on house upgrades even if their earnings are comparable.
+
+
+7.3  MONEY SINKS
+----------------
+Money is spent primarily on Toolbox perk charges. This keeps high earners
+continuously spending rather than accumulating idle wealth.
+
+Primary sinks:
+  - Perk charges (Bolt and Bespoke, all categories)
+  - Shop utility items
+
+The rich spend to stay competitive. A player who hoards money but skips
+tool investment is at a consistent disadvantage on Hard + Fragile jobs.
+
+
+================================================================================
+  8. SHOP
+================================================================================
+
+The Shop is accessed through the laptop. All items use in-game money only.
+
+TOOLBOX PERKS
+  Perk charges in both Bolt and Bespoke tiers. Main shop category.
+
+JOB MANAGEMENT
+  Job Re-Roll           Return an accepted job to pool without rep penalty (1 use)
+  Deadline Extension    Add 30 seconds to Urgent jobs (1 use)
+  Sticky Notes          Mark a board job; alert if nearly claimed
+
+EFFICIENCY
+  Tool Pouch            Reduces tool setup animation before minigames
+  Work Playlist         Ambient music at client locations (cosmetic)
+
+REPUTATION
+  Apology Note          Reduces abandon rep penalty (single use)
+  Thank You Package     Bonus rep after a specific job completion
+
+
+================================================================================
+  9. TALKOGRAM  [POST-LAUNCH]
+================================================================================
+
+Talkogram is the in-game activity feed accessed through the laptop.
+
+It is a lightweight server-local feed — not a full social media platform.
+There are no comments, no likes, no cross-server persistence. It exists to
+give job completions a moment of acknowledgment and to give the server a
+shared sense of activity.
+
+
+9.1  WHAT IT DOES
+-----------------
+After every completed job (Pass, Good, or Perfect), a post is automatically
+generated and added to the server feed. The post is visible to all players
+on the same server.
+
+Posts use templates based on result quality:
+
+  Result   Template
+  -------  --------------------------------------------------------
+  Perfect  "Absolutely nailed this [job name]. Client loved it."
+  Good     "Pretty happy with how this [job name] turned out."
+  Pass     "Just finished a [job name] — not my best, but done!"
+
+Posts include: player name, job name, result, and timestamp.
+Failed jobs do not generate a post.
+
+
+9.2  WHAT IT DOES NOT DO
+------------------------
+  - No comments
+  - No likes
+  - No cross-server DataStore feed
+  - No popular post tracking
+  - No per-player post limits
+
+The feed is session-scoped. When the server closes, the feed clears.
+
+
+9.3  WHY IT EXISTS
+------------------
+Completing a job should feel witnessed. Without the feed, you watch numbers
+go up — money, followers, rep — but nothing in the world acknowledges the
+work. The Talkogram post is the "ding" moment: a line appears, the server
+sees what you just did, and it feels like it mattered.
+
+It also gives followers their thematic context. Players earn followers because
+their completed jobs appear on Talkogram. Without that story, followers would
+be an unexplained number.
+
+
+================================================================================
+  10. PLAYER PROGRESSION
+================================================================================
+
+Progression is multi-axis — players grow along money, followers, and
+reputation simultaneously. Each axis drives different systems.
+
+  Money       -> House upgrades (one of two requirements)
+  Followers   -> House upgrades (second requirement; rewards quality play)
+  Reputation  -> Direct Offer quality + Toolbox slot unlocks
+
+
+10.1  PLAYER HOUSE  [POST-LAUNCH]
+----------------------------------
+The player's house upgrades when BOTH money and follower thresholds are met.
+Requiring followers alongside money means players who play well (earning
+Good/Perfect results) progress faster than players who grind low-tier jobs
+for raw cash.
+
+  House                Money      Followers   Description
+  -------------------  ---------  ----------  -------------------------------
+  Starter Flat         $0         0            Basic starting apartment
+  Corner House         $5,000     1,000        Modest street-level workshop
+  Workshop Villa       $75,000    15,000       Dedicated professional space
+  Skyline Penthouse    $750,000   125,000      Elite craftsperson's residence
+
+Houses are visual status symbols and serve as the player's spawn point.
+
+
+10.2  REPUTATION MILESTONES (SUMMARY)
+--------------------------------------
+  Rep    Reward
+  -----  ----------------------------------------
+  1.0    Direct Offers begin
+  1.5    4th Toolbox slot
+  2.0    Direct Offer tier upgrade
+  3.0    5th Toolbox slot
+  3.5    Direct Offer tier upgrade
+  4.5    Elite-Special Direct Offers
+  5.0    Max rep cosmetic badge
+
+
+10.3  DAILY CONTRACTS  (planned)
+---------------------------------
+A separate daily board shows 3 rotating challenges. Examples:
+
+  "Complete 4 Rare or higher jobs today           -> $500 bonus"
+  "Achieve Perfect on 2 Fragile jobs              -> 1 Bespoke perk charge"
+  "Earn $3,000 in a single session                -> Word of Mouth (Bespoke)"
+
+Daily contracts give a login motivation independent of the board state.
+They refresh at midnight server time.
+
+
+================================================================================
+  11. PENALTY SYSTEM
+================================================================================
+
+Failure and abandonment carry rep consequences that scale with tier.
+
+Why scaling: a new player gambling on an Elite board job has little rep to
+protect — the penalty barely hurts. A veteran at rep 4.0 failing that same
+job loses meaningful progress. The system is self-calibrating without needing
+explicit gates.
+
+
+11.1  REPUTATION PENALTIES BY TIER
+------------------------------------
+  Tier       Fail     Abandon
+  ---------  -------  -------
+  Starter    -0.03    -0.05
+  Mid        -0.05    -0.08
+  Premium    -0.10    -0.15
+  Prestige   -0.15    -0.22
+  Exclusive  -0.22    -0.32
+  Elite      -0.30    -0.45
+
+Special event penalties are defined per event — see Section 13.
+
+
+11.2  COMPOUND FAILURE COST
+----------------------------
+Failing a job costs the player four things at once:
+
+  1. Rep loss           scaled by tier (see above)
+  2. Tool charges lost  all equipped Toolbox perks lose one charge
+  3. No pay earned      time spent, nothing received
+  4. Time lost          another job could have been taken instead
+
+There is NO direct money deduction on failure. Tool charge burn already
+functions as the money penalty — it scales with how much the player invested
+in their loadout. The riskier and better-equipped the attempt, the more it
+costs to fail.
+
+Failed jobs also do not generate a Talkogram post, meaning no followers
+are earned. On high-tier jobs where follower gains are large, this is a
+meaningful additional cost felt in house upgrade progress.
+
+
+11.3  INFORMED RISK
+-------------------
+Every job card shows before acceptance:
+  - Difficulty level   (Easy / Medium / Hard)
+  - Fragile indicator  (if applicable)
+  - Minigame count     (number in chain)
+  - Rep penalty        (exact rep loss on fail)
+
+Players make an informed bet. If they fail after seeing the consequences,
+the punishment feels earned, not arbitrary.
+
+
+================================================================================
+  12. HOT JOBS
+================================================================================
+
+Hot Jobs are special board events appearing every 5-8 minutes. A 10-second
+animated countdown plays before the job becomes claimable, alerting the
+entire server simultaneously.
+
+  Pay multiplier:     3.0x the tier's normal range
+  Follower bonus:     +75%
+  Visual:             Animated gold border on the job card
+  Countdown:          10 seconds, visible to all players
+
+  Job Alert (Bespoke) perk: gives a 5-second early notification before the
+  countdown starts, allowing prepared players to position themselves.
+
+Hot Jobs are the most exciting shared board moments. Everyone on the server
+sees the same countdown and whoever clicks Accept fastest wins.
+
+Hot Job Hunter perk can increase the multiplier to 3.5x (Bolt) or 4.0x
+(Bespoke) for equipped players.
+
+
+================================================================================
+  13. SPECIAL EVENTS
+================================================================================
+
+Special Events are limited-time modes tied to real-world calendar events
+(Christmas, Halloween, etc.). They are not a permanent job tier — they
+activate and deactivate on a schedule defined by the development team.
+
+All parameters are variable and defined per event:
+
+  Parameter         Notes
+  ----------------  ----------------------------------------------------------
+  Pay range         Set per event. Can exceed Elite range or be intentionally
+                    lower for accessibility events.
+  Difficulty        Set per event. Can be Easy (fun/festive) or Hard
+                    (limited-time challenge).
+  Fragile modifier  Optional. Applied or omitted per event design.
+  Minigame pool     Custom per event. May include themed variants of base
+                    minigames or entirely new one-off minigames.
+  Follower gains    Set per event.
+  Penalty scaling   Set per event. Accessibility events may reduce penalties.
+  Duration          Active window defined per event (e.g. December 1–31).
+
+Special Event jobs appear in a dedicated section of the job board or
+replace a portion of the standard board during the event window. The
+exact presentation is decided per event.
+
+Special Events are not designed during alpha. Parameters will be
+authored in a per-event config when each event is developed.
+
+
+================================================================================
+  APPENDIX A — SYSTEM INTERACTION MAP
+================================================================================
+
+  Shared Job Board ------> AcceptJob ------> LocationManager.Assign
+                                                      |
+                                          Client Location (minigames)
+                                                      |
+                                          SubmitJobResult (server)
+                                          /           |          \
+                                     Pay/USD    Followers     Reputation
+                                         |           |              |
+                                   House tier  House tier    Direct Offers
+                                   (money req) (follower req) tier + Toolbox
+                                         |                        slots
+                                   Visual status
+                                         |
+                                   Spend on Toolbox perks
+                                         |
+                                   Better job outcomes
+
+
+================================================================================
+  APPENDIX B — BALANCE NOTES
+================================================================================
+
+  - Rep gains are intentionally slow. 25 Perfect jobs to reach max. Rep is a
+    long-term stat that reflects a real session history.
+
+  - Elite/Special jobs on the shared board are rare enough (~1 per 8-16 min)
+    to feel like events. Direct Offers are the veteran's reliable pipeline.
+
+  - Bespoke perk conditions ("Good or better only") mean skilled players
+    benefit more from the same perk than unskilled players. The system
+    rewards competence, not just spending.
+
+  - Perk charge costs should be balanced so that a full Toolbox loadout for
+    a Special job costs roughly 10-15% of that job's expected pay on success.
+    Investment should feel significant but not punishing.
+
+  - The abandon penalty is always ~1.5x the fail penalty. Abandoning a job
+    mid-task leaves the client hanging entirely, while a failed attempt at
+    least made the effort.
+
+  - House upgrade follower thresholds are intentionally harder to hit than
+    money thresholds at higher tiers. The Skyline Penthouse requires 125,000
+    followers — achievable only through sustained Good/Perfect play on
+    mid-to-high tier jobs. It should feel like a genuine milestone, not an
+    inevitable grind endpoint.
+
+  - Failed jobs produce no Talkogram post and therefore no followers. On
+    Special jobs (800-1,200 followers per completion), a single failure
+    represents a significant setback in house upgrade progress. This is
+    intended — it adds weight to high-stakes attempts beyond rep loss alone.
+
+
+================================================================================
+  APPENDIX C — RELEASE SCOPE
+================================================================================
+
+ALPHA RELEASE — in scope
+  - Shared job board (all 7 tiers, Hot Jobs, Daily Contracts)
+  - Direct Offers system
+  - Reputation system (0.0–5.0, drives offers + Toolbox slots)
+  - Pick 5 Toolbox with Bolt/Bespoke perks
+  - Scaled failure and abandon penalties by tier
+  - 4 base minigames: Tack Removal, Staple Gunning,
+    Seam Stitching, Foam Padding
+  - Shop (perk charges, Job Management, Efficiency, Reputation items)
+  - Compound failure cost (rep + charge burn + no pay + time)
+
+POST-LAUNCH / BETA — deferred
+  - Talkogram activity feed (Section 9)
+  - Followers as house upgrade currency (Section 7.2)
+  - Player Housing and upgrade tiers (Section 10.1)
+  - Button Tufting minigame (Section 4.5)  — unlocks at Premium
+  - Spring Tensioning minigame (Section 4.6) — unlocks at Prestige
+  - Webbing Weave minigame (Section 4.7)   — unlocks at Exclusive
+  - Corner Fold minigame (Section 4.8)     — unlocks at Elite
+  - Tier-gated perks for post-launch minigames (Section 6.5)
+  - Special Events (Section 13)
+
+Sections and entries marked [POST-LAUNCH] throughout this document
+are designed and balanced but not scheduled for alpha build.
+
+
+================================================================================
+  UPHOLSTERY! GDD v8.3
+  Reflects design decisions from development sessions through 2026-06-02
+================================================================================

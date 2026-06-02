@@ -1,0 +1,5465 @@
+{
+  "directed": false,
+  "multigraph": false,
+  "graph": {
+    "hyperedges": [
+      {
+        "id": "gameplay_loop_systems",
+        "label": "Core Gameplay Loop \u2014 Accept, Play, Earn, Spend",
+        "nodes": [
+          "gdd_shared_job_board",
+          "gdd_minigames",
+          "gdd_reputation_system",
+          "gdd_economy",
+          "gdd_toolbox_perk_system"
+        ],
+        "relation": "participate_in",
+        "confidence": "EXTRACTED",
+        "confidence_score": 0.95,
+        "source_file": "UPHOLSTERY_GDD_v8.txt"
+      },
+      {
+        "id": "progression_axes",
+        "label": "Multi-Axis Progression \u2014 Money, Followers, Reputation",
+        "nodes": [
+          "gdd_economy",
+          "gdd_followers",
+          "gdd_reputation_system",
+          "gdd_player_house",
+          "gdd_direct_offers"
+        ],
+        "relation": "participate_in",
+        "confidence": "EXTRACTED",
+        "confidence_score": 0.95,
+        "source_file": "UPHOLSTERY_GDD_v8.txt"
+      },
+      {
+        "id": "client_server_minigame_pipeline",
+        "label": "Client-Server Minigame Execution Pipeline",
+        "nodes": [
+          "explain_gameplay_client",
+          "explain_minigame_runner",
+          "explain_laptop_data",
+          "explain_location_manager"
+        ],
+        "relation": "implement",
+        "confidence": "EXTRACTED",
+        "confidence_score": 0.95,
+        "source_file": "explain.md"
+      }
+    ]
+  },
+  "nodes": [
+    {
+      "label": "settings.json",
+      "file_type": "code",
+      "source_file": ".claude/settings.json",
+      "source_location": "L1",
+      "id": "claude_settings",
+      "community": 16,
+      "norm_label": "settings.json"
+    },
+    {
+      "label": "hooks",
+      "file_type": "code",
+      "source_file": ".claude/settings.json",
+      "source_location": "L2",
+      "id": "claude_settings_hooks",
+      "community": 16,
+      "norm_label": "hooks"
+    },
+    {
+      "label": "PreToolUse",
+      "file_type": "code",
+      "source_file": ".claude/settings.json",
+      "source_location": "L3",
+      "id": "claude_settings_hooks_pretooluse",
+      "community": 16,
+      "norm_label": "pretooluse"
+    },
+    {
+      "label": "settings.local.json",
+      "file_type": "code",
+      "source_file": ".claude/settings.local.json",
+      "source_location": "L1",
+      "id": "claude_settings_local",
+      "community": 17,
+      "norm_label": "settings.local.json"
+    },
+    {
+      "label": "permissions",
+      "file_type": "code",
+      "source_file": ".claude/settings.local.json",
+      "source_location": "L2",
+      "id": "claude_settings_local_permissions",
+      "community": 17,
+      "norm_label": "permissions"
+    },
+    {
+      "label": "allow",
+      "file_type": "code",
+      "source_file": ".claude/settings.local.json",
+      "source_location": "L3",
+      "id": "claude_settings_local_permissions_allow",
+      "community": 17,
+      "norm_label": "allow"
+    },
+    {
+      "label": "default.project.json",
+      "file_type": "code",
+      "source_file": "default.project.json",
+      "source_location": "L1",
+      "id": "default_project",
+      "community": 0,
+      "norm_label": "default.project.json"
+    },
+    {
+      "label": "name",
+      "file_type": "code",
+      "source_file": "default.project.json",
+      "source_location": "L2",
+      "id": "default_project_name",
+      "community": 0,
+      "norm_label": "name"
+    },
+    {
+      "label": "tree",
+      "file_type": "code",
+      "source_file": "default.project.json",
+      "source_location": "L3",
+      "id": "default_project_tree",
+      "community": 0,
+      "norm_label": "tree"
+    },
+    {
+      "label": "$className",
+      "file_type": "code",
+      "source_file": "default.project.json",
+      "source_location": "L4",
+      "id": "default_project_tree_classname",
+      "community": 0,
+      "norm_label": "$classname"
+    },
+    {
+      "label": "ReplicatedStorage",
+      "file_type": "code",
+      "source_file": "default.project.json",
+      "source_location": "L6",
+      "id": "default_project_tree_replicatedstorage",
+      "community": 0,
+      "norm_label": "replicatedstorage"
+    },
+    {
+      "label": "Shared",
+      "file_type": "code",
+      "source_file": "default.project.json",
+      "source_location": "L7",
+      "id": "default_project_replicatedstorage_shared",
+      "community": 0,
+      "norm_label": "shared"
+    },
+    {
+      "label": "$path",
+      "file_type": "code",
+      "source_file": "default.project.json",
+      "source_location": "L8",
+      "id": "default_project_shared_path",
+      "community": 0,
+      "norm_label": "$path"
+    },
+    {
+      "label": "ServerScriptService",
+      "file_type": "code",
+      "source_file": "default.project.json",
+      "source_location": "L12",
+      "id": "default_project_tree_serverscriptservice",
+      "community": 0,
+      "norm_label": "serverscriptservice"
+    },
+    {
+      "label": "$path",
+      "file_type": "code",
+      "source_file": "default.project.json",
+      "source_location": "L13",
+      "id": "default_project_serverscriptservice_path",
+      "community": 0,
+      "norm_label": "$path"
+    },
+    {
+      "label": "StarterPlayer",
+      "file_type": "code",
+      "source_file": "default.project.json",
+      "source_location": "L16",
+      "id": "default_project_tree_starterplayer",
+      "community": 0,
+      "norm_label": "starterplayer"
+    },
+    {
+      "label": "StarterPlayerScripts",
+      "file_type": "code",
+      "source_file": "default.project.json",
+      "source_location": "L17",
+      "id": "default_project_starterplayer_starterplayerscripts",
+      "community": 0,
+      "norm_label": "starterplayerscripts"
+    },
+    {
+      "label": "Client",
+      "file_type": "code",
+      "source_file": "default.project.json",
+      "source_location": "L18",
+      "id": "default_project_starterplayerscripts_client",
+      "community": 0,
+      "norm_label": "client"
+    },
+    {
+      "label": "$path",
+      "file_type": "code",
+      "source_file": "default.project.json",
+      "source_location": "L19",
+      "id": "default_project_client_path",
+      "community": 0,
+      "norm_label": "$path"
+    },
+    {
+      "label": "StarterGui",
+      "file_type": "code",
+      "source_file": "default.project.json",
+      "source_location": "L24",
+      "id": "default_project_tree_startergui",
+      "community": 0,
+      "norm_label": "startergui"
+    },
+    {
+      "label": "GuiScript",
+      "file_type": "code",
+      "source_file": "default.project.json",
+      "source_location": "L25",
+      "id": "default_project_startergui_guiscript",
+      "community": 0,
+      "norm_label": "guiscript"
+    },
+    {
+      "label": "$path",
+      "file_type": "code",
+      "source_file": "default.project.json",
+      "source_location": "L26",
+      "id": "default_project_guiscript_path",
+      "community": 0,
+      "norm_label": "$path"
+    },
+    {
+      "label": "Workspace",
+      "file_type": "code",
+      "source_file": "default.project.json",
+      "source_location": "L30",
+      "id": "default_project_tree_workspace",
+      "community": 0,
+      "norm_label": "workspace"
+    },
+    {
+      "label": "$properties",
+      "file_type": "code",
+      "source_file": "default.project.json",
+      "source_location": "L31",
+      "id": "default_project_workspace_properties",
+      "community": 0,
+      "norm_label": "$properties"
+    },
+    {
+      "label": "FilteringEnabled",
+      "file_type": "code",
+      "source_file": "default.project.json",
+      "source_location": "L32",
+      "id": "default_project_properties_filteringenabled",
+      "community": 0,
+      "norm_label": "filteringenabled"
+    },
+    {
+      "label": "Lighting",
+      "file_type": "code",
+      "source_file": "default.project.json",
+      "source_location": "L35",
+      "id": "default_project_tree_lighting",
+      "community": 0,
+      "norm_label": "lighting"
+    },
+    {
+      "label": "$properties",
+      "file_type": "code",
+      "source_file": "default.project.json",
+      "source_location": "L36",
+      "id": "default_project_lighting_properties",
+      "community": 0,
+      "norm_label": "$properties"
+    },
+    {
+      "label": "Ambient",
+      "file_type": "code",
+      "source_file": "default.project.json",
+      "source_location": "L37",
+      "id": "default_project_properties_ambient",
+      "community": 0,
+      "norm_label": "ambient"
+    },
+    {
+      "label": "Brightness",
+      "file_type": "code",
+      "source_file": "default.project.json",
+      "source_location": "L42",
+      "id": "default_project_properties_brightness",
+      "community": 0,
+      "norm_label": "brightness"
+    },
+    {
+      "label": "GlobalShadows",
+      "file_type": "code",
+      "source_file": "default.project.json",
+      "source_location": "L43",
+      "id": "default_project_properties_globalshadows",
+      "community": 0,
+      "norm_label": "globalshadows"
+    },
+    {
+      "label": "Outlines",
+      "file_type": "code",
+      "source_file": "default.project.json",
+      "source_location": "L44",
+      "id": "default_project_properties_outlines",
+      "community": 0,
+      "norm_label": "outlines"
+    },
+    {
+      "label": "Technology",
+      "file_type": "code",
+      "source_file": "default.project.json",
+      "source_location": "L45",
+      "id": "default_project_properties_technology",
+      "community": 0,
+      "norm_label": "technology"
+    },
+    {
+      "label": "SoundService",
+      "file_type": "code",
+      "source_file": "default.project.json",
+      "source_location": "L48",
+      "id": "default_project_tree_soundservice",
+      "community": 0,
+      "norm_label": "soundservice"
+    },
+    {
+      "label": "$properties",
+      "file_type": "code",
+      "source_file": "default.project.json",
+      "source_location": "L49",
+      "id": "default_project_soundservice_properties",
+      "community": 0,
+      "norm_label": "$properties"
+    },
+    {
+      "label": "RespectFilteringEnabled",
+      "file_type": "code",
+      "source_file": "default.project.json",
+      "source_location": "L50",
+      "id": "default_project_properties_respectfilteringenabled",
+      "community": 0,
+      "norm_label": "respectfilteringenabled"
+    },
+    {
+      "label": "AdminPanel.client.luau",
+      "file_type": "code",
+      "source_file": "src/gui/Gameplay/AdminPanel.client.luau",
+      "source_location": "L1",
+      "id": "gameplay_adminpanel_client",
+      "community": 14,
+      "norm_label": "adminpanel.client.luau"
+    },
+    {
+      "label": "make()",
+      "file_type": "code",
+      "source_file": "src/gui/Gameplay/AdminPanel.client.luau",
+      "source_location": "L43",
+      "id": "gameplay_adminpanel_client_make",
+      "community": 14,
+      "norm_label": "make()"
+    },
+    {
+      "label": "corner()",
+      "file_type": "code",
+      "source_file": "src/gui/Gameplay/AdminPanel.client.luau",
+      "source_location": "L49",
+      "id": "gameplay_adminpanel_client_corner",
+      "community": 14,
+      "norm_label": "corner()"
+    },
+    {
+      "label": "makeDropdown()",
+      "file_type": "code",
+      "source_file": "src/gui/Gameplay/AdminPanel.client.luau",
+      "source_location": "L111",
+      "id": "gameplay_adminpanel_client_makedropdown",
+      "community": 14,
+      "norm_label": "makedropdown()"
+    },
+    {
+      "label": "DevJobPanel.client.luau",
+      "file_type": "code",
+      "source_file": "src/gui/Gameplay/DevJobPanel.client.luau",
+      "source_location": "L1",
+      "id": "gameplay_devjobpanel_client",
+      "community": 27,
+      "norm_label": "devjobpanel.client.luau"
+    },
+    {
+      "label": "DevTestButton.client.luau",
+      "file_type": "code",
+      "source_file": "src/gui/Gameplay/DevTestButton.client.luau",
+      "source_location": "L1",
+      "id": "gameplay_devtestbutton_client",
+      "community": 28,
+      "norm_label": "devtestbutton.client.luau"
+    },
+    {
+      "label": "GameplayClient.client.luau",
+      "file_type": "code",
+      "source_file": "src/gui/Gameplay/GameplayClient.client.luau",
+      "source_location": "L1",
+      "id": "gameplay_gameplayclient_client",
+      "community": 11,
+      "norm_label": "gameplayclient.client.luau"
+    },
+    {
+      "label": "irisFullSize()",
+      "file_type": "code",
+      "source_file": "src/gui/Gameplay/GameplayClient.client.luau",
+      "source_location": "L88",
+      "id": "gameplay_gameplayclient_client_irisfullsize",
+      "community": 11,
+      "norm_label": "irisfullsize()"
+    },
+    {
+      "label": "irisClose()",
+      "file_type": "code",
+      "source_file": "src/gui/Gameplay/GameplayClient.client.luau",
+      "source_location": "L94",
+      "id": "gameplay_gameplayclient_client_irisclose",
+      "community": 11,
+      "norm_label": "irisclose()"
+    },
+    {
+      "label": "irisOpen()",
+      "file_type": "code",
+      "source_file": "src/gui/Gameplay/GameplayClient.client.luau",
+      "source_location": "L103",
+      "id": "gameplay_gameplayclient_client_irisopen",
+      "community": 11,
+      "norm_label": "irisopen()"
+    },
+    {
+      "label": "showHUD()",
+      "file_type": "code",
+      "source_file": "src/gui/Gameplay/GameplayClient.client.luau",
+      "source_location": "L128",
+      "id": "gameplay_gameplayclient_client_showhud",
+      "community": 11,
+      "norm_label": "showhud()"
+    },
+    {
+      "label": "hideHUD()",
+      "file_type": "code",
+      "source_file": "src/gui/Gameplay/GameplayClient.client.luau",
+      "source_location": "L133",
+      "id": "gameplay_gameplayclient_client_hidehud",
+      "community": 11,
+      "norm_label": "hidehud()"
+    },
+    {
+      "label": "moveCharacter()",
+      "file_type": "code",
+      "source_file": "src/gui/Gameplay/GameplayClient.client.luau",
+      "source_location": "L137",
+      "id": "gameplay_gameplayclient_client_movecharacter",
+      "community": 11,
+      "norm_label": "movecharacter()"
+    },
+    {
+      "label": "clearAllHighlights()",
+      "file_type": "code",
+      "source_file": "src/gui/Gameplay/GameplayClient.client.luau",
+      "source_location": "L146",
+      "id": "gameplay_gameplayclient_client_clearallhighlights",
+      "community": 11,
+      "norm_label": "clearallhighlights()"
+    },
+    {
+      "label": "onDoorTriggered()",
+      "file_type": "code",
+      "source_file": "src/gui/Gameplay/GameplayClient.client.luau",
+      "source_location": "L210",
+      "id": "gameplay_gameplayclient_client_ondoortriggered",
+      "community": 4,
+      "norm_label": "ondoortriggered()"
+    },
+    {
+      "label": "thisIs.client.luau",
+      "file_type": "code",
+      "source_file": "src/gui/Gameplay/thisIs.client.luau",
+      "source_location": "L1",
+      "id": "gameplay_thisis_client",
+      "community": 29,
+      "norm_label": "thisis.client.luau"
+    },
+    {
+      "label": "AppsFrame.client.luau",
+      "file_type": "code",
+      "source_file": "src/gui/Laptop/AppsFrame.client.luau",
+      "source_location": "L1",
+      "id": "laptop_appsframe_client",
+      "community": 21,
+      "norm_label": "appsframe.client.luau"
+    },
+    {
+      "label": "resetTabs()",
+      "file_type": "code",
+      "source_file": "src/gui/Laptop/AppsFrame.client.luau",
+      "source_location": "L26",
+      "id": "laptop_appsframe_client_resettabs",
+      "community": 21,
+      "norm_label": "resettabs()"
+    },
+    {
+      "label": "DesktopFrame.client.luau",
+      "file_type": "code",
+      "source_file": "src/gui/Laptop/DesktopFrame.client.luau",
+      "source_location": "L1",
+      "id": "laptop_desktopframe_client",
+      "community": 22,
+      "norm_label": "desktopframe.client.luau"
+    },
+    {
+      "label": "resetUI()",
+      "file_type": "code",
+      "source_file": "src/gui/Laptop/DesktopFrame.client.luau",
+      "source_location": "L19",
+      "id": "laptop_desktopframe_client_resetui",
+      "community": 22,
+      "norm_label": "resetui()"
+    },
+    {
+      "label": "LaptopBoot.client.luau",
+      "file_type": "code",
+      "source_file": "src/gui/Laptop/LaptopBoot.client.luau",
+      "source_location": "L1",
+      "id": "laptop_laptopboot_client",
+      "community": 23,
+      "norm_label": "laptopboot.client.luau"
+    },
+    {
+      "label": "playBootSequence()",
+      "file_type": "code",
+      "source_file": "src/gui/Laptop/LaptopBoot.client.luau",
+      "source_location": "L18",
+      "id": "laptop_laptopboot_client_playbootsequence",
+      "community": 23,
+      "norm_label": "playbootsequence()"
+    },
+    {
+      "label": "LaptopInteraction.client.luau",
+      "file_type": "code",
+      "source_file": "src/gui/Laptop/LaptopInteraction.client.luau",
+      "source_location": "L1",
+      "id": "laptop_laptopinteraction_client",
+      "community": 18,
+      "norm_label": "laptopinteraction.client.luau"
+    },
+    {
+      "label": "setupLaptop()",
+      "file_type": "code",
+      "source_file": "src/gui/Laptop/LaptopInteraction.client.luau",
+      "source_location": "L37",
+      "id": "laptop_laptopinteraction_client_setuplaptop",
+      "community": 18,
+      "norm_label": "setuplaptop()"
+    },
+    {
+      "label": "isNearAnyLaptop()",
+      "file_type": "code",
+      "source_file": "src/gui/Laptop/LaptopInteraction.client.luau",
+      "source_location": "L104",
+      "id": "laptop_laptopinteraction_client_isnearanylaptop",
+      "community": 18,
+      "norm_label": "isnearanylaptop()"
+    },
+    {
+      "label": "MoneyMaker_Tab.client.luau",
+      "file_type": "code",
+      "source_file": "src/gui/Laptop/MoneyMaker_Tab.client.luau",
+      "source_location": "L1",
+      "id": "laptop_moneymaker_tab_client",
+      "community": 12,
+      "norm_label": "moneymaker_tab.client.luau"
+    },
+    {
+      "label": "splitCamelCase()",
+      "file_type": "code",
+      "source_file": "src/gui/Laptop/MoneyMaker_Tab.client.luau",
+      "source_location": "L44",
+      "id": "laptop_moneymaker_tab_client_splitcamelcase",
+      "community": 12,
+      "norm_label": "splitcamelcase()"
+    },
+    {
+      "label": "clearCards()",
+      "file_type": "code",
+      "source_file": "src/gui/Laptop/MoneyMaker_Tab.client.luau",
+      "source_location": "L58",
+      "id": "laptop_moneymaker_tab_client_clearcards",
+      "community": 12,
+      "norm_label": "clearcards()"
+    },
+    {
+      "label": "populateBoard()",
+      "file_type": "code",
+      "source_file": "src/gui/Laptop/MoneyMaker_Tab.client.luau",
+      "source_location": "L66",
+      "id": "laptop_moneymaker_tab_client_populateboard",
+      "community": 12,
+      "norm_label": "populateboard()"
+    },
+    {
+      "label": "refreshBoard()",
+      "file_type": "code",
+      "source_file": "src/gui/Laptop/MoneyMaker_Tab.client.luau",
+      "source_location": "L110",
+      "id": "laptop_moneymaker_tab_client_refreshboard",
+      "community": 12,
+      "norm_label": "refreshboard()"
+    },
+    {
+      "label": "Shop_Tab.client.luau",
+      "file_type": "code",
+      "source_file": "src/gui/Laptop/Shop_Tab.client.luau",
+      "source_location": "L1",
+      "id": "laptop_shop_tab_client",
+      "community": 31,
+      "norm_label": "shop_tab.client.luau"
+    },
+    {
+      "label": "StarterLaptopState.client.luau",
+      "file_type": "code",
+      "source_file": "src/gui/Laptop/StarterLaptopState.client.luau",
+      "source_location": "L1",
+      "id": "laptop_starterlaptopstate_client",
+      "community": 32,
+      "norm_label": "starterlaptopstate.client.luau"
+    },
+    {
+      "label": "GameSettings.client.luau",
+      "file_type": "code",
+      "source_file": "src/gui/System/GameSettings.client.luau",
+      "source_location": "L1",
+      "id": "system_gamesettings_client",
+      "community": 35,
+      "norm_label": "gamesettings.client.luau"
+    },
+    {
+      "label": "LoadingScreen.client.luau",
+      "file_type": "code",
+      "source_file": "src/gui/System/LoadingScreen.client.luau",
+      "source_location": "L1",
+      "id": "system_loadingscreen_client",
+      "community": 36,
+      "norm_label": "loadingscreen.client.luau"
+    },
+    {
+      "label": "ProximityPromptStyle.client.luau",
+      "file_type": "code",
+      "source_file": "src/gui/System/ProximityPromptStyle.client.luau",
+      "source_location": "L1",
+      "id": "system_proximitypromptstyle_client",
+      "community": 26,
+      "norm_label": "proximitypromptstyle.client.luau"
+    },
+    {
+      "label": "getKeyText()",
+      "file_type": "code",
+      "source_file": "src/gui/System/ProximityPromptStyle.client.luau",
+      "source_location": "L31",
+      "id": "system_proximitypromptstyle_client_getkeytext",
+      "community": 26,
+      "norm_label": "getkeytext()"
+    },
+    {
+      "label": "GameSettings.server.luau",
+      "file_type": "code",
+      "source_file": "src/server/GameSettings.server.luau",
+      "source_location": "L1",
+      "id": "server_gamesettings_server",
+      "community": 33,
+      "norm_label": "gamesettings.server.luau"
+    },
+    {
+      "label": "LaptopPromptConfig.server.luau",
+      "file_type": "code",
+      "source_file": "src/server/LaptopPromptConfig.server.luau",
+      "source_location": "L1",
+      "id": "server_laptoppromptconfig_server",
+      "community": 20,
+      "norm_label": "laptoppromptconfig.server.luau"
+    },
+    {
+      "label": "configurePrompt()",
+      "file_type": "code",
+      "source_file": "src/server/LaptopPromptConfig.server.luau",
+      "source_location": "L7",
+      "id": "server_laptoppromptconfig_server_configureprompt",
+      "community": 20,
+      "norm_label": "configureprompt()"
+    },
+    {
+      "label": "setupLaptop()",
+      "file_type": "code",
+      "source_file": "src/server/LaptopPromptConfig.server.luau",
+      "source_location": "L15",
+      "id": "server_laptoppromptconfig_server_setuplaptop",
+      "community": 20,
+      "norm_label": "setuplaptop()"
+    },
+    {
+      "label": "JobPool.luau",
+      "file_type": "code",
+      "source_file": "src/server/Laptop/JobPool.luau",
+      "source_location": "L1",
+      "id": "laptop_jobpool",
+      "community": 3,
+      "norm_label": "jobpool.luau"
+    },
+    {
+      "label": "generateGlobalPool()",
+      "file_type": "code",
+      "source_file": "src/server/Laptop/JobPool.luau",
+      "source_location": "L30",
+      "id": "laptop_jobpool_generateglobalpool",
+      "community": 3,
+      "norm_label": "generateglobalpool()"
+    },
+    {
+      "label": "cleanupPlayer()",
+      "file_type": "code",
+      "source_file": "src/server/Laptop/JobPool.luau",
+      "source_location": "L48",
+      "id": "laptop_jobpool_cleanupplayer",
+      "community": 3,
+      "norm_label": "cleanupplayer()"
+    },
+    {
+      "label": "init()",
+      "file_type": "code",
+      "source_file": "src/server/Laptop/JobPool.luau",
+      "source_location": "L58",
+      "id": "laptop_jobpool_init",
+      "community": 3,
+      "norm_label": "init()"
+    },
+    {
+      "label": "LaptopData.server.luau",
+      "file_type": "code",
+      "source_file": "src/server/Laptop/LaptopData.server.luau",
+      "source_location": "L1",
+      "id": "laptop_laptopdata_server",
+      "community": 30,
+      "norm_label": "laptopdata.server.luau"
+    },
+    {
+      "label": "LaptopRemotes.server.luau",
+      "file_type": "code",
+      "source_file": "src/server/Laptop/LaptopRemotes.server.luau",
+      "source_location": "L1",
+      "id": "laptop_laptopremotes_server",
+      "community": 19,
+      "norm_label": "laptopremotes.server.luau"
+    },
+    {
+      "label": "remote()",
+      "file_type": "code",
+      "source_file": "src/server/Laptop/LaptopRemotes.server.luau",
+      "source_location": "L14",
+      "id": "laptop_laptopremotes_server_remote",
+      "community": 19,
+      "norm_label": "remote()"
+    },
+    {
+      "label": "remoteFunction()",
+      "file_type": "code",
+      "source_file": "src/server/Laptop/LaptopRemotes.server.luau",
+      "source_location": "L20",
+      "id": "laptop_laptopremotes_server_remotefunction",
+      "community": 19,
+      "norm_label": "remotefunction()"
+    },
+    {
+      "label": "TalkogramHandler.luau",
+      "file_type": "code",
+      "source_file": "src/server/Laptop/TalkogramHandler.luau",
+      "source_location": "L1",
+      "id": "laptop_talkogramhandler",
+      "community": 3,
+      "norm_label": "talkogramhandler.luau"
+    },
+    {
+      "label": "savePost()",
+      "file_type": "code",
+      "source_file": "src/server/Laptop/TalkogramHandler.luau",
+      "source_location": "L64",
+      "id": "laptop_talkogramhandler_savepost",
+      "community": 3,
+      "norm_label": "savepost()"
+    },
+    {
+      "label": "loadGlobalFeed()",
+      "file_type": "code",
+      "source_file": "src/server/Laptop/TalkogramHandler.luau",
+      "source_location": "L82",
+      "id": "laptop_talkogramhandler_loadglobalfeed",
+      "community": 3,
+      "norm_label": "loadglobalfeed()"
+    },
+    {
+      "label": "init()",
+      "file_type": "code",
+      "source_file": "src/server/Laptop/TalkogramHandler.luau",
+      "source_location": "L94",
+      "id": "laptop_talkogramhandler_init",
+      "community": 3,
+      "norm_label": "init()"
+    },
+    {
+      "label": "Leaderboard.server.luau",
+      "file_type": "code",
+      "source_file": "src/server/Leaderboard.server.luau",
+      "source_location": "L1",
+      "id": "server_leaderboard_server",
+      "community": 25,
+      "norm_label": "leaderboard.server.luau"
+    },
+    {
+      "label": "syncRep()",
+      "file_type": "code",
+      "source_file": "src/server/Leaderboard.server.luau",
+      "source_location": "L45",
+      "id": "server_leaderboard_server_syncrep",
+      "community": 25,
+      "norm_label": "syncrep()"
+    },
+    {
+      "label": "LocationManager.luau",
+      "file_type": "code",
+      "source_file": "src/server/LocationManager.luau",
+      "source_location": "L1",
+      "id": "server_locationmanager",
+      "community": 8,
+      "norm_label": "locationmanager.luau"
+    },
+    {
+      "label": "getDamagedVariants()",
+      "file_type": "code",
+      "source_file": "src/server/LocationManager.luau",
+      "source_location": "L119",
+      "id": "server_locationmanager_getdamagedvariants",
+      "community": 8,
+      "norm_label": "getdamagedvariants()"
+    },
+    {
+      "label": "pickRandom()",
+      "file_type": "code",
+      "source_file": "src/server/LocationManager.luau",
+      "source_location": "L129",
+      "id": "server_locationmanager_pickrandom",
+      "community": 8,
+      "norm_label": "pickrandom()"
+    },
+    {
+      "label": "colorizeClone()",
+      "file_type": "code",
+      "source_file": "src/server/LocationManager.luau",
+      "source_location": "L133",
+      "id": "server_locationmanager_colorizeclone",
+      "community": 8,
+      "norm_label": "colorizeclone()"
+    },
+    {
+      "label": "colorizeSlot()",
+      "file_type": "code",
+      "source_file": "src/server/LocationManager.luau",
+      "source_location": "L147",
+      "id": "server_locationmanager_colorizeslot",
+      "community": 8,
+      "norm_label": "colorizeslot()"
+    },
+    {
+      "label": "placeFurnitureDefault()",
+      "file_type": "code",
+      "source_file": "src/server/LocationManager.luau",
+      "source_location": "L162",
+      "id": "server_locationmanager_placefurnituredefault",
+      "community": 8,
+      "norm_label": "placefurnituredefault()"
+    },
+    {
+      "label": "LocationManager.GetLocationNames()",
+      "file_type": "code",
+      "source_file": "src/server/LocationManager.luau",
+      "source_location": "L194",
+      "id": "server_locationmanager_locationmanager_getlocationnames",
+      "community": 8,
+      "norm_label": "locationmanager.getlocationnames()"
+    },
+    {
+      "label": "LocationManager.GetLocationsByTier()",
+      "file_type": "code",
+      "source_file": "src/server/LocationManager.luau",
+      "source_location": "L203",
+      "id": "server_locationmanager_locationmanager_getlocationsbytier",
+      "community": 8,
+      "norm_label": "locationmanager.getlocationsbytier()"
+    },
+    {
+      "label": "LocationManager.GetAvailableTiers()",
+      "file_type": "code",
+      "source_file": "src/server/LocationManager.luau",
+      "source_location": "L211",
+      "id": "server_locationmanager_locationmanager_getavailabletiers",
+      "community": 8,
+      "norm_label": "locationmanager.getavailabletiers()"
+    },
+    {
+      "label": "LocationManager.Assign()",
+      "file_type": "code",
+      "source_file": "src/server/LocationManager.luau",
+      "source_location": "L221",
+      "id": "server_locationmanager_locationmanager_assign",
+      "community": 8,
+      "norm_label": "locationmanager.assign()"
+    },
+    {
+      "label": "LocationManager.Release()",
+      "file_type": "code",
+      "source_file": "src/server/LocationManager.luau",
+      "source_location": "L495",
+      "id": "server_locationmanager_locationmanager_release",
+      "community": 3,
+      "norm_label": "locationmanager.release()"
+    },
+    {
+      "label": "applyColors()",
+      "file_type": "code",
+      "source_file": "src/server/LocationManager.luau",
+      "source_location": "L560",
+      "id": "server_locationmanager_applycolors",
+      "community": 8,
+      "norm_label": "applycolors()"
+    },
+    {
+      "label": "PlayerData.server.luau",
+      "file_type": "code",
+      "source_file": "src/server/PlayerData/PlayerData.server.luau",
+      "source_location": "L1",
+      "id": "playerdata_playerdata_server",
+      "community": 24,
+      "norm_label": "playerdata.server.luau"
+    },
+    {
+      "label": "savePlayerData()",
+      "file_type": "code",
+      "source_file": "src/server/PlayerData/PlayerData.server.luau",
+      "source_location": "L8",
+      "id": "playerdata_playerdata_server_saveplayerdata",
+      "community": 24,
+      "norm_label": "saveplayerdata()"
+    },
+    {
+      "label": "PlayerHouseManager.luau",
+      "file_type": "code",
+      "source_file": "src/server/PlayerHouseManager.luau",
+      "source_location": "L1",
+      "id": "server_playerhousemanager",
+      "community": 3,
+      "norm_label": "playerhousemanager.luau"
+    },
+    {
+      "label": "getHouseCFrame()",
+      "file_type": "code",
+      "source_file": "src/server/PlayerHouseManager.luau",
+      "source_location": "L41",
+      "id": "server_playerhousemanager_gethousecframe",
+      "community": 3,
+      "norm_label": "gethousecframe()"
+    },
+    {
+      "label": "assignHouse()",
+      "file_type": "code",
+      "source_file": "src/server/PlayerHouseManager.luau",
+      "source_location": "L56",
+      "id": "server_playerhousemanager_assignhouse",
+      "community": 3,
+      "norm_label": "assignhouse()"
+    },
+    {
+      "label": "releaseHouse()",
+      "file_type": "code",
+      "source_file": "src/server/PlayerHouseManager.luau",
+      "source_location": "L69",
+      "id": "server_playerhousemanager_releasehouse",
+      "community": 3,
+      "norm_label": "releasehouse()"
+    },
+    {
+      "label": "PlayerHouseManager.GetHouseCFrame()",
+      "file_type": "code",
+      "source_file": "src/server/PlayerHouseManager.luau",
+      "source_location": "L81",
+      "id": "server_playerhousemanager_playerhousemanager_gethousecframe",
+      "community": 3,
+      "norm_label": "playerhousemanager.gethousecframe()"
+    },
+    {
+      "label": "PlayerHouseManager.GetAssignment()",
+      "file_type": "code",
+      "source_file": "src/server/PlayerHouseManager.luau",
+      "source_location": "L85",
+      "id": "server_playerhousemanager_playerhousemanager_getassignment",
+      "community": 3,
+      "norm_label": "playerhousemanager.getassignment()"
+    },
+    {
+      "label": "PlayerHouseManager.SetTier()",
+      "file_type": "code",
+      "source_file": "src/server/PlayerHouseManager.luau",
+      "source_location": "L90",
+      "id": "server_playerhousemanager_playerhousemanager_settier",
+      "community": 3,
+      "norm_label": "playerhousemanager.settier()"
+    },
+    {
+      "label": "onPlayerAdded()",
+      "file_type": "code",
+      "source_file": "src/server/PlayerHouseManager.luau",
+      "source_location": "L99",
+      "id": "server_playerhousemanager_onplayeradded",
+      "community": 3,
+      "norm_label": "onplayeradded()"
+    },
+    {
+      "label": "RadiantJobGenerator.luau",
+      "file_type": "code",
+      "source_file": "src/server/RadiantJobGenerator.luau",
+      "source_location": "L1",
+      "id": "server_radiantjobgenerator",
+      "community": 6,
+      "norm_label": "radiantjobgenerator.luau"
+    },
+    {
+      "label": "toDisplayName()",
+      "file_type": "code",
+      "source_file": "src/server/RadiantJobGenerator.luau",
+      "source_location": "L40",
+      "id": "server_radiantjobgenerator_todisplayname",
+      "community": 6,
+      "norm_label": "todisplayname()"
+    },
+    {
+      "label": "buildFurniturePool()",
+      "file_type": "code",
+      "source_file": "src/server/RadiantJobGenerator.luau",
+      "source_location": "L44",
+      "id": "server_radiantjobgenerator_buildfurniturepool",
+      "community": 6,
+      "norm_label": "buildfurniturepool()"
+    },
+    {
+      "label": "pickRandom()",
+      "file_type": "code",
+      "source_file": "src/server/RadiantJobGenerator.luau",
+      "source_location": "L85",
+      "id": "server_radiantjobgenerator_pickrandom",
+      "community": 6,
+      "norm_label": "pickrandom()"
+    },
+    {
+      "label": "shuffleCopy()",
+      "file_type": "code",
+      "source_file": "src/server/RadiantJobGenerator.luau",
+      "source_location": "L89",
+      "id": "server_radiantjobgenerator_shufflecopy",
+      "community": 6,
+      "norm_label": "shufflecopy()"
+    },
+    {
+      "label": "pickForCategory()",
+      "file_type": "code",
+      "source_file": "src/server/RadiantJobGenerator.luau",
+      "source_location": "L101",
+      "id": "server_radiantjobgenerator_pickforcategory",
+      "community": 6,
+      "norm_label": "pickforcategory()"
+    },
+    {
+      "label": "getFurniturePool()",
+      "file_type": "code",
+      "source_file": "src/server/RadiantJobGenerator.luau",
+      "source_location": "L120",
+      "id": "server_radiantjobgenerator_getfurniturepool",
+      "community": 6,
+      "norm_label": "getfurniturepool()"
+    },
+    {
+      "label": "rollJobTier()",
+      "file_type": "code",
+      "source_file": "src/server/RadiantJobGenerator.luau",
+      "source_location": "L142",
+      "id": "server_radiantjobgenerator_rolljobtier",
+      "community": 6,
+      "norm_label": "rolljobtier()"
+    },
+    {
+      "label": "calcPay()",
+      "file_type": "code",
+      "source_file": "src/server/RadiantJobGenerator.luau",
+      "source_location": "L167",
+      "id": "server_radiantjobgenerator_calcpay",
+      "community": 6,
+      "norm_label": "calcpay()"
+    },
+    {
+      "label": "calcFollowers()",
+      "file_type": "code",
+      "source_file": "src/server/RadiantJobGenerator.luau",
+      "source_location": "L172",
+      "id": "server_radiantjobgenerator_calcfollowers",
+      "community": 6,
+      "norm_label": "calcfollowers()"
+    },
+    {
+      "label": "buildJobName()",
+      "file_type": "code",
+      "source_file": "src/server/RadiantJobGenerator.luau",
+      "source_location": "L179",
+      "id": "server_radiantjobgenerator_buildjobname",
+      "community": 6,
+      "norm_label": "buildjobname()"
+    },
+    {
+      "label": "RadiantJobGenerator.Generate()",
+      "file_type": "code",
+      "source_file": "src/server/RadiantJobGenerator.luau",
+      "source_location": "L193",
+      "id": "server_radiantjobgenerator_radiantjobgenerator_generate",
+      "community": 6,
+      "norm_label": "radiantjobgenerator.generate()"
+    },
+    {
+      "label": "ShopData.luau",
+      "file_type": "code",
+      "source_file": "src/shared/Data/ShopData.luau",
+      "source_location": "L1",
+      "id": "data_shopdata",
+      "community": 13,
+      "norm_label": "shopdata.luau"
+    },
+    {
+      "label": "ShopProducts.GetById()",
+      "file_type": "code",
+      "source_file": "src/shared/Data/ShopData.luau",
+      "source_location": "L332",
+      "id": "data_shopdata_shopproducts_getbyid",
+      "community": 13,
+      "norm_label": "shopproducts.getbyid()"
+    },
+    {
+      "label": "ShopProducts.GetByCategory()",
+      "file_type": "code",
+      "source_file": "src/shared/Data/ShopData.luau",
+      "source_location": "L340",
+      "id": "data_shopdata_shopproducts_getbycategory",
+      "community": 13,
+      "norm_label": "shopproducts.getbycategory()"
+    },
+    {
+      "label": "ShopProducts.GetAvailableForTier()",
+      "file_type": "code",
+      "source_file": "src/shared/Data/ShopData.luau",
+      "source_location": "L356",
+      "id": "data_shopdata_shopproducts_getavailablefortier",
+      "community": 13,
+      "norm_label": "shopproducts.getavailablefortier()"
+    },
+    {
+      "label": "GameConfig.luau",
+      "file_type": "code",
+      "source_file": "src/shared/GameConfig.luau",
+      "source_location": "L1",
+      "id": "shared_gameconfig",
+      "community": 34,
+      "norm_label": "gameconfig.luau"
+    },
+    {
+      "label": "FoamPadding.luau",
+      "file_type": "code",
+      "source_file": "src/shared/Minigames/FoamPadding.luau",
+      "source_location": "L1",
+      "id": "minigames_foampadding",
+      "community": 9,
+      "norm_label": "foampadding.luau"
+    },
+    {
+      "label": "disconnect()",
+      "file_type": "code",
+      "source_file": "src/shared/Minigames/FoamPadding.luau",
+      "source_location": "L32",
+      "id": "minigames_foampadding_disconnect",
+      "community": 9,
+      "norm_label": "disconnect()"
+    },
+    {
+      "label": "copyCells()",
+      "file_type": "code",
+      "source_file": "src/shared/Minigames/FoamPadding.luau",
+      "source_location": "L73",
+      "id": "minigames_foampadding_copycells",
+      "community": 9,
+      "norm_label": "copycells()"
+    },
+    {
+      "label": "rotateCW()",
+      "file_type": "code",
+      "source_file": "src/shared/Minigames/FoamPadding.luau",
+      "source_location": "L79",
+      "id": "minigames_foampadding_rotatecw",
+      "community": 9,
+      "norm_label": "rotatecw()"
+    },
+    {
+      "label": "cellBounds()",
+      "file_type": "code",
+      "source_file": "src/shared/Minigames/FoamPadding.luau",
+      "source_location": "L91",
+      "id": "minigames_foampadding_cellbounds",
+      "community": 9,
+      "norm_label": "cellbounds()"
+    },
+    {
+      "label": "generateMold()",
+      "file_type": "code",
+      "source_file": "src/shared/Minigames/FoamPadding.luau",
+      "source_location": "L101",
+      "id": "minigames_foampadding_generatemold",
+      "community": 9,
+      "norm_label": "generatemold()"
+    },
+    {
+      "label": "FoamPadding.Start()",
+      "file_type": "code",
+      "source_file": "src/shared/Minigames/FoamPadding.luau",
+      "source_location": "L149",
+      "id": "minigames_foampadding_foampadding_start",
+      "community": 9,
+      "norm_label": "foampadding.start()"
+    },
+    {
+      "label": "FoamPadding.GetResult()",
+      "file_type": "code",
+      "source_file": "src/shared/Minigames/FoamPadding.luau",
+      "source_location": "L710",
+      "id": "minigames_foampadding_foampadding_getresult",
+      "community": 9,
+      "norm_label": "foampadding.getresult()"
+    },
+    {
+      "label": "FoamPadding.Cleanup()",
+      "file_type": "code",
+      "source_file": "src/shared/Minigames/FoamPadding.luau",
+      "source_location": "L714",
+      "id": "minigames_foampadding_foampadding_cleanup",
+      "community": 9,
+      "norm_label": "foampadding.cleanup()"
+    },
+    {
+      "label": "FoamPadding.Cancel()",
+      "file_type": "code",
+      "source_file": "src/shared/Minigames/FoamPadding.luau",
+      "source_location": "L723",
+      "id": "minigames_foampadding_foampadding_cancel",
+      "community": 9,
+      "norm_label": "foampadding.cancel()"
+    },
+    {
+      "label": "MinigameRunner.luau",
+      "file_type": "code",
+      "source_file": "src/shared/Minigames/MinigameRunner.luau",
+      "source_location": "L1",
+      "id": "minigames_minigamerunner",
+      "community": 4,
+      "norm_label": "minigamerunner.luau"
+    },
+    {
+      "label": "addBlur()",
+      "file_type": "code",
+      "source_file": "src/shared/Minigames/MinigameRunner.luau",
+      "source_location": "L57",
+      "id": "minigames_minigamerunner_addblur",
+      "community": 4,
+      "norm_label": "addblur()"
+    },
+    {
+      "label": "removeBlur()",
+      "file_type": "code",
+      "source_file": "src/shared/Minigames/MinigameRunner.luau",
+      "source_location": "L66",
+      "id": "minigames_minigamerunner_removeblur",
+      "community": 4,
+      "norm_label": "removeblur()"
+    },
+    {
+      "label": "buildGui()",
+      "file_type": "code",
+      "source_file": "src/shared/Minigames/MinigameRunner.luau",
+      "source_location": "L77",
+      "id": "minigames_minigamerunner_buildgui",
+      "community": 4,
+      "norm_label": "buildgui()"
+    },
+    {
+      "label": "showGui()",
+      "file_type": "code",
+      "source_file": "src/shared/Minigames/MinigameRunner.luau",
+      "source_location": "L94",
+      "id": "minigames_minigamerunner_showgui",
+      "community": 4,
+      "norm_label": "showgui()"
+    },
+    {
+      "label": "showResultOverlay()",
+      "file_type": "code",
+      "source_file": "src/shared/Minigames/MinigameRunner.luau",
+      "source_location": "L100",
+      "id": "minigames_minigamerunner_showresultoverlay",
+      "community": 4,
+      "norm_label": "showresultoverlay()"
+    },
+    {
+      "label": "buildParams()",
+      "file_type": "code",
+      "source_file": "src/shared/Minigames/MinigameRunner.luau",
+      "source_location": "L154",
+      "id": "minigames_minigamerunner_buildparams",
+      "community": 4,
+      "norm_label": "buildparams()"
+    },
+    {
+      "label": "requireModule()",
+      "file_type": "code",
+      "source_file": "src/shared/Minigames/MinigameRunner.luau",
+      "source_location": "L185",
+      "id": "minigames_minigamerunner_requiremodule",
+      "community": 4,
+      "norm_label": "requiremodule()"
+    },
+    {
+      "label": "MinigameRunner.IsRunning()",
+      "file_type": "code",
+      "source_file": "src/shared/Minigames/MinigameRunner.luau",
+      "source_location": "L193",
+      "id": "minigames_minigamerunner_minigamerunner_isrunning",
+      "community": 4,
+      "norm_label": "minigamerunner.isrunning()"
+    },
+    {
+      "label": "MinigameRunner.Cancel()",
+      "file_type": "code",
+      "source_file": "src/shared/Minigames/MinigameRunner.luau",
+      "source_location": "L197",
+      "id": "minigames_minigamerunner_minigamerunner_cancel",
+      "community": 4,
+      "norm_label": "minigamerunner.cancel()"
+    },
+    {
+      "label": "MinigameRunner.Run()",
+      "file_type": "code",
+      "source_file": "src/shared/Minigames/MinigameRunner.luau",
+      "source_location": "L203",
+      "id": "minigames_minigamerunner_minigamerunner_run",
+      "community": 4,
+      "norm_label": "minigamerunner.run()"
+    },
+    {
+      "label": "MinigameRunner.RunChain()",
+      "file_type": "code",
+      "source_file": "src/shared/Minigames/MinigameRunner.luau",
+      "source_location": "L228",
+      "id": "minigames_minigamerunner_minigamerunner_runchain",
+      "community": 4,
+      "norm_label": "minigamerunner.runchain()"
+    },
+    {
+      "label": "MinigameRunner.CollapseChainResult()",
+      "file_type": "code",
+      "source_file": "src/shared/Minigames/MinigameRunner.luau",
+      "source_location": "L269",
+      "id": "minigames_minigamerunner_minigamerunner_collapsechainresult",
+      "community": 4,
+      "norm_label": "minigamerunner.collapsechainresult()"
+    },
+    {
+      "label": "SeamStitching.luau",
+      "file_type": "code",
+      "source_file": "src/shared/Minigames/SeamStitching.luau",
+      "source_location": "L1",
+      "id": "minigames_seamstitching",
+      "community": 5,
+      "norm_label": "seamstitching.luau"
+    },
+    {
+      "label": "disconnect()",
+      "file_type": "code",
+      "source_file": "src/shared/Minigames/SeamStitching.luau",
+      "source_location": "L34",
+      "id": "minigames_seamstitching_disconnect",
+      "community": 5,
+      "norm_label": "disconnect()"
+    },
+    {
+      "label": "makePill()",
+      "file_type": "code",
+      "source_file": "src/shared/Minigames/SeamStitching.luau",
+      "source_location": "L59",
+      "id": "minigames_seamstitching_makepill",
+      "community": 5,
+      "norm_label": "makepill()"
+    },
+    {
+      "label": "makeLabel()",
+      "file_type": "code",
+      "source_file": "src/shared/Minigames/SeamStitching.luau",
+      "source_location": "L73",
+      "id": "minigames_seamstitching_makelabel",
+      "community": 5,
+      "norm_label": "makelabel()"
+    },
+    {
+      "label": "generatePath()",
+      "file_type": "code",
+      "source_file": "src/shared/Minigames/SeamStitching.luau",
+      "source_location": "L90",
+      "id": "minigames_seamstitching_generatepath",
+      "community": 5,
+      "norm_label": "generatepath()"
+    },
+    {
+      "label": "closestPointOnSegment()",
+      "file_type": "code",
+      "source_file": "src/shared/Minigames/SeamStitching.luau",
+      "source_location": "L115",
+      "id": "minigames_seamstitching_closestpointonsegment",
+      "community": 5,
+      "norm_label": "closestpointonsegment()"
+    },
+    {
+      "label": "addTrailDot()",
+      "file_type": "code",
+      "source_file": "src/shared/Minigames/SeamStitching.luau",
+      "source_location": "L127",
+      "id": "minigames_seamstitching_addtraildot",
+      "community": 5,
+      "norm_label": "addtraildot()"
+    },
+    {
+      "label": "buildDeviationMeter()",
+      "file_type": "code",
+      "source_file": "src/shared/Minigames/SeamStitching.luau",
+      "source_location": "L149",
+      "id": "minigames_seamstitching_builddeviationmeter",
+      "community": 5,
+      "norm_label": "builddeviationmeter()"
+    },
+    {
+      "label": "buildUI()",
+      "file_type": "code",
+      "source_file": "src/shared/Minigames/SeamStitching.luau",
+      "source_location": "L189",
+      "id": "minigames_seamstitching_buildui",
+      "community": 5,
+      "norm_label": "buildui()"
+    },
+    {
+      "label": "highlightSegment()",
+      "file_type": "code",
+      "source_file": "src/shared/Minigames/SeamStitching.luau",
+      "source_location": "L305",
+      "id": "minigames_seamstitching_highlightsegment",
+      "community": 5,
+      "norm_label": "highlightsegment()"
+    },
+    {
+      "label": "SeamStitching.Start()",
+      "file_type": "code",
+      "source_file": "src/shared/Minigames/SeamStitching.luau",
+      "source_location": "L325",
+      "id": "minigames_seamstitching_seamstitching_start",
+      "community": 5,
+      "norm_label": "seamstitching.start()"
+    },
+    {
+      "label": "SeamStitching.GetResult()",
+      "file_type": "code",
+      "source_file": "src/shared/Minigames/SeamStitching.luau",
+      "source_location": "L480",
+      "id": "minigames_seamstitching_seamstitching_getresult",
+      "community": 5,
+      "norm_label": "seamstitching.getresult()"
+    },
+    {
+      "label": "SeamStitching.Cleanup()",
+      "file_type": "code",
+      "source_file": "src/shared/Minigames/SeamStitching.luau",
+      "source_location": "L484",
+      "id": "minigames_seamstitching_seamstitching_cleanup",
+      "community": 5,
+      "norm_label": "seamstitching.cleanup()"
+    },
+    {
+      "label": "SeamStitching.Cancel()",
+      "file_type": "code",
+      "source_file": "src/shared/Minigames/SeamStitching.luau",
+      "source_location": "L497",
+      "id": "minigames_seamstitching_seamstitching_cancel",
+      "community": 5,
+      "norm_label": "seamstitching.cancel()"
+    },
+    {
+      "label": "StapleGunning.luau",
+      "file_type": "code",
+      "source_file": "src/shared/Minigames/StapleGunning.luau",
+      "source_location": "L1",
+      "id": "minigames_staplegunning",
+      "community": 7,
+      "norm_label": "staplegunning.luau"
+    },
+    {
+      "label": "disconnect()",
+      "file_type": "code",
+      "source_file": "src/shared/Minigames/StapleGunning.luau",
+      "source_location": "L32",
+      "id": "minigames_staplegunning_disconnect",
+      "community": 7,
+      "norm_label": "disconnect()"
+    },
+    {
+      "label": "makePill()",
+      "file_type": "code",
+      "source_file": "src/shared/Minigames/StapleGunning.luau",
+      "source_location": "L54",
+      "id": "minigames_staplegunning_makepill",
+      "community": 7,
+      "norm_label": "makepill()"
+    },
+    {
+      "label": "makeLabel()",
+      "file_type": "code",
+      "source_file": "src/shared/Minigames/StapleGunning.luau",
+      "source_location": "L68",
+      "id": "minigames_staplegunning_makelabel",
+      "community": 7,
+      "norm_label": "makelabel()"
+    },
+    {
+      "label": "showFeedback()",
+      "file_type": "code",
+      "source_file": "src/shared/Minigames/StapleGunning.luau",
+      "source_location": "L81",
+      "id": "minigames_staplegunning_showfeedback",
+      "community": 7,
+      "norm_label": "showfeedback()"
+    },
+    {
+      "label": "generateZones()",
+      "file_type": "code",
+      "source_file": "src/shared/Minigames/StapleGunning.luau",
+      "source_location": "L94",
+      "id": "minigames_staplegunning_generatezones",
+      "community": 7,
+      "norm_label": "generatezones()"
+    },
+    {
+      "label": "buildUI()",
+      "file_type": "code",
+      "source_file": "src/shared/Minigames/StapleGunning.luau",
+      "source_location": "L109",
+      "id": "minigames_staplegunning_buildui",
+      "community": 7,
+      "norm_label": "buildui()"
+    },
+    {
+      "label": "StapleGunning.Start()",
+      "file_type": "code",
+      "source_file": "src/shared/Minigames/StapleGunning.luau",
+      "source_location": "L228",
+      "id": "minigames_staplegunning_staplegunning_start",
+      "community": 7,
+      "norm_label": "staplegunning.start()"
+    },
+    {
+      "label": "StapleGunning.GetResult()",
+      "file_type": "code",
+      "source_file": "src/shared/Minigames/StapleGunning.luau",
+      "source_location": "L370",
+      "id": "minigames_staplegunning_staplegunning_getresult",
+      "community": 7,
+      "norm_label": "staplegunning.getresult()"
+    },
+    {
+      "label": "StapleGunning.Cleanup()",
+      "file_type": "code",
+      "source_file": "src/shared/Minigames/StapleGunning.luau",
+      "source_location": "L374",
+      "id": "minigames_staplegunning_staplegunning_cleanup",
+      "community": 7,
+      "norm_label": "staplegunning.cleanup()"
+    },
+    {
+      "label": "StapleGunning.Cancel()",
+      "file_type": "code",
+      "source_file": "src/shared/Minigames/StapleGunning.luau",
+      "source_location": "L386",
+      "id": "minigames_staplegunning_staplegunning_cancel",
+      "community": 7,
+      "norm_label": "staplegunning.cancel()"
+    },
+    {
+      "label": "TackRemoval.luau",
+      "file_type": "code",
+      "source_file": "src/shared/Minigames/TackRemoval.luau",
+      "source_location": "L1",
+      "id": "minigames_tackremoval",
+      "community": 10,
+      "norm_label": "tackremoval.luau"
+    },
+    {
+      "label": "disconnect()",
+      "file_type": "code",
+      "source_file": "src/shared/Minigames/TackRemoval.luau",
+      "source_location": "L31",
+      "id": "minigames_tackremoval_disconnect",
+      "community": 10,
+      "norm_label": "disconnect()"
+    },
+    {
+      "label": "makePill()",
+      "file_type": "code",
+      "source_file": "src/shared/Minigames/TackRemoval.luau",
+      "source_location": "L55",
+      "id": "minigames_tackremoval_makepill",
+      "community": 10,
+      "norm_label": "makepill()"
+    },
+    {
+      "label": "makeLabel()",
+      "file_type": "code",
+      "source_file": "src/shared/Minigames/TackRemoval.luau",
+      "source_location": "L69",
+      "id": "minigames_tackremoval_makelabel",
+      "community": 10,
+      "norm_label": "makelabel()"
+    },
+    {
+      "label": "showHitText()",
+      "file_type": "code",
+      "source_file": "src/shared/Minigames/TackRemoval.luau",
+      "source_location": "L83",
+      "id": "minigames_tackremoval_showhittext",
+      "community": 10,
+      "norm_label": "showhittext()"
+    },
+    {
+      "label": "TackRemoval.Start()",
+      "file_type": "code",
+      "source_file": "src/shared/Minigames/TackRemoval.luau",
+      "source_location": "L109",
+      "id": "minigames_tackremoval_tackremoval_start",
+      "community": 10,
+      "norm_label": "tackremoval.start()"
+    },
+    {
+      "label": "TackRemoval.GetResult()",
+      "file_type": "code",
+      "source_file": "src/shared/Minigames/TackRemoval.luau",
+      "source_location": "L314",
+      "id": "minigames_tackremoval_tackremoval_getresult",
+      "community": 10,
+      "norm_label": "tackremoval.getresult()"
+    },
+    {
+      "label": "TackRemoval.Cleanup()",
+      "file_type": "code",
+      "source_file": "src/shared/Minigames/TackRemoval.luau",
+      "source_location": "L318",
+      "id": "minigames_tackremoval_tackremoval_cleanup",
+      "community": 10,
+      "norm_label": "tackremoval.cleanup()"
+    },
+    {
+      "label": "TackRemoval.Cancel()",
+      "file_type": "code",
+      "source_file": "src/shared/Minigames/TackRemoval.luau",
+      "source_location": "L330",
+      "id": "minigames_tackremoval_tackremoval_cancel",
+      "community": 10,
+      "norm_label": "tackremoval.cancel()"
+    },
+    {
+      "label": "SFXPlayer.luau",
+      "file_type": "code",
+      "source_file": "src/shared/SFXPlayer.luau",
+      "source_location": "L1",
+      "id": "shared_sfxplayer",
+      "community": 15,
+      "norm_label": "sfxplayer.luau"
+    },
+    {
+      "label": "SFXPlayer.Play()",
+      "file_type": "code",
+      "source_file": "src/shared/SFXPlayer.luau",
+      "source_location": "L24",
+      "id": "shared_sfxplayer_sfxplayer_play",
+      "community": 15,
+      "norm_label": "sfxplayer.play()"
+    },
+    {
+      "label": "SFXPlayer.PlayLooping()",
+      "file_type": "code",
+      "source_file": "src/shared/SFXPlayer.luau",
+      "source_location": "L31",
+      "id": "shared_sfxplayer_sfxplayer_playlooping",
+      "community": 15,
+      "norm_label": "sfxplayer.playlooping()"
+    },
+    {
+      "label": "SFXPlayer.Stop()",
+      "file_type": "code",
+      "source_file": "src/shared/SFXPlayer.luau",
+      "source_location": "L43",
+      "id": "shared_sfxplayer_sfxplayer_stop",
+      "community": 15,
+      "norm_label": "sfxplayer.stop()"
+    },
+    {
+      "label": "UPHOLSTERY! Game",
+      "file_type": "document",
+      "source_file": "UPHOLSTERY_GDD_v8.txt",
+      "source_location": "\u00a71",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "gdd_upholstery_game",
+      "community": 1,
+      "norm_label": "upholstery! game"
+    },
+    {
+      "label": "Core Gameplay Loop",
+      "file_type": "document",
+      "source_file": "UPHOLSTERY_GDD_v8.txt",
+      "source_location": "\u00a72",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "gdd_core_gameplay_loop",
+      "community": 1,
+      "norm_label": "core gameplay loop"
+    },
+    {
+      "label": "Job System",
+      "file_type": "document",
+      "source_file": "UPHOLSTERY_GDD_v8.txt",
+      "source_location": "\u00a73",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "gdd_job_system",
+      "community": 1,
+      "norm_label": "job system"
+    },
+    {
+      "label": "Shared Job Board",
+      "file_type": "document",
+      "source_file": "UPHOLSTERY_GDD_v8.txt",
+      "source_location": "\u00a73.1",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "gdd_shared_job_board",
+      "community": 1,
+      "norm_label": "shared job board"
+    },
+    {
+      "label": "Direct Offers",
+      "file_type": "document",
+      "source_file": "UPHOLSTERY_GDD_v8.txt",
+      "source_location": "\u00a73.2",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "gdd_direct_offers",
+      "community": 1,
+      "norm_label": "direct offers"
+    },
+    {
+      "label": "Job Structure",
+      "file_type": "document",
+      "source_file": "UPHOLSTERY_GDD_v8.txt",
+      "source_location": "\u00a73.3",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "gdd_job_structure",
+      "community": 2,
+      "norm_label": "job structure"
+    },
+    {
+      "label": "Hot Jobs",
+      "file_type": "document",
+      "source_file": "UPHOLSTERY_GDD_v8.txt",
+      "source_location": "\u00a73.4 / \u00a712",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "gdd_hot_jobs",
+      "community": 1,
+      "norm_label": "hot jobs"
+    },
+    {
+      "label": "Minigames System",
+      "file_type": "document",
+      "source_file": "UPHOLSTERY_GDD_v8.txt",
+      "source_location": "\u00a74",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "gdd_minigames",
+      "community": 2,
+      "norm_label": "minigames system"
+    },
+    {
+      "label": "Tack Removal Minigame",
+      "file_type": "document",
+      "source_file": "UPHOLSTERY_GDD_v8.txt",
+      "source_location": "\u00a74.1",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "gdd_tack_removal",
+      "community": 2,
+      "norm_label": "tack removal minigame"
+    },
+    {
+      "label": "Staple Gunning Minigame",
+      "file_type": "document",
+      "source_file": "UPHOLSTERY_GDD_v8.txt",
+      "source_location": "\u00a74.2",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "gdd_staple_gunning",
+      "community": 2,
+      "norm_label": "staple gunning minigame"
+    },
+    {
+      "label": "Seam Stitching Minigame",
+      "file_type": "document",
+      "source_file": "UPHOLSTERY_GDD_v8.txt",
+      "source_location": "\u00a74.3",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "gdd_seam_stitching",
+      "community": 2,
+      "norm_label": "seam stitching minigame"
+    },
+    {
+      "label": "Foam Padding Minigame",
+      "file_type": "document",
+      "source_file": "UPHOLSTERY_GDD_v8.txt",
+      "source_location": "\u00a74.4",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "gdd_foam_padding",
+      "community": 2,
+      "norm_label": "foam padding minigame"
+    },
+    {
+      "label": "Button Tufting Minigame (Post-Launch)",
+      "file_type": "document",
+      "source_file": "UPHOLSTERY_GDD_v8.txt",
+      "source_location": "\u00a74.5",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "gdd_button_tufting",
+      "community": 2,
+      "norm_label": "button tufting minigame (post-launch)"
+    },
+    {
+      "label": "Spring Tensioning Minigame (Post-Launch)",
+      "file_type": "document",
+      "source_file": "UPHOLSTERY_GDD_v8.txt",
+      "source_location": "\u00a74.6",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "gdd_spring_tensioning",
+      "community": 2,
+      "norm_label": "spring tensioning minigame (post-launch)"
+    },
+    {
+      "label": "Webbing Weave Minigame (Post-Launch)",
+      "file_type": "document",
+      "source_file": "UPHOLSTERY_GDD_v8.txt",
+      "source_location": "\u00a74.7",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "gdd_webbing_weave",
+      "community": 2,
+      "norm_label": "webbing weave minigame (post-launch)"
+    },
+    {
+      "label": "Corner Fold Minigame (Post-Launch)",
+      "file_type": "document",
+      "source_file": "UPHOLSTERY_GDD_v8.txt",
+      "source_location": "\u00a74.8",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "gdd_corner_fold",
+      "community": 2,
+      "norm_label": "corner fold minigame (post-launch)"
+    },
+    {
+      "label": "Fragile Modifier",
+      "file_type": "rationale",
+      "source_file": "UPHOLSTERY_GDD_v8.txt",
+      "source_location": "\u00a74.9",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "rationale": "Tightens all precision windows by 40% on Premium+ jobs. Forces real investment in protection perks. The cost of overreaching is built into the modifier itself.",
+      "id": "gdd_fragile_modifier",
+      "community": 2,
+      "norm_label": "fragile modifier"
+    },
+    {
+      "label": "Reputation System",
+      "file_type": "document",
+      "source_file": "UPHOLSTERY_GDD_v8.txt",
+      "source_location": "\u00a75",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "gdd_reputation_system",
+      "community": 1,
+      "norm_label": "reputation system"
+    },
+    {
+      "label": "Toolbox Pick-5 Perk System",
+      "file_type": "document",
+      "source_file": "UPHOLSTERY_GDD_v8.txt",
+      "source_location": "\u00a76",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "gdd_toolbox_perk_system",
+      "community": 1,
+      "norm_label": "toolbox pick-5 perk system"
+    },
+    {
+      "label": "Bolt vs Bespoke Perk Tiers",
+      "file_type": "rationale",
+      "source_file": "UPHOLSTERY_GDD_v8.txt",
+      "source_location": "\u00a76.2",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "rationale": "Bolt perks are reliable and accessible; Bespoke are conditional and stronger. Bespoke conditions like 'Good or better only' mean skilled players benefit more \u2014 the system rewards competence, not just spending.",
+      "id": "gdd_bolt_bespoke",
+      "community": 1,
+      "norm_label": "bolt vs bespoke perk tiers"
+    },
+    {
+      "label": "Economy System",
+      "file_type": "document",
+      "source_file": "UPHOLSTERY_GDD_v8.txt",
+      "source_location": "\u00a77",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "gdd_economy",
+      "community": 1,
+      "norm_label": "economy system"
+    },
+    {
+      "label": "Followers Currency",
+      "file_type": "document",
+      "source_file": "UPHOLSTERY_GDD_v8.txt",
+      "source_location": "\u00a77.2",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "gdd_followers",
+      "community": 1,
+      "norm_label": "followers currency"
+    },
+    {
+      "label": "Money Sinks",
+      "file_type": "rationale",
+      "source_file": "UPHOLSTERY_GDD_v8.txt",
+      "source_location": "\u00a77.3",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "rationale": "Perk charges are the primary money sink. Keeps high earners spending continuously rather than accumulating idle wealth.",
+      "id": "gdd_money_sinks",
+      "community": 1,
+      "norm_label": "money sinks"
+    },
+    {
+      "label": "Shop",
+      "file_type": "document",
+      "source_file": "UPHOLSTERY_GDD_v8.txt",
+      "source_location": "\u00a78",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "gdd_shop",
+      "community": 1,
+      "norm_label": "shop"
+    },
+    {
+      "label": "Talkogram Activity Feed (Post-Launch)",
+      "file_type": "document",
+      "source_file": "UPHOLSTERY_GDD_v8.txt",
+      "source_location": "\u00a79",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "gdd_talkogram",
+      "community": 1,
+      "norm_label": "talkogram activity feed (post-launch)"
+    },
+    {
+      "label": "Player Progression",
+      "file_type": "document",
+      "source_file": "UPHOLSTERY_GDD_v8.txt",
+      "source_location": "\u00a710",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "gdd_player_progression",
+      "community": 1,
+      "norm_label": "player progression"
+    },
+    {
+      "label": "Player House (Post-Launch)",
+      "file_type": "document",
+      "source_file": "UPHOLSTERY_GDD_v8.txt",
+      "source_location": "\u00a710.1",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "gdd_player_house",
+      "community": 1,
+      "norm_label": "player house (post-launch)"
+    },
+    {
+      "label": "Daily Contracts",
+      "file_type": "document",
+      "source_file": "UPHOLSTERY_GDD_v8.txt",
+      "source_location": "\u00a710.3",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "gdd_daily_contracts",
+      "community": 1,
+      "norm_label": "daily contracts"
+    },
+    {
+      "label": "Penalty System",
+      "file_type": "document",
+      "source_file": "UPHOLSTERY_GDD_v8.txt",
+      "source_location": "\u00a711",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "gdd_penalty_system",
+      "community": 1,
+      "norm_label": "penalty system"
+    },
+    {
+      "label": "Special Events",
+      "file_type": "document",
+      "source_file": "UPHOLSTERY_GDD_v8.txt",
+      "source_location": "\u00a713",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "gdd_special_events",
+      "community": 2,
+      "norm_label": "special events"
+    },
+    {
+      "label": "Design Pillars",
+      "file_type": "rationale",
+      "source_file": "UPHOLSTERY_GDD_v8.txt",
+      "source_location": "\u00a71",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "rationale": "Four pillars: (1) Skill has a ceiling, loadout raises the floor; (2) Every job is a bet; (3) Reputation is earned not bought; (4) The board is shared, the grind is personal.",
+      "id": "gdd_design_pillars",
+      "community": 1,
+      "norm_label": "design pillars"
+    },
+    {
+      "label": "Minigame Common Interface",
+      "file_type": "rationale",
+      "source_file": "UPHOLSTERY_GDD_v8.txt",
+      "source_location": "\u00a74",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "rationale": "All minigames share Start(container,config)->GetResult()->Cleanup() API. Results: FAIL->PASS->GOOD->PERFECT. Worst result in chain becomes final result.",
+      "id": "gdd_minigame_interface",
+      "community": 2,
+      "norm_label": "minigame common interface"
+    },
+    {
+      "label": "Compound Failure Cost Design",
+      "file_type": "rationale",
+      "source_file": "UPHOLSTERY_GDD_v8.txt",
+      "source_location": "\u00a711.2",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "rationale": "Failure costs: rep loss + tool charges lost + no pay + time lost. No direct money deduction \u2014 charge burn scales with loadout investment. Intentional design so riskier equipped attempts cost more to fail.",
+      "id": "gdd_compound_failure",
+      "community": 1,
+      "norm_label": "compound failure cost design"
+    },
+    {
+      "label": "LaptopInteraction Script",
+      "file_type": "code",
+      "source_file": "explain.md",
+      "source_location": "\u00a71",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "explain_laptop_interaction",
+      "community": 1,
+      "norm_label": "laptopinteraction script"
+    },
+    {
+      "label": "LaptopBrowser Script",
+      "file_type": "code",
+      "source_file": "explain.md",
+      "source_location": "\u00a71",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "explain_laptop_browser",
+      "community": 1,
+      "norm_label": "laptopbrowser script"
+    },
+    {
+      "label": "GameplayClient Script",
+      "file_type": "code",
+      "source_file": "explain.md",
+      "source_location": "\u00a71",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "explain_gameplay_client",
+      "community": 1,
+      "norm_label": "gameplayclient script"
+    },
+    {
+      "label": "LaptopData Server Script",
+      "file_type": "code",
+      "source_file": "explain.md",
+      "source_location": "\u00a72",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "explain_laptop_data",
+      "community": 1,
+      "norm_label": "laptopdata server script"
+    },
+    {
+      "label": "LocationManager Script",
+      "file_type": "code",
+      "source_file": "explain.md",
+      "source_location": "\u00a72",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "explain_location_manager",
+      "community": 1,
+      "norm_label": "locationmanager script"
+    },
+    {
+      "label": "PlayerData Server Script",
+      "file_type": "code",
+      "source_file": "explain.md",
+      "source_location": "\u00a72",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "explain_player_data",
+      "community": 1,
+      "norm_label": "playerdata server script"
+    },
+    {
+      "label": "GameConfig Shared Module",
+      "file_type": "code",
+      "source_file": "explain.md",
+      "source_location": "\u00a73",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "explain_game_config",
+      "community": 1,
+      "norm_label": "gameconfig shared module"
+    },
+    {
+      "label": "MinigameRunner Module",
+      "file_type": "code",
+      "source_file": "explain.md",
+      "source_location": "\u00a73",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "explain_minigame_runner",
+      "community": 2,
+      "norm_label": "minigamerunner module"
+    },
+    {
+      "label": "TackRemoval Luau Module",
+      "file_type": "code",
+      "source_file": "explain.md",
+      "source_location": "\u00a73",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "explain_tack_removal_script",
+      "community": 2,
+      "norm_label": "tackremoval luau module"
+    },
+    {
+      "label": "StapleGunning Luau Module",
+      "file_type": "code",
+      "source_file": "explain.md",
+      "source_location": "\u00a73",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "explain_staple_gunning_script",
+      "community": 2,
+      "norm_label": "staplegunning luau module"
+    },
+    {
+      "label": "SeamStitching Luau Module",
+      "file_type": "code",
+      "source_file": "explain.md",
+      "source_location": "\u00a73",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "explain_seam_stitching_script",
+      "community": 2,
+      "norm_label": "seamstitching luau module"
+    },
+    {
+      "label": "FoamPadding Luau Module",
+      "file_type": "code",
+      "source_file": "explain.md",
+      "source_location": "\u00a73",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "explain_foam_padding_script",
+      "community": 2,
+      "norm_label": "foampadding luau module"
+    },
+    {
+      "label": "Rojo Build Tool",
+      "file_type": "document",
+      "source_file": "README.md",
+      "source_location": "\u00a71",
+      "source_url": "https://rojo.space/docs",
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "readme_rojo",
+      "community": 1,
+      "norm_label": "rojo build tool"
+    }
+  ],
+  "links": [
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": ".claude/settings.json",
+      "source_location": "L2",
+      "weight": 1.0,
+      "source": "claude_settings",
+      "target": "claude_settings_hooks",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": ".claude/settings.json",
+      "source_location": "L3",
+      "weight": 1.0,
+      "source": "claude_settings_hooks",
+      "target": "claude_settings_hooks_pretooluse",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": ".claude/settings.local.json",
+      "source_location": "L2",
+      "weight": 1.0,
+      "source": "claude_settings_local",
+      "target": "claude_settings_local_permissions",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": ".claude/settings.local.json",
+      "source_location": "L3",
+      "weight": 1.0,
+      "source": "claude_settings_local_permissions",
+      "target": "claude_settings_local_permissions_allow",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "default.project.json",
+      "source_location": "L2",
+      "weight": 1.0,
+      "source": "default_project",
+      "target": "default_project_name",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "default.project.json",
+      "source_location": "L3",
+      "weight": 1.0,
+      "source": "default_project",
+      "target": "default_project_tree",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "default.project.json",
+      "source_location": "L4",
+      "weight": 1.0,
+      "source": "default_project_tree",
+      "target": "default_project_tree_classname",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "default.project.json",
+      "source_location": "L35",
+      "weight": 1.0,
+      "source": "default_project_tree",
+      "target": "default_project_tree_lighting",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "default.project.json",
+      "source_location": "L6",
+      "weight": 1.0,
+      "source": "default_project_tree",
+      "target": "default_project_tree_replicatedstorage",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "default.project.json",
+      "source_location": "L12",
+      "weight": 1.0,
+      "source": "default_project_tree",
+      "target": "default_project_tree_serverscriptservice",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "default.project.json",
+      "source_location": "L48",
+      "weight": 1.0,
+      "source": "default_project_tree",
+      "target": "default_project_tree_soundservice",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "default.project.json",
+      "source_location": "L24",
+      "weight": 1.0,
+      "source": "default_project_tree",
+      "target": "default_project_tree_startergui",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "default.project.json",
+      "source_location": "L16",
+      "weight": 1.0,
+      "source": "default_project_tree",
+      "target": "default_project_tree_starterplayer",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "default.project.json",
+      "source_location": "L30",
+      "weight": 1.0,
+      "source": "default_project_tree",
+      "target": "default_project_tree_workspace",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "default.project.json",
+      "source_location": "L7",
+      "weight": 1.0,
+      "source": "default_project_tree_replicatedstorage",
+      "target": "default_project_replicatedstorage_shared",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "default.project.json",
+      "source_location": "L8",
+      "weight": 1.0,
+      "source": "default_project_replicatedstorage_shared",
+      "target": "default_project_shared_path",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "default.project.json",
+      "source_location": "L13",
+      "weight": 1.0,
+      "source": "default_project_tree_serverscriptservice",
+      "target": "default_project_serverscriptservice_path",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "default.project.json",
+      "source_location": "L17",
+      "weight": 1.0,
+      "source": "default_project_tree_starterplayer",
+      "target": "default_project_starterplayer_starterplayerscripts",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "default.project.json",
+      "source_location": "L18",
+      "weight": 1.0,
+      "source": "default_project_starterplayer_starterplayerscripts",
+      "target": "default_project_starterplayerscripts_client",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "default.project.json",
+      "source_location": "L19",
+      "weight": 1.0,
+      "source": "default_project_starterplayerscripts_client",
+      "target": "default_project_client_path",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "default.project.json",
+      "source_location": "L25",
+      "weight": 1.0,
+      "source": "default_project_tree_startergui",
+      "target": "default_project_startergui_guiscript",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "default.project.json",
+      "source_location": "L26",
+      "weight": 1.0,
+      "source": "default_project_startergui_guiscript",
+      "target": "default_project_guiscript_path",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "default.project.json",
+      "source_location": "L31",
+      "weight": 1.0,
+      "source": "default_project_tree_workspace",
+      "target": "default_project_workspace_properties",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "default.project.json",
+      "source_location": "L32",
+      "weight": 1.0,
+      "source": "default_project_workspace_properties",
+      "target": "default_project_properties_filteringenabled",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "default.project.json",
+      "source_location": "L36",
+      "weight": 1.0,
+      "source": "default_project_tree_lighting",
+      "target": "default_project_lighting_properties",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "default.project.json",
+      "source_location": "L37",
+      "weight": 1.0,
+      "source": "default_project_lighting_properties",
+      "target": "default_project_properties_ambient",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "default.project.json",
+      "source_location": "L42",
+      "weight": 1.0,
+      "source": "default_project_lighting_properties",
+      "target": "default_project_properties_brightness",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "default.project.json",
+      "source_location": "L43",
+      "weight": 1.0,
+      "source": "default_project_lighting_properties",
+      "target": "default_project_properties_globalshadows",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "default.project.json",
+      "source_location": "L44",
+      "weight": 1.0,
+      "source": "default_project_lighting_properties",
+      "target": "default_project_properties_outlines",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "default.project.json",
+      "source_location": "L45",
+      "weight": 1.0,
+      "source": "default_project_lighting_properties",
+      "target": "default_project_properties_technology",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "default.project.json",
+      "source_location": "L49",
+      "weight": 1.0,
+      "source": "default_project_tree_soundservice",
+      "target": "default_project_soundservice_properties",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "default.project.json",
+      "source_location": "L50",
+      "weight": 1.0,
+      "source": "default_project_soundservice_properties",
+      "target": "default_project_properties_respectfilteringenabled",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/gui/Gameplay/AdminPanel.client.luau",
+      "source_location": "L49",
+      "weight": 1.0,
+      "source": "gameplay_adminpanel_client",
+      "target": "gameplay_adminpanel_client_corner",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/gui/Gameplay/AdminPanel.client.luau",
+      "source_location": "L43",
+      "weight": 1.0,
+      "source": "gameplay_adminpanel_client",
+      "target": "gameplay_adminpanel_client_make",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/gui/Gameplay/AdminPanel.client.luau",
+      "source_location": "L111",
+      "weight": 1.0,
+      "source": "gameplay_adminpanel_client",
+      "target": "gameplay_adminpanel_client_makedropdown",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "src/gui/Gameplay/AdminPanel.client.luau",
+      "source_location": "L49",
+      "weight": 1.0,
+      "source": "gameplay_adminpanel_client_corner",
+      "target": "gameplay_adminpanel_client_make",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "src/gui/Gameplay/AdminPanel.client.luau",
+      "source_location": "L112",
+      "weight": 1.0,
+      "source": "gameplay_adminpanel_client_makedropdown",
+      "target": "gameplay_adminpanel_client_make",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "src/gui/Gameplay/AdminPanel.client.luau",
+      "source_location": "L141",
+      "weight": 1.0,
+      "source": "gameplay_adminpanel_client_makedropdown",
+      "target": "gameplay_adminpanel_client_corner",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/gui/Gameplay/GameplayClient.client.luau",
+      "source_location": "L146",
+      "weight": 1.0,
+      "source": "gameplay_gameplayclient_client",
+      "target": "gameplay_gameplayclient_client_clearallhighlights",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/gui/Gameplay/GameplayClient.client.luau",
+      "source_location": "L133",
+      "weight": 1.0,
+      "source": "gameplay_gameplayclient_client",
+      "target": "gameplay_gameplayclient_client_hidehud",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/gui/Gameplay/GameplayClient.client.luau",
+      "source_location": "L94",
+      "weight": 1.0,
+      "source": "gameplay_gameplayclient_client",
+      "target": "gameplay_gameplayclient_client_irisclose",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/gui/Gameplay/GameplayClient.client.luau",
+      "source_location": "L88",
+      "weight": 1.0,
+      "source": "gameplay_gameplayclient_client",
+      "target": "gameplay_gameplayclient_client_irisfullsize",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/gui/Gameplay/GameplayClient.client.luau",
+      "source_location": "L103",
+      "weight": 1.0,
+      "source": "gameplay_gameplayclient_client",
+      "target": "gameplay_gameplayclient_client_irisopen",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/gui/Gameplay/GameplayClient.client.luau",
+      "source_location": "L137",
+      "weight": 1.0,
+      "source": "gameplay_gameplayclient_client",
+      "target": "gameplay_gameplayclient_client_movecharacter",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/gui/Gameplay/GameplayClient.client.luau",
+      "source_location": "L210",
+      "weight": 1.0,
+      "source": "gameplay_gameplayclient_client",
+      "target": "gameplay_gameplayclient_client_ondoortriggered",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/gui/Gameplay/GameplayClient.client.luau",
+      "source_location": "L128",
+      "weight": 1.0,
+      "source": "gameplay_gameplayclient_client",
+      "target": "gameplay_gameplayclient_client_showhud",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "src/gui/Gameplay/GameplayClient.client.luau",
+      "source_location": "L99",
+      "weight": 1.0,
+      "source": "gameplay_gameplayclient_client_irisclose",
+      "target": "gameplay_gameplayclient_client_irisfullsize",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "src/gui/Gameplay/GameplayClient.client.luau",
+      "source_location": "L104",
+      "weight": 1.0,
+      "source": "gameplay_gameplayclient_client_irisopen",
+      "target": "gameplay_gameplayclient_client_irisfullsize",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "src/gui/Gameplay/GameplayClient.client.luau",
+      "source_location": "L215",
+      "weight": 1.0,
+      "source": "gameplay_gameplayclient_client_ondoortriggered",
+      "target": "minigames_minigamerunner_minigamerunner_cancel"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "src/gui/Gameplay/GameplayClient.client.luau",
+      "source_location": "L227",
+      "weight": 1.0,
+      "source": "gameplay_gameplayclient_client_ondoortriggered",
+      "target": "minigames_minigamerunner_minigamerunner_collapsechainresult"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "src/gui/Gameplay/GameplayClient.client.luau",
+      "source_location": "L214",
+      "weight": 1.0,
+      "source": "gameplay_gameplayclient_client_ondoortriggered",
+      "target": "minigames_minigamerunner_minigamerunner_isrunning"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/gui/Laptop/AppsFrame.client.luau",
+      "source_location": "L26",
+      "weight": 1.0,
+      "source": "laptop_appsframe_client",
+      "target": "laptop_appsframe_client_resettabs",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/gui/Laptop/DesktopFrame.client.luau",
+      "source_location": "L19",
+      "weight": 1.0,
+      "source": "laptop_desktopframe_client",
+      "target": "laptop_desktopframe_client_resetui",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/gui/Laptop/LaptopBoot.client.luau",
+      "source_location": "L18",
+      "weight": 1.0,
+      "source": "laptop_laptopboot_client",
+      "target": "laptop_laptopboot_client_playbootsequence",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/gui/Laptop/LaptopInteraction.client.luau",
+      "source_location": "L104",
+      "weight": 1.0,
+      "source": "laptop_laptopinteraction_client",
+      "target": "laptop_laptopinteraction_client_isnearanylaptop",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/gui/Laptop/LaptopInteraction.client.luau",
+      "source_location": "L37",
+      "weight": 1.0,
+      "source": "laptop_laptopinteraction_client",
+      "target": "laptop_laptopinteraction_client_setuplaptop",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/gui/Laptop/MoneyMaker_Tab.client.luau",
+      "source_location": "L58",
+      "weight": 1.0,
+      "source": "laptop_moneymaker_tab_client",
+      "target": "laptop_moneymaker_tab_client_clearcards",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/gui/Laptop/MoneyMaker_Tab.client.luau",
+      "source_location": "L66",
+      "weight": 1.0,
+      "source": "laptop_moneymaker_tab_client",
+      "target": "laptop_moneymaker_tab_client_populateboard",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/gui/Laptop/MoneyMaker_Tab.client.luau",
+      "source_location": "L110",
+      "weight": 1.0,
+      "source": "laptop_moneymaker_tab_client",
+      "target": "laptop_moneymaker_tab_client_refreshboard",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/gui/Laptop/MoneyMaker_Tab.client.luau",
+      "source_location": "L44",
+      "weight": 1.0,
+      "source": "laptop_moneymaker_tab_client",
+      "target": "laptop_moneymaker_tab_client_splitcamelcase",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "src/gui/Laptop/MoneyMaker_Tab.client.luau",
+      "source_location": "L76",
+      "weight": 1.0,
+      "source": "laptop_moneymaker_tab_client_populateboard",
+      "target": "laptop_moneymaker_tab_client_splitcamelcase",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "src/gui/Laptop/MoneyMaker_Tab.client.luau",
+      "source_location": "L67",
+      "weight": 1.0,
+      "source": "laptop_moneymaker_tab_client_populateboard",
+      "target": "laptop_moneymaker_tab_client_clearcards",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "src/gui/Laptop/MoneyMaker_Tab.client.luau",
+      "source_location": "L114",
+      "weight": 1.0,
+      "source": "laptop_moneymaker_tab_client_refreshboard",
+      "target": "laptop_moneymaker_tab_client_populateboard",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/gui/System/ProximityPromptStyle.client.luau",
+      "source_location": "L31",
+      "weight": 1.0,
+      "source": "system_proximitypromptstyle_client",
+      "target": "system_proximitypromptstyle_client_getkeytext",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/server/LaptopPromptConfig.server.luau",
+      "source_location": "L7",
+      "weight": 1.0,
+      "source": "server_laptoppromptconfig_server",
+      "target": "server_laptoppromptconfig_server_configureprompt",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/server/LaptopPromptConfig.server.luau",
+      "source_location": "L15",
+      "weight": 1.0,
+      "source": "server_laptoppromptconfig_server",
+      "target": "server_laptoppromptconfig_server_setuplaptop",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "src/server/LaptopPromptConfig.server.luau",
+      "source_location": "L21",
+      "weight": 1.0,
+      "source": "server_laptoppromptconfig_server_setuplaptop",
+      "target": "server_laptoppromptconfig_server_configureprompt",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/server/Laptop/JobPool.luau",
+      "source_location": "L48",
+      "weight": 1.0,
+      "source": "laptop_jobpool",
+      "target": "laptop_jobpool_cleanupplayer",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/server/Laptop/JobPool.luau",
+      "source_location": "L30",
+      "weight": 1.0,
+      "source": "laptop_jobpool",
+      "target": "laptop_jobpool_generateglobalpool",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/server/Laptop/JobPool.luau",
+      "source_location": "L58",
+      "weight": 1.0,
+      "source": "laptop_jobpool",
+      "target": "laptop_jobpool_init",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "src/server/Laptop/JobPool.luau",
+      "source_location": "L166",
+      "weight": 1.0,
+      "source": "laptop_jobpool_init",
+      "target": "laptop_talkogramhandler_savepost"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "src/server/Laptop/JobPool.luau",
+      "source_location": "L101",
+      "weight": 1.0,
+      "source": "laptop_jobpool_init",
+      "target": "server_locationmanager_locationmanager_assign"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "src/server/Laptop/JobPool.luau",
+      "source_location": "L117",
+      "weight": 1.0,
+      "source": "laptop_jobpool_init",
+      "target": "server_locationmanager_locationmanager_release"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/server/Laptop/LaptopRemotes.server.luau",
+      "source_location": "L14",
+      "weight": 1.0,
+      "source": "laptop_laptopremotes_server",
+      "target": "laptop_laptopremotes_server_remote",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/server/Laptop/LaptopRemotes.server.luau",
+      "source_location": "L20",
+      "weight": 1.0,
+      "source": "laptop_laptopremotes_server",
+      "target": "laptop_laptopremotes_server_remotefunction",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/server/Laptop/TalkogramHandler.luau",
+      "source_location": "L94",
+      "weight": 1.0,
+      "source": "laptop_talkogramhandler",
+      "target": "laptop_talkogramhandler_init",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/server/Laptop/TalkogramHandler.luau",
+      "source_location": "L82",
+      "weight": 1.0,
+      "source": "laptop_talkogramhandler",
+      "target": "laptop_talkogramhandler_loadglobalfeed",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/server/Laptop/TalkogramHandler.luau",
+      "source_location": "L64",
+      "weight": 1.0,
+      "source": "laptop_talkogramhandler",
+      "target": "laptop_talkogramhandler_savepost",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "src/server/Laptop/TalkogramHandler.luau",
+      "source_location": "L104",
+      "weight": 1.0,
+      "source": "laptop_talkogramhandler_init",
+      "target": "laptop_talkogramhandler_loadglobalfeed",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/server/Leaderboard.server.luau",
+      "source_location": "L45",
+      "weight": 1.0,
+      "source": "server_leaderboard_server",
+      "target": "server_leaderboard_server_syncrep",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/server/LocationManager.luau",
+      "source_location": "L560",
+      "weight": 1.0,
+      "source": "server_locationmanager",
+      "target": "server_locationmanager_applycolors",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/server/LocationManager.luau",
+      "source_location": "L133",
+      "weight": 1.0,
+      "source": "server_locationmanager",
+      "target": "server_locationmanager_colorizeclone",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/server/LocationManager.luau",
+      "source_location": "L147",
+      "weight": 1.0,
+      "source": "server_locationmanager",
+      "target": "server_locationmanager_colorizeslot",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/server/LocationManager.luau",
+      "source_location": "L119",
+      "weight": 1.0,
+      "source": "server_locationmanager",
+      "target": "server_locationmanager_getdamagedvariants",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/server/LocationManager.luau",
+      "source_location": "L221",
+      "weight": 1.0,
+      "source": "server_locationmanager",
+      "target": "server_locationmanager_locationmanager_assign",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/server/LocationManager.luau",
+      "source_location": "L211",
+      "weight": 1.0,
+      "source": "server_locationmanager",
+      "target": "server_locationmanager_locationmanager_getavailabletiers",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/server/LocationManager.luau",
+      "source_location": "L194",
+      "weight": 1.0,
+      "source": "server_locationmanager",
+      "target": "server_locationmanager_locationmanager_getlocationnames",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/server/LocationManager.luau",
+      "source_location": "L203",
+      "weight": 1.0,
+      "source": "server_locationmanager",
+      "target": "server_locationmanager_locationmanager_getlocationsbytier",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/server/LocationManager.luau",
+      "source_location": "L495",
+      "weight": 1.0,
+      "source": "server_locationmanager",
+      "target": "server_locationmanager_locationmanager_release",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/server/LocationManager.luau",
+      "source_location": "L129",
+      "weight": 1.0,
+      "source": "server_locationmanager",
+      "target": "server_locationmanager_pickrandom",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/server/LocationManager.luau",
+      "source_location": "L162",
+      "weight": 1.0,
+      "source": "server_locationmanager",
+      "target": "server_locationmanager_placefurnituredefault",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "src/server/LocationManager.luau",
+      "source_location": "L372",
+      "weight": 1.0,
+      "source": "server_locationmanager_locationmanager_assign",
+      "target": "server_locationmanager_getdamagedvariants",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "src/server/LocationManager.luau",
+      "source_location": "L134",
+      "weight": 1.0,
+      "source": "server_locationmanager_colorizeclone",
+      "target": "server_locationmanager_pickrandom",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "src/server/LocationManager.luau",
+      "source_location": "L378",
+      "weight": 1.0,
+      "source": "server_locationmanager_locationmanager_assign",
+      "target": "server_locationmanager_pickrandom",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "src/server/LocationManager.luau",
+      "source_location": "L385",
+      "weight": 1.0,
+      "source": "server_locationmanager_locationmanager_assign",
+      "target": "server_locationmanager_colorizeclone",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "src/server/LocationManager.luau",
+      "source_location": "L470",
+      "weight": 1.0,
+      "source": "server_locationmanager_locationmanager_assign",
+      "target": "server_locationmanager_colorizeslot",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "src/server/LocationManager.luau",
+      "source_location": "L503",
+      "weight": 1.0,
+      "source": "server_locationmanager_locationmanager_release",
+      "target": "server_playerhousemanager_playerhousemanager_gethousecframe"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/server/PlayerData/PlayerData.server.luau",
+      "source_location": "L8",
+      "weight": 1.0,
+      "source": "playerdata_playerdata_server",
+      "target": "playerdata_playerdata_server_saveplayerdata",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/server/PlayerHouseManager.luau",
+      "source_location": "L56",
+      "weight": 1.0,
+      "source": "server_playerhousemanager",
+      "target": "server_playerhousemanager_assignhouse",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/server/PlayerHouseManager.luau",
+      "source_location": "L41",
+      "weight": 1.0,
+      "source": "server_playerhousemanager",
+      "target": "server_playerhousemanager_gethousecframe",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/server/PlayerHouseManager.luau",
+      "source_location": "L99",
+      "weight": 1.0,
+      "source": "server_playerhousemanager",
+      "target": "server_playerhousemanager_onplayeradded",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/server/PlayerHouseManager.luau",
+      "source_location": "L85",
+      "weight": 1.0,
+      "source": "server_playerhousemanager",
+      "target": "server_playerhousemanager_playerhousemanager_getassignment",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/server/PlayerHouseManager.luau",
+      "source_location": "L81",
+      "weight": 1.0,
+      "source": "server_playerhousemanager",
+      "target": "server_playerhousemanager_playerhousemanager_gethousecframe",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/server/PlayerHouseManager.luau",
+      "source_location": "L90",
+      "weight": 1.0,
+      "source": "server_playerhousemanager",
+      "target": "server_playerhousemanager_playerhousemanager_settier",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/server/PlayerHouseManager.luau",
+      "source_location": "L69",
+      "weight": 1.0,
+      "source": "server_playerhousemanager",
+      "target": "server_playerhousemanager_releasehouse",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "src/server/PlayerHouseManager.luau",
+      "source_location": "L103",
+      "weight": 1.0,
+      "source": "server_playerhousemanager_onplayeradded",
+      "target": "server_playerhousemanager_gethousecframe",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "src/server/PlayerHouseManager.luau",
+      "source_location": "L82",
+      "weight": 1.0,
+      "source": "server_playerhousemanager_playerhousemanager_gethousecframe",
+      "target": "server_playerhousemanager_gethousecframe",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "src/server/PlayerHouseManager.luau",
+      "source_location": "L100",
+      "weight": 1.0,
+      "source": "server_playerhousemanager_onplayeradded",
+      "target": "server_playerhousemanager_assignhouse",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/server/RadiantJobGenerator.luau",
+      "source_location": "L44",
+      "weight": 1.0,
+      "source": "server_radiantjobgenerator",
+      "target": "server_radiantjobgenerator_buildfurniturepool",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/server/RadiantJobGenerator.luau",
+      "source_location": "L179",
+      "weight": 1.0,
+      "source": "server_radiantjobgenerator",
+      "target": "server_radiantjobgenerator_buildjobname",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/server/RadiantJobGenerator.luau",
+      "source_location": "L172",
+      "weight": 1.0,
+      "source": "server_radiantjobgenerator",
+      "target": "server_radiantjobgenerator_calcfollowers",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/server/RadiantJobGenerator.luau",
+      "source_location": "L167",
+      "weight": 1.0,
+      "source": "server_radiantjobgenerator",
+      "target": "server_radiantjobgenerator_calcpay",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/server/RadiantJobGenerator.luau",
+      "source_location": "L120",
+      "weight": 1.0,
+      "source": "server_radiantjobgenerator",
+      "target": "server_radiantjobgenerator_getfurniturepool",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/server/RadiantJobGenerator.luau",
+      "source_location": "L101",
+      "weight": 1.0,
+      "source": "server_radiantjobgenerator",
+      "target": "server_radiantjobgenerator_pickforcategory",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/server/RadiantJobGenerator.luau",
+      "source_location": "L85",
+      "weight": 1.0,
+      "source": "server_radiantjobgenerator",
+      "target": "server_radiantjobgenerator_pickrandom",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/server/RadiantJobGenerator.luau",
+      "source_location": "L193",
+      "weight": 1.0,
+      "source": "server_radiantjobgenerator",
+      "target": "server_radiantjobgenerator_radiantjobgenerator_generate",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/server/RadiantJobGenerator.luau",
+      "source_location": "L142",
+      "weight": 1.0,
+      "source": "server_radiantjobgenerator",
+      "target": "server_radiantjobgenerator_rolljobtier",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/server/RadiantJobGenerator.luau",
+      "source_location": "L89",
+      "weight": 1.0,
+      "source": "server_radiantjobgenerator",
+      "target": "server_radiantjobgenerator_shufflecopy",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/server/RadiantJobGenerator.luau",
+      "source_location": "L40",
+      "weight": 1.0,
+      "source": "server_radiantjobgenerator",
+      "target": "server_radiantjobgenerator_todisplayname",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "src/server/RadiantJobGenerator.luau",
+      "source_location": "L60",
+      "weight": 1.0,
+      "source": "server_radiantjobgenerator_buildfurniturepool",
+      "target": "server_radiantjobgenerator_todisplayname",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "src/server/RadiantJobGenerator.luau",
+      "source_location": "L220",
+      "weight": 1.0,
+      "source": "server_radiantjobgenerator_radiantjobgenerator_generate",
+      "target": "server_radiantjobgenerator_todisplayname",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "src/server/RadiantJobGenerator.luau",
+      "source_location": "L105",
+      "weight": 1.0,
+      "source": "server_radiantjobgenerator_pickforcategory",
+      "target": "server_radiantjobgenerator_pickrandom",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "src/server/RadiantJobGenerator.luau",
+      "source_location": "L245",
+      "weight": 1.0,
+      "source": "server_radiantjobgenerator_radiantjobgenerator_generate",
+      "target": "server_radiantjobgenerator_pickrandom",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "src/server/RadiantJobGenerator.luau",
+      "source_location": "L207",
+      "weight": 1.0,
+      "source": "server_radiantjobgenerator_radiantjobgenerator_generate",
+      "target": "server_radiantjobgenerator_shufflecopy",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "src/server/RadiantJobGenerator.luau",
+      "source_location": "L217",
+      "weight": 1.0,
+      "source": "server_radiantjobgenerator_radiantjobgenerator_generate",
+      "target": "server_radiantjobgenerator_pickforcategory",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "src/server/RadiantJobGenerator.luau",
+      "source_location": "L200",
+      "weight": 1.0,
+      "source": "server_radiantjobgenerator_radiantjobgenerator_generate",
+      "target": "server_radiantjobgenerator_getfurniturepool",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "src/server/RadiantJobGenerator.luau",
+      "source_location": "L197",
+      "weight": 1.0,
+      "source": "server_radiantjobgenerator_radiantjobgenerator_generate",
+      "target": "server_radiantjobgenerator_rolljobtier",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "src/server/RadiantJobGenerator.luau",
+      "source_location": "L253",
+      "weight": 1.0,
+      "source": "server_radiantjobgenerator_radiantjobgenerator_generate",
+      "target": "server_radiantjobgenerator_calcpay",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "src/server/RadiantJobGenerator.luau",
+      "source_location": "L254",
+      "weight": 1.0,
+      "source": "server_radiantjobgenerator_radiantjobgenerator_generate",
+      "target": "server_radiantjobgenerator_calcfollowers",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "src/server/RadiantJobGenerator.luau",
+      "source_location": "L244",
+      "weight": 1.0,
+      "source": "server_radiantjobgenerator_radiantjobgenerator_generate",
+      "target": "server_radiantjobgenerator_buildjobname",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/shared/Data/ShopData.luau",
+      "source_location": "L356",
+      "weight": 1.0,
+      "source": "data_shopdata",
+      "target": "data_shopdata_shopproducts_getavailablefortier",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/shared/Data/ShopData.luau",
+      "source_location": "L340",
+      "weight": 1.0,
+      "source": "data_shopdata",
+      "target": "data_shopdata_shopproducts_getbycategory",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/shared/Data/ShopData.luau",
+      "source_location": "L332",
+      "weight": 1.0,
+      "source": "data_shopdata",
+      "target": "data_shopdata_shopproducts_getbyid",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/shared/Minigames/FoamPadding.luau",
+      "source_location": "L91",
+      "weight": 1.0,
+      "source": "minigames_foampadding",
+      "target": "minigames_foampadding_cellbounds",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/shared/Minigames/FoamPadding.luau",
+      "source_location": "L73",
+      "weight": 1.0,
+      "source": "minigames_foampadding",
+      "target": "minigames_foampadding_copycells",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/shared/Minigames/FoamPadding.luau",
+      "source_location": "L32",
+      "weight": 1.0,
+      "source": "minigames_foampadding",
+      "target": "minigames_foampadding_disconnect",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/shared/Minigames/FoamPadding.luau",
+      "source_location": "L723",
+      "weight": 1.0,
+      "source": "minigames_foampadding",
+      "target": "minigames_foampadding_foampadding_cancel",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/shared/Minigames/FoamPadding.luau",
+      "source_location": "L714",
+      "weight": 1.0,
+      "source": "minigames_foampadding",
+      "target": "minigames_foampadding_foampadding_cleanup",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/shared/Minigames/FoamPadding.luau",
+      "source_location": "L710",
+      "weight": 1.0,
+      "source": "minigames_foampadding",
+      "target": "minigames_foampadding_foampadding_getresult",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/shared/Minigames/FoamPadding.luau",
+      "source_location": "L149",
+      "weight": 1.0,
+      "source": "minigames_foampadding",
+      "target": "minigames_foampadding_foampadding_start",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/shared/Minigames/FoamPadding.luau",
+      "source_location": "L101",
+      "weight": 1.0,
+      "source": "minigames_foampadding",
+      "target": "minigames_foampadding_generatemold",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/shared/Minigames/FoamPadding.luau",
+      "source_location": "L79",
+      "weight": 1.0,
+      "source": "minigames_foampadding",
+      "target": "minigames_foampadding_rotatecw",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "src/shared/Minigames/FoamPadding.luau",
+      "source_location": "L715",
+      "weight": 1.0,
+      "source": "minigames_foampadding_foampadding_cleanup",
+      "target": "minigames_foampadding_disconnect",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "src/shared/Minigames/FoamPadding.luau",
+      "source_location": "L679",
+      "weight": 1.0,
+      "source": "minigames_foampadding_foampadding_start",
+      "target": "minigames_foampadding_disconnect",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "src/shared/Minigames/FoamPadding.luau",
+      "source_location": "L180",
+      "weight": 1.0,
+      "source": "minigames_foampadding_foampadding_start",
+      "target": "minigames_foampadding_copycells",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "src/shared/Minigames/FoamPadding.luau",
+      "source_location": "L120",
+      "weight": 1.0,
+      "source": "minigames_foampadding_generatemold",
+      "target": "minigames_foampadding_copycells",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "src/shared/Minigames/FoamPadding.luau",
+      "source_location": "L181",
+      "weight": 1.0,
+      "source": "minigames_foampadding_foampadding_start",
+      "target": "minigames_foampadding_rotatecw",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "src/shared/Minigames/FoamPadding.luau",
+      "source_location": "L121",
+      "weight": 1.0,
+      "source": "minigames_foampadding_generatemold",
+      "target": "minigames_foampadding_rotatecw",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "src/shared/Minigames/FoamPadding.luau",
+      "source_location": "L122",
+      "weight": 1.0,
+      "source": "minigames_foampadding_generatemold",
+      "target": "minigames_foampadding_cellbounds",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "src/shared/Minigames/FoamPadding.luau",
+      "source_location": "L160",
+      "weight": 1.0,
+      "source": "minigames_foampadding_foampadding_start",
+      "target": "minigames_foampadding_generatemold",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/shared/Minigames/MinigameRunner.luau",
+      "source_location": "L57",
+      "weight": 1.0,
+      "source": "minigames_minigamerunner",
+      "target": "minigames_minigamerunner_addblur",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/shared/Minigames/MinigameRunner.luau",
+      "source_location": "L77",
+      "weight": 1.0,
+      "source": "minigames_minigamerunner",
+      "target": "minigames_minigamerunner_buildgui",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/shared/Minigames/MinigameRunner.luau",
+      "source_location": "L154",
+      "weight": 1.0,
+      "source": "minigames_minigamerunner",
+      "target": "minigames_minigamerunner_buildparams",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/shared/Minigames/MinigameRunner.luau",
+      "source_location": "L197",
+      "weight": 1.0,
+      "source": "minigames_minigamerunner",
+      "target": "minigames_minigamerunner_minigamerunner_cancel",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/shared/Minigames/MinigameRunner.luau",
+      "source_location": "L269",
+      "weight": 1.0,
+      "source": "minigames_minigamerunner",
+      "target": "minigames_minigamerunner_minigamerunner_collapsechainresult",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/shared/Minigames/MinigameRunner.luau",
+      "source_location": "L193",
+      "weight": 1.0,
+      "source": "minigames_minigamerunner",
+      "target": "minigames_minigamerunner_minigamerunner_isrunning",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/shared/Minigames/MinigameRunner.luau",
+      "source_location": "L203",
+      "weight": 1.0,
+      "source": "minigames_minigamerunner",
+      "target": "minigames_minigamerunner_minigamerunner_run",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/shared/Minigames/MinigameRunner.luau",
+      "source_location": "L228",
+      "weight": 1.0,
+      "source": "minigames_minigamerunner",
+      "target": "minigames_minigamerunner_minigamerunner_runchain",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/shared/Minigames/MinigameRunner.luau",
+      "source_location": "L66",
+      "weight": 1.0,
+      "source": "minigames_minigamerunner",
+      "target": "minigames_minigamerunner_removeblur",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/shared/Minigames/MinigameRunner.luau",
+      "source_location": "L185",
+      "weight": 1.0,
+      "source": "minigames_minigamerunner",
+      "target": "minigames_minigamerunner_requiremodule",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/shared/Minigames/MinigameRunner.luau",
+      "source_location": "L94",
+      "weight": 1.0,
+      "source": "minigames_minigamerunner",
+      "target": "minigames_minigamerunner_showgui",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/shared/Minigames/MinigameRunner.luau",
+      "source_location": "L100",
+      "weight": 1.0,
+      "source": "minigames_minigamerunner",
+      "target": "minigames_minigamerunner_showresultoverlay",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "src/shared/Minigames/MinigameRunner.luau",
+      "source_location": "L206",
+      "weight": 1.0,
+      "source": "minigames_minigamerunner_minigamerunner_run",
+      "target": "minigames_minigamerunner_addblur",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "src/shared/Minigames/MinigameRunner.luau",
+      "source_location": "L230",
+      "weight": 1.0,
+      "source": "minigames_minigamerunner_minigamerunner_runchain",
+      "target": "minigames_minigamerunner_addblur",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "src/shared/Minigames/MinigameRunner.luau",
+      "source_location": "L220",
+      "weight": 1.0,
+      "source": "minigames_minigamerunner_minigamerunner_run",
+      "target": "minigames_minigamerunner_removeblur",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "src/shared/Minigames/MinigameRunner.luau",
+      "source_location": "L253",
+      "weight": 1.0,
+      "source": "minigames_minigamerunner_minigamerunner_runchain",
+      "target": "minigames_minigamerunner_removeblur",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "src/shared/Minigames/MinigameRunner.luau",
+      "source_location": "L205",
+      "weight": 1.0,
+      "source": "minigames_minigamerunner_minigamerunner_run",
+      "target": "minigames_minigamerunner_buildgui",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "src/shared/Minigames/MinigameRunner.luau",
+      "source_location": "L229",
+      "weight": 1.0,
+      "source": "minigames_minigamerunner_minigamerunner_runchain",
+      "target": "minigames_minigamerunner_buildgui",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "src/shared/Minigames/MinigameRunner.luau",
+      "source_location": "L207",
+      "weight": 1.0,
+      "source": "minigames_minigamerunner_minigamerunner_run",
+      "target": "minigames_minigamerunner_showgui",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "src/shared/Minigames/MinigameRunner.luau",
+      "source_location": "L231",
+      "weight": 1.0,
+      "source": "minigames_minigamerunner_minigamerunner_runchain",
+      "target": "minigames_minigamerunner_showgui",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "src/shared/Minigames/MinigameRunner.luau",
+      "source_location": "L217",
+      "weight": 1.0,
+      "source": "minigames_minigamerunner_minigamerunner_run",
+      "target": "minigames_minigamerunner_showresultoverlay",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "src/shared/Minigames/MinigameRunner.luau",
+      "source_location": "L259",
+      "weight": 1.0,
+      "source": "minigames_minigamerunner_minigamerunner_runchain",
+      "target": "minigames_minigamerunner_showresultoverlay",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "src/shared/Minigames/MinigameRunner.luau",
+      "source_location": "L204",
+      "weight": 1.0,
+      "source": "minigames_minigamerunner_minigamerunner_run",
+      "target": "minigames_minigamerunner_buildparams",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "src/shared/Minigames/MinigameRunner.luau",
+      "source_location": "L240",
+      "weight": 1.0,
+      "source": "minigames_minigamerunner_minigamerunner_runchain",
+      "target": "minigames_minigamerunner_buildparams",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "src/shared/Minigames/MinigameRunner.luau",
+      "source_location": "L208",
+      "weight": 1.0,
+      "source": "minigames_minigamerunner_minigamerunner_run",
+      "target": "minigames_minigamerunner_requiremodule",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "src/shared/Minigames/MinigameRunner.luau",
+      "source_location": "L239",
+      "weight": 1.0,
+      "source": "minigames_minigamerunner_minigamerunner_runchain",
+      "target": "minigames_minigamerunner_requiremodule",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/shared/Minigames/SeamStitching.luau",
+      "source_location": "L127",
+      "weight": 1.0,
+      "source": "minigames_seamstitching",
+      "target": "minigames_seamstitching_addtraildot",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/shared/Minigames/SeamStitching.luau",
+      "source_location": "L149",
+      "weight": 1.0,
+      "source": "minigames_seamstitching",
+      "target": "minigames_seamstitching_builddeviationmeter",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/shared/Minigames/SeamStitching.luau",
+      "source_location": "L189",
+      "weight": 1.0,
+      "source": "minigames_seamstitching",
+      "target": "minigames_seamstitching_buildui",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/shared/Minigames/SeamStitching.luau",
+      "source_location": "L115",
+      "weight": 1.0,
+      "source": "minigames_seamstitching",
+      "target": "minigames_seamstitching_closestpointonsegment",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/shared/Minigames/SeamStitching.luau",
+      "source_location": "L34",
+      "weight": 1.0,
+      "source": "minigames_seamstitching",
+      "target": "minigames_seamstitching_disconnect",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/shared/Minigames/SeamStitching.luau",
+      "source_location": "L90",
+      "weight": 1.0,
+      "source": "minigames_seamstitching",
+      "target": "minigames_seamstitching_generatepath",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/shared/Minigames/SeamStitching.luau",
+      "source_location": "L305",
+      "weight": 1.0,
+      "source": "minigames_seamstitching",
+      "target": "minigames_seamstitching_highlightsegment",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/shared/Minigames/SeamStitching.luau",
+      "source_location": "L73",
+      "weight": 1.0,
+      "source": "minigames_seamstitching",
+      "target": "minigames_seamstitching_makelabel",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/shared/Minigames/SeamStitching.luau",
+      "source_location": "L59",
+      "weight": 1.0,
+      "source": "minigames_seamstitching",
+      "target": "minigames_seamstitching_makepill",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/shared/Minigames/SeamStitching.luau",
+      "source_location": "L497",
+      "weight": 1.0,
+      "source": "minigames_seamstitching",
+      "target": "minigames_seamstitching_seamstitching_cancel",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/shared/Minigames/SeamStitching.luau",
+      "source_location": "L484",
+      "weight": 1.0,
+      "source": "minigames_seamstitching",
+      "target": "minigames_seamstitching_seamstitching_cleanup",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/shared/Minigames/SeamStitching.luau",
+      "source_location": "L480",
+      "weight": 1.0,
+      "source": "minigames_seamstitching",
+      "target": "minigames_seamstitching_seamstitching_getresult",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/shared/Minigames/SeamStitching.luau",
+      "source_location": "L325",
+      "weight": 1.0,
+      "source": "minigames_seamstitching",
+      "target": "minigames_seamstitching_seamstitching_start",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "src/shared/Minigames/SeamStitching.luau",
+      "source_location": "L485",
+      "weight": 1.0,
+      "source": "minigames_seamstitching_seamstitching_cleanup",
+      "target": "minigames_seamstitching_disconnect",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "src/shared/Minigames/SeamStitching.luau",
+      "source_location": "L190",
+      "weight": 1.0,
+      "source": "minigames_seamstitching_buildui",
+      "target": "minigames_seamstitching_makepill",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "src/shared/Minigames/SeamStitching.luau",
+      "source_location": "L191",
+      "weight": 1.0,
+      "source": "minigames_seamstitching_buildui",
+      "target": "minigames_seamstitching_makelabel",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "src/shared/Minigames/SeamStitching.luau",
+      "source_location": "L336",
+      "weight": 1.0,
+      "source": "minigames_seamstitching_seamstitching_start",
+      "target": "minigames_seamstitching_generatepath",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "src/shared/Minigames/SeamStitching.luau",
+      "source_location": "L420",
+      "weight": 1.0,
+      "source": "minigames_seamstitching_seamstitching_start",
+      "target": "minigames_seamstitching_closestpointonsegment",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "src/shared/Minigames/SeamStitching.luau",
+      "source_location": "L436",
+      "weight": 1.0,
+      "source": "minigames_seamstitching_seamstitching_start",
+      "target": "minigames_seamstitching_addtraildot",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "src/shared/Minigames/SeamStitching.luau",
+      "source_location": "L298",
+      "weight": 1.0,
+      "source": "minigames_seamstitching_buildui",
+      "target": "minigames_seamstitching_builddeviationmeter",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "src/shared/Minigames/SeamStitching.luau",
+      "source_location": "L343",
+      "weight": 1.0,
+      "source": "minigames_seamstitching_seamstitching_start",
+      "target": "minigames_seamstitching_buildui",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/shared/Minigames/StapleGunning.luau",
+      "source_location": "L109",
+      "weight": 1.0,
+      "source": "minigames_staplegunning",
+      "target": "minigames_staplegunning_buildui",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/shared/Minigames/StapleGunning.luau",
+      "source_location": "L32",
+      "weight": 1.0,
+      "source": "minigames_staplegunning",
+      "target": "minigames_staplegunning_disconnect",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/shared/Minigames/StapleGunning.luau",
+      "source_location": "L94",
+      "weight": 1.0,
+      "source": "minigames_staplegunning",
+      "target": "minigames_staplegunning_generatezones",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/shared/Minigames/StapleGunning.luau",
+      "source_location": "L68",
+      "weight": 1.0,
+      "source": "minigames_staplegunning",
+      "target": "minigames_staplegunning_makelabel",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/shared/Minigames/StapleGunning.luau",
+      "source_location": "L54",
+      "weight": 1.0,
+      "source": "minigames_staplegunning",
+      "target": "minigames_staplegunning_makepill",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/shared/Minigames/StapleGunning.luau",
+      "source_location": "L81",
+      "weight": 1.0,
+      "source": "minigames_staplegunning",
+      "target": "minigames_staplegunning_showfeedback",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/shared/Minigames/StapleGunning.luau",
+      "source_location": "L386",
+      "weight": 1.0,
+      "source": "minigames_staplegunning",
+      "target": "minigames_staplegunning_staplegunning_cancel",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/shared/Minigames/StapleGunning.luau",
+      "source_location": "L374",
+      "weight": 1.0,
+      "source": "minigames_staplegunning",
+      "target": "minigames_staplegunning_staplegunning_cleanup",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/shared/Minigames/StapleGunning.luau",
+      "source_location": "L370",
+      "weight": 1.0,
+      "source": "minigames_staplegunning",
+      "target": "minigames_staplegunning_staplegunning_getresult",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/shared/Minigames/StapleGunning.luau",
+      "source_location": "L228",
+      "weight": 1.0,
+      "source": "minigames_staplegunning",
+      "target": "minigames_staplegunning_staplegunning_start",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "src/shared/Minigames/StapleGunning.luau",
+      "source_location": "L375",
+      "weight": 1.0,
+      "source": "minigames_staplegunning_staplegunning_cleanup",
+      "target": "minigames_staplegunning_disconnect",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "src/shared/Minigames/StapleGunning.luau",
+      "source_location": "L345",
+      "weight": 1.0,
+      "source": "minigames_staplegunning_staplegunning_start",
+      "target": "minigames_staplegunning_disconnect",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "src/shared/Minigames/StapleGunning.luau",
+      "source_location": "L111",
+      "weight": 1.0,
+      "source": "minigames_staplegunning_buildui",
+      "target": "minigames_staplegunning_makepill",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "src/shared/Minigames/StapleGunning.luau",
+      "source_location": "L112",
+      "weight": 1.0,
+      "source": "minigames_staplegunning_buildui",
+      "target": "minigames_staplegunning_makelabel",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "src/shared/Minigames/StapleGunning.luau",
+      "source_location": "L324",
+      "weight": 1.0,
+      "source": "minigames_staplegunning_staplegunning_start",
+      "target": "minigames_staplegunning_showfeedback",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "src/shared/Minigames/StapleGunning.luau",
+      "source_location": "L248",
+      "weight": 1.0,
+      "source": "minigames_staplegunning_staplegunning_start",
+      "target": "minigames_staplegunning_generatezones",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "src/shared/Minigames/StapleGunning.luau",
+      "source_location": "L251",
+      "weight": 1.0,
+      "source": "minigames_staplegunning_staplegunning_start",
+      "target": "minigames_staplegunning_buildui",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/shared/Minigames/TackRemoval.luau",
+      "source_location": "L31",
+      "weight": 1.0,
+      "source": "minigames_tackremoval",
+      "target": "minigames_tackremoval_disconnect",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/shared/Minigames/TackRemoval.luau",
+      "source_location": "L69",
+      "weight": 1.0,
+      "source": "minigames_tackremoval",
+      "target": "minigames_tackremoval_makelabel",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/shared/Minigames/TackRemoval.luau",
+      "source_location": "L55",
+      "weight": 1.0,
+      "source": "minigames_tackremoval",
+      "target": "minigames_tackremoval_makepill",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/shared/Minigames/TackRemoval.luau",
+      "source_location": "L83",
+      "weight": 1.0,
+      "source": "minigames_tackremoval",
+      "target": "minigames_tackremoval_showhittext",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/shared/Minigames/TackRemoval.luau",
+      "source_location": "L330",
+      "weight": 1.0,
+      "source": "minigames_tackremoval",
+      "target": "minigames_tackremoval_tackremoval_cancel",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/shared/Minigames/TackRemoval.luau",
+      "source_location": "L318",
+      "weight": 1.0,
+      "source": "minigames_tackremoval",
+      "target": "minigames_tackremoval_tackremoval_cleanup",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/shared/Minigames/TackRemoval.luau",
+      "source_location": "L314",
+      "weight": 1.0,
+      "source": "minigames_tackremoval",
+      "target": "minigames_tackremoval_tackremoval_getresult",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/shared/Minigames/TackRemoval.luau",
+      "source_location": "L109",
+      "weight": 1.0,
+      "source": "minigames_tackremoval",
+      "target": "minigames_tackremoval_tackremoval_start",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "src/shared/Minigames/TackRemoval.luau",
+      "source_location": "L319",
+      "weight": 1.0,
+      "source": "minigames_tackremoval_tackremoval_cleanup",
+      "target": "minigames_tackremoval_disconnect",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "src/shared/Minigames/TackRemoval.luau",
+      "source_location": "L123",
+      "weight": 1.0,
+      "source": "minigames_tackremoval_tackremoval_start",
+      "target": "minigames_tackremoval_makepill",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "src/shared/Minigames/TackRemoval.luau",
+      "source_location": "L124",
+      "weight": 1.0,
+      "source": "minigames_tackremoval_tackremoval_start",
+      "target": "minigames_tackremoval_makelabel",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "src/shared/Minigames/TackRemoval.luau",
+      "source_location": "L279",
+      "weight": 1.0,
+      "source": "minigames_tackremoval_tackremoval_start",
+      "target": "minigames_tackremoval_showhittext",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/shared/SFXPlayer.luau",
+      "source_location": "L24",
+      "weight": 1.0,
+      "source": "shared_sfxplayer",
+      "target": "shared_sfxplayer_sfxplayer_play",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/shared/SFXPlayer.luau",
+      "source_location": "L31",
+      "weight": 1.0,
+      "source": "shared_sfxplayer",
+      "target": "shared_sfxplayer_sfxplayer_playlooping",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/shared/SFXPlayer.luau",
+      "source_location": "L43",
+      "weight": 1.0,
+      "source": "shared_sfxplayer",
+      "target": "shared_sfxplayer_sfxplayer_stop",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "UPHOLSTERY_GDD_v8.txt",
+      "source_location": "\u00a71",
+      "weight": 1.0,
+      "source": "gdd_design_pillars",
+      "target": "gdd_upholstery_game"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "README.md",
+      "source_location": "\u00a71",
+      "weight": 1.0,
+      "source": "readme_rojo",
+      "target": "gdd_upholstery_game"
+    },
+    {
+      "relation": "conceptually_related_to",
+      "confidence": "INFERRED",
+      "confidence_score": 0.85,
+      "source_file": "explain.md",
+      "source_location": "\u00a71",
+      "weight": 1.0,
+      "source": "gdd_core_gameplay_loop",
+      "target": "explain_gameplay_client"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "UPHOLSTERY_GDD_v8.txt",
+      "source_location": "\u00a72",
+      "weight": 1.0,
+      "source": "gdd_core_gameplay_loop",
+      "target": "gdd_minigames"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "UPHOLSTERY_GDD_v8.txt",
+      "source_location": "\u00a72",
+      "weight": 1.0,
+      "source": "gdd_core_gameplay_loop",
+      "target": "gdd_reputation_system"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "UPHOLSTERY_GDD_v8.txt",
+      "source_location": "\u00a72",
+      "weight": 1.0,
+      "source": "gdd_core_gameplay_loop",
+      "target": "gdd_shared_job_board"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "UPHOLSTERY_GDD_v8.txt",
+      "source_location": "\u00a72",
+      "weight": 1.0,
+      "source": "gdd_core_gameplay_loop",
+      "target": "gdd_toolbox_perk_system"
+    },
+    {
+      "relation": "conceptually_related_to",
+      "confidence": "INFERRED",
+      "confidence_score": 0.85,
+      "source_file": "explain.md",
+      "source_location": "\u00a72",
+      "weight": 1.0,
+      "source": "gdd_job_system",
+      "target": "explain_location_manager"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "UPHOLSTERY_GDD_v8.txt",
+      "source_location": "\u00a73",
+      "weight": 1.0,
+      "source": "gdd_job_system",
+      "target": "gdd_direct_offers"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "UPHOLSTERY_GDD_v8.txt",
+      "source_location": "\u00a73.4",
+      "weight": 1.0,
+      "source": "gdd_job_system",
+      "target": "gdd_hot_jobs"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "UPHOLSTERY_GDD_v8.txt",
+      "source_location": "\u00a73",
+      "weight": 1.0,
+      "source": "gdd_job_system",
+      "target": "gdd_job_structure"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "UPHOLSTERY_GDD_v8.txt",
+      "source_location": "\u00a73",
+      "weight": 1.0,
+      "source": "gdd_job_system",
+      "target": "gdd_shared_job_board"
+    },
+    {
+      "relation": "conceptually_related_to",
+      "confidence": "INFERRED",
+      "confidence_score": 0.85,
+      "source_file": "explain.md",
+      "source_location": "\u00a71",
+      "weight": 1.0,
+      "source": "gdd_shared_job_board",
+      "target": "explain_laptop_browser"
+    },
+    {
+      "relation": "semantically_similar_to",
+      "confidence": "INFERRED",
+      "confidence_score": 0.85,
+      "source_file": "UPHOLSTERY_GDD_v8.txt",
+      "source_location": "\u00a73.2 / \u00a75",
+      "weight": 1.0,
+      "source": "gdd_reputation_system",
+      "target": "gdd_direct_offers"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "UPHOLSTERY_GDD_v8.txt",
+      "source_location": "\u00a73.2",
+      "weight": 1.0,
+      "source": "gdd_direct_offers",
+      "target": "gdd_talkogram"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "UPHOLSTERY_GDD_v8.txt",
+      "source_location": "\u00a73.3",
+      "weight": 1.0,
+      "source": "gdd_job_structure",
+      "target": "gdd_fragile_modifier"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "UPHOLSTERY_GDD_v8.txt",
+      "source_location": "\u00a73.3",
+      "weight": 1.0,
+      "source": "gdd_job_structure",
+      "target": "gdd_minigames"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "UPHOLSTERY_GDD_v8.txt",
+      "source_location": "\u00a73.3",
+      "weight": 1.0,
+      "source": "gdd_job_structure",
+      "target": "gdd_special_events"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "UPHOLSTERY_GDD_v8.txt",
+      "source_location": "\u00a74.9",
+      "weight": 1.0,
+      "source": "gdd_minigames",
+      "target": "gdd_fragile_modifier"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "UPHOLSTERY_GDD_v8.txt",
+      "source_location": "\u00a74",
+      "weight": 1.0,
+      "source": "gdd_minigames",
+      "target": "gdd_minigame_interface"
+    },
+    {
+      "relation": "conceptually_related_to",
+      "confidence": "INFERRED",
+      "confidence_score": 0.95,
+      "source_file": "explain.md",
+      "source_location": "\u00a73",
+      "weight": 1.0,
+      "source": "gdd_minigames",
+      "target": "explain_minigame_runner"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "UPHOLSTERY_GDD_v8.txt",
+      "source_location": "\u00a74.5",
+      "weight": 1.0,
+      "source": "gdd_minigames",
+      "target": "gdd_button_tufting"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "UPHOLSTERY_GDD_v8.txt",
+      "source_location": "\u00a74.8",
+      "weight": 1.0,
+      "source": "gdd_minigames",
+      "target": "gdd_corner_fold"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "UPHOLSTERY_GDD_v8.txt",
+      "source_location": "\u00a74",
+      "weight": 1.0,
+      "source": "gdd_minigames",
+      "target": "gdd_foam_padding"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "UPHOLSTERY_GDD_v8.txt",
+      "source_location": "\u00a74",
+      "weight": 1.0,
+      "source": "gdd_minigames",
+      "target": "gdd_seam_stitching"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "UPHOLSTERY_GDD_v8.txt",
+      "source_location": "\u00a74.6",
+      "weight": 1.0,
+      "source": "gdd_minigames",
+      "target": "gdd_spring_tensioning"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "UPHOLSTERY_GDD_v8.txt",
+      "source_location": "\u00a74",
+      "weight": 1.0,
+      "source": "gdd_minigames",
+      "target": "gdd_staple_gunning"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "UPHOLSTERY_GDD_v8.txt",
+      "source_location": "\u00a74",
+      "weight": 1.0,
+      "source": "gdd_minigames",
+      "target": "gdd_tack_removal"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "UPHOLSTERY_GDD_v8.txt",
+      "source_location": "\u00a74.7",
+      "weight": 1.0,
+      "source": "gdd_minigames",
+      "target": "gdd_webbing_weave"
+    },
+    {
+      "relation": "conceptually_related_to",
+      "confidence": "INFERRED",
+      "confidence_score": 0.95,
+      "source_file": "explain.md",
+      "source_location": "\u00a73",
+      "weight": 1.0,
+      "source": "gdd_tack_removal",
+      "target": "explain_tack_removal_script"
+    },
+    {
+      "relation": "implements",
+      "confidence": "INFERRED",
+      "confidence_score": 0.95,
+      "source_file": "explain.md",
+      "source_location": "\u00a73",
+      "weight": 1.0,
+      "source": "explain_staple_gunning_script",
+      "target": "gdd_staple_gunning"
+    },
+    {
+      "relation": "implements",
+      "confidence": "INFERRED",
+      "confidence_score": 0.95,
+      "source_file": "explain.md",
+      "source_location": "\u00a73",
+      "weight": 1.0,
+      "source": "explain_seam_stitching_script",
+      "target": "gdd_seam_stitching"
+    },
+    {
+      "relation": "implements",
+      "confidence": "INFERRED",
+      "confidence_score": 0.95,
+      "source_file": "explain.md",
+      "source_location": "\u00a73",
+      "weight": 1.0,
+      "source": "explain_foam_padding_script",
+      "target": "gdd_foam_padding"
+    },
+    {
+      "relation": "semantically_similar_to",
+      "confidence": "INFERRED",
+      "confidence_score": 0.65,
+      "source_file": "UPHOLSTERY_GDD_v8.txt",
+      "source_location": "\u00a75 / \u00a77.2",
+      "weight": 1.0,
+      "source": "gdd_followers",
+      "target": "gdd_reputation_system"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "UPHOLSTERY_GDD_v8.txt",
+      "source_location": "\u00a710",
+      "weight": 1.0,
+      "source": "gdd_player_progression",
+      "target": "gdd_reputation_system"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "UPHOLSTERY_GDD_v8.txt",
+      "source_location": "\u00a75.1",
+      "weight": 1.0,
+      "source": "gdd_reputation_system",
+      "target": "gdd_penalty_system"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "UPHOLSTERY_GDD_v8.txt",
+      "source_location": "\u00a75",
+      "weight": 1.0,
+      "source": "gdd_reputation_system",
+      "target": "gdd_toolbox_perk_system"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "UPHOLSTERY_GDD_v8.txt",
+      "source_location": "\u00a76.2",
+      "weight": 1.0,
+      "source": "gdd_toolbox_perk_system",
+      "target": "gdd_bolt_bespoke"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "UPHOLSTERY_GDD_v8.txt",
+      "source_location": "\u00a711.2",
+      "weight": 1.0,
+      "source": "gdd_penalty_system",
+      "target": "gdd_toolbox_perk_system"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "UPHOLSTERY_GDD_v8.txt",
+      "source_location": "\u00a78",
+      "weight": 1.0,
+      "source": "gdd_shop",
+      "target": "gdd_toolbox_perk_system"
+    },
+    {
+      "relation": "conceptually_related_to",
+      "confidence": "INFERRED",
+      "confidence_score": 0.75,
+      "source_file": "explain.md",
+      "source_location": "\u00a72",
+      "weight": 1.0,
+      "source": "gdd_economy",
+      "target": "explain_player_data"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "UPHOLSTERY_GDD_v8.txt",
+      "source_location": "\u00a77.2",
+      "weight": 1.0,
+      "source": "gdd_economy",
+      "target": "gdd_followers"
+    },
+    {
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "UPHOLSTERY_GDD_v8.txt",
+      "source_location": "\u00a77.3",
+      "weight": 1.0,
+      "source": "gdd_money_sinks",
+      "target": "gdd_economy"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "UPHOLSTERY_GDD_v8.txt",
+      "source_location": "\u00a710",
+      "weight": 1.0,
+      "source": "gdd_player_progression",
+      "target": "gdd_economy"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "UPHOLSTERY_GDD_v8.txt",
+      "source_location": "\u00a78",
+      "weight": 1.0,
+      "source": "gdd_shop",
+      "target": "gdd_economy"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "UPHOLSTERY_GDD_v8.txt",
+      "source_location": "\u00a77.2",
+      "weight": 1.0,
+      "source": "gdd_followers",
+      "target": "gdd_player_house"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "UPHOLSTERY_GDD_v8.txt",
+      "source_location": "\u00a79.3",
+      "weight": 1.0,
+      "source": "gdd_followers",
+      "target": "gdd_talkogram"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "UPHOLSTERY_GDD_v8.txt",
+      "source_location": "\u00a710",
+      "weight": 1.0,
+      "source": "gdd_player_progression",
+      "target": "gdd_followers"
+    },
+    {
+      "relation": "implements",
+      "confidence": "INFERRED",
+      "confidence_score": 0.95,
+      "source_file": "explain.md",
+      "source_location": "\u00a71",
+      "weight": 1.0,
+      "source": "explain_laptop_browser",
+      "target": "gdd_shop"
+    },
+    {
+      "relation": "implements",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "explain.md",
+      "source_location": "\u00a71",
+      "weight": 1.0,
+      "source": "explain_laptop_browser",
+      "target": "gdd_talkogram"
+    },
+    {
+      "relation": "conceptually_related_to",
+      "confidence": "INFERRED",
+      "confidence_score": 0.85,
+      "source_file": "explain.md",
+      "source_location": "\u00a72",
+      "weight": 1.0,
+      "source": "gdd_talkogram",
+      "target": "explain_laptop_data"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "UPHOLSTERY_GDD_v8.txt",
+      "source_location": "\u00a711.2",
+      "weight": 1.0,
+      "source": "gdd_penalty_system",
+      "target": "gdd_talkogram"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "UPHOLSTERY_GDD_v8.txt",
+      "source_location": "\u00a710.3",
+      "weight": 1.0,
+      "source": "gdd_player_progression",
+      "target": "gdd_daily_contracts"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "UPHOLSTERY_GDD_v8.txt",
+      "source_location": "\u00a710.1",
+      "weight": 1.0,
+      "source": "gdd_player_progression",
+      "target": "gdd_player_house"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "UPHOLSTERY_GDD_v8.txt",
+      "source_location": "\u00a711.2",
+      "weight": 1.0,
+      "source": "gdd_penalty_system",
+      "target": "gdd_compound_failure"
+    },
+    {
+      "relation": "semantically_similar_to",
+      "confidence": "INFERRED",
+      "confidence_score": 0.75,
+      "source_file": "UPHOLSTERY_GDD_v8.txt",
+      "source_location": "\u00a71 / \u00a711",
+      "weight": 1.0,
+      "source": "gdd_penalty_system",
+      "target": "gdd_design_pillars"
+    },
+    {
+      "relation": "implements",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "explain.md",
+      "source_location": "\u00a73",
+      "weight": 1.0,
+      "source": "explain_minigame_runner",
+      "target": "gdd_minigame_interface"
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "explain.md",
+      "source_location": "\u00a71",
+      "weight": 1.0,
+      "source": "explain_laptop_interaction",
+      "target": "explain_laptop_browser"
+    },
+    {
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "confidence_score": 0.85,
+      "source_file": "explain.md",
+      "source_location": "\u00a71",
+      "weight": 1.0,
+      "source": "explain_laptop_browser",
+      "target": "explain_game_config"
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "explain.md",
+      "source_location": "\u00a71",
+      "weight": 1.0,
+      "source": "explain_laptop_browser",
+      "target": "explain_laptop_data"
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "explain.md",
+      "source_location": "\u00a71",
+      "weight": 1.0,
+      "source": "explain_gameplay_client",
+      "target": "explain_laptop_data"
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "explain.md",
+      "source_location": "\u00a71",
+      "weight": 1.0,
+      "source": "explain_gameplay_client",
+      "target": "explain_minigame_runner"
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "explain.md",
+      "source_location": "\u00a72",
+      "weight": 1.0,
+      "source": "explain_laptop_data",
+      "target": "explain_location_manager"
+    },
+    {
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "confidence_score": 0.85,
+      "source_file": "explain.md",
+      "source_location": "\u00a72",
+      "weight": 1.0,
+      "source": "explain_location_manager",
+      "target": "explain_game_config"
+    },
+    {
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "confidence_score": 0.95,
+      "source_file": "explain.md",
+      "source_location": "\u00a73",
+      "weight": 1.0,
+      "source": "explain_minigame_runner",
+      "target": "explain_game_config"
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "explain.md",
+      "source_location": "\u00a73",
+      "weight": 1.0,
+      "source": "explain_minigame_runner",
+      "target": "explain_foam_padding_script"
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "explain.md",
+      "source_location": "\u00a73",
+      "weight": 1.0,
+      "source": "explain_minigame_runner",
+      "target": "explain_seam_stitching_script"
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "explain.md",
+      "source_location": "\u00a73",
+      "weight": 1.0,
+      "source": "explain_minigame_runner",
+      "target": "explain_staple_gunning_script"
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "explain.md",
+      "source_location": "\u00a73",
+      "weight": 1.0,
+      "source": "explain_minigame_runner",
+      "target": "explain_tack_removal_script"
+    }
+  ],
+  "hyperedges": [
+    {
+      "id": "gameplay_loop_systems",
+      "label": "Core Gameplay Loop \u2014 Accept, Play, Earn, Spend",
+      "nodes": [
+        "gdd_shared_job_board",
+        "gdd_minigames",
+        "gdd_reputation_system",
+        "gdd_economy",
+        "gdd_toolbox_perk_system"
+      ],
+      "relation": "participate_in",
+      "confidence": "EXTRACTED",
+      "confidence_score": 0.95,
+      "source_file": "UPHOLSTERY_GDD_v8.txt"
+    },
+    {
+      "id": "progression_axes",
+      "label": "Multi-Axis Progression \u2014 Money, Followers, Reputation",
+      "nodes": [
+        "gdd_economy",
+        "gdd_followers",
+        "gdd_reputation_system",
+        "gdd_player_house",
+        "gdd_direct_offers"
+      ],
+      "relation": "participate_in",
+      "confidence": "EXTRACTED",
+      "confidence_score": 0.95,
+      "source_file": "UPHOLSTERY_GDD_v8.txt"
+    },
+    {
+      "id": "client_server_minigame_pipeline",
+      "label": "Client-Server Minigame Execution Pipeline",
+      "nodes": [
+        "explain_gameplay_client",
+        "explain_minigame_runner",
+        "explain_laptop_data",
+        "explain_location_manager"
+      ],
+      "relation": "implement",
+      "confidence": "EXTRACTED",
+      "confidence_score": 0.95,
+      "source_file": "explain.md"
+    }
+  ],
+  "built_at_commit": "dfd2fb65d2d31c3f5e6308278d643eb8e39fb117"
+}
