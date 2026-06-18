@@ -11,6 +11,8 @@ local Shop_Tab = Apps:WaitForChild("Shop_Tab")
 local Talkogram_Tab = Apps:WaitForChild("Talkogram_Tab")
 local Miscellaneous = Apps:WaitForChild("Miscellaneous")
 
+LaptopGui.Enabled = true
+
 -- state awal ketika player join
 LaptopScreen.Visible = false
 LaptopScreen.Active = true
