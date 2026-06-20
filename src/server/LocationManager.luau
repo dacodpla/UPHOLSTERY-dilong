@@ -45,8 +45,12 @@ local _pool = {}
 -- _slotCounts[locationName] = number of Slot_N templates discovered
 local _slotCounts = {}
 
--- _locationsByTier[tier] = { locationName, ... }  — built from Tier attribute on each folder
+-- _locationsByTier[tier] = { locationName, ... }  — kept for admin/generator APIs; not used for slot selection
 local _locationsByTier = {}
+
+-- _maxFurniture[locationName] = number  — MaxFurniture attribute on the location folder.
+-- If the slot has more Repairable models than this, a random subset is chosen per job.
+local _maxFurniture = {}
 
 -- _bespokeOnlyLocations[locationName] = true  — set BespokeOnly (bool) attribute on the folder
 -- These locations are excluded from procedural job assignment; only reachable via locationOverride
@@ -69,8 +73,12 @@ if not _activeSlotsFolder then
 end
 
 -- ── Pool initialisation ───────────────────────────────────────────────────
--- Discovers locations dynamically from ServerStorage. Each subfolder must have
--- a "Tier" string attribute ("Starter" / "Mid" / "Premium" / "Prestige").
+-- Discovers locations dynamically from ServerStorage.
+-- Optional folder attributes:
+--   Tier         (string)  — gates which jobs can use this location (Starter/Mid/Premium/…).
+--   MaxFurniture (number)  — caps how many Repairable pieces are used per job; excess are
+--                            chosen randomly so every visit feels different.
+--   BespokeOnly  (bool)    — excludes this location from procedural job assignment.
 -- Slot count is inferred by counting Slot_N Model children in the template folder.
 
 if not serverLocationsFolder then
@@ -100,12 +108,18 @@ else
 				end
 				table.insert(_locationsByTier[tier], locationFolder.Name)
 
+				local maxFurniture = locationFolder:GetAttribute("MaxFurniture")
+				if type(maxFurniture) == "number" and maxFurniture > 0 then
+					_maxFurniture[locationFolder.Name] = math.floor(maxFurniture)
+				end
+
 				if locationFolder:GetAttribute("BespokeOnly") == true then
 					_bespokeOnlyLocations[locationFolder.Name] = true
 				end
 
-				print(("[LocationManager] Registered '%s' (Tier: %s, %d slots%s)"):format(
+				print(("[LocationManager] Registered '%s' (Tier: %s, %d slots, MaxFurniture: %s%s)"):format(
 					locationFolder.Name, tier, slotCount,
+					_maxFurniture[locationFolder.Name] and tostring(_maxFurniture[locationFolder.Name]) or "unlimited",
 					_bespokeOnlyLocations[locationFolder.Name] and ", BespokeOnly" or ""))
 			else
 				warn(("[LocationManager] '%s' has no Slot_N models — skipping"):format(locationFolder.Name))
@@ -115,6 +129,24 @@ else
 end
 
 -- ── Helpers ───────────────────────────────────────────────────────────────
+
+-- Returns a pure-rotation CFrame for a tagged origin Model.
+-- Priority order:
+--   1. PrimaryPart.CFrame           — set a PrimaryPart in Studio for reliable visual rotation
+--   2. RotationY attribute (degrees) — lightweight fallback if no PrimaryPart; Y-axis only
+--   3. First BasePart.CFrame        — last resort; works if the model's parts are individually rotated
+local function getOriginCF(model: Model): CFrame
+	if model.PrimaryPart then
+		return model.PrimaryPart.CFrame
+	end
+	local rotY = model:GetAttribute("RotationY")
+	if type(rotY) == "number" then
+		local bbCF = model:GetBoundingBox()
+		return bbCF * CFrame.Angles(0, math.rad(rotY), 0)
+	end
+	local firstPart = model:FindFirstChildWhichIsA("BasePart", true)
+	return firstPart and firstPart.CFrame or model:GetPivot()
+end
 
 local function getDamagedVariants(typeFolder)
 	local variants = {}
@@ -225,6 +257,7 @@ function LocationManager.Assign(player, job)
 		return false
 	end
 
+	-- Collect every free slot across locations that match this job's tier.
 	local tierNames = _locationsByTier[job.tier]
 	if not tierNames or #tierNames == 0 then
 		warn("[LocationManager] No locations registered for tier:", job.tier)
@@ -232,10 +265,6 @@ function LocationManager.Assign(player, job)
 		return false
 	end
 
-	-- Search shuffled tier list so all location names get even use
-	-- Collect every free slot across all locations of this tier, then pick randomly.
-	-- This ensures all 6 layout variants get equal exposure rather than always
-	-- filling slot 1 before slot 2, etc.
 	local freeSlots = {}
 	for _, name in ipairs(tierNames) do
 		local pool = _pool[name]
@@ -338,8 +367,26 @@ function LocationManager.Assign(player, job)
 	end
 
 	if isTagBased then
-		-- Sort by RepairOrder (lower = first), then by Name for stability
-		table.sort(repairableModels, function(a, b)
+		local cap = _maxFurniture[chosenName]
+
+		local selectedModels
+		if cap and #repairableModels > cap then
+			-- Fisher-Yates shuffle on a copy, then take the first `cap` entries
+			local shuffled = table.clone(repairableModels)
+			for i = #shuffled, 2, -1 do
+				local j = math.random(i)
+				shuffled[i], shuffled[j] = shuffled[j], shuffled[i]
+			end
+			selectedModels = {}
+			for i = 1, cap do
+				selectedModels[i] = shuffled[i]
+			end
+		else
+			selectedModels = repairableModels
+		end
+
+		-- Sort the selected subset by RepairOrder (lower = first), then by Name for stability
+		table.sort(selectedModels, function(a, b)
 			local oa = a:GetAttribute("RepairOrder") or 999
 			local ob = b:GetAttribute("RepairOrder") or 999
 			if oa ~= ob then return oa < ob end
@@ -347,10 +394,10 @@ function LocationManager.Assign(player, job)
 		end)
 
 		local furnitureFolder = ServerStorage:FindFirstChild("FurnitureModels")
-		local maxPieces = math.min(#repairableModels, math.max(#(job.minigames or {}), 1))
+		local maxPieces = #selectedModels  -- location defines piece count; client falls back to minigames[1] for extra pieces
 
 		for i = 1, maxPieces do
-			local taggedModel  = repairableModels[i]
+			local taggedModel  = selectedModels[i]
 			local furnitureKey = taggedModel:GetAttribute("FurnitureKey")
 
 			if not furnitureKey then
@@ -364,10 +411,13 @@ function LocationManager.Assign(player, job)
 				continue
 			end
 
-			-- Position the damage clone at the tagged model's bounding-box base
-			local tagPivot   = taggedModel:GetPivot()
-			local _, tagSize = taggedModel:GetBoundingBox()
-			local tagBaseY   = tagPivot.Position.Y - tagSize.Y / 2
+			-- Position the damage clone at the tagged model's bounding-box base.
+			-- GetBoundingBox() gives us the AABB center (reliable X/Y/Z) independent of PrimaryPart.
+			-- getOriginCF() gives us the actual Studio rotation via PrimaryPart or first BasePart.
+			local bbCF, tagSize = taggedModel:GetBoundingBox()
+			local tagBaseY      = bbCF.Position.Y - tagSize.Y / 2
+			local originCF      = getOriginCF(taggedModel)
+			local tagRotation   = CFrame.fromMatrix(Vector3.zero, originCF.XVector, originCF.YVector, originCF.ZVector)
 
 			local variants = getDamagedVariants(typeFolder)
 			if #variants == 0 then
@@ -378,11 +428,13 @@ function LocationManager.Assign(player, job)
 			local clone = pickRandom(variants):Clone()
 			clone.Parent = slotModel
 			local _, dmgSize = clone:GetBoundingBox()
-			clone:PivotTo(CFrame.new(tagPivot.X, tagBaseY + dmgSize.Y / 2, tagPivot.Z) * tagPivot.Rotation)
+			clone:PivotTo(CFrame.new(bbCF.X, tagBaseY + dmgSize.Y / 2, bbCF.Z) * tagRotation)
 			for _, part in ipairs(clone:GetDescendants()) do
 				if part:IsA("BasePart") then part.Anchored = true end
 			end
-			colorizeClone(clone)
+			if taggedModel:GetAttribute("RandomColor") == true then
+				colorizeClone(clone)
+			end
 
 			-- Hide the tagged model while the damage clone is shown
 			for _, part in ipairs(taggedModel:GetDescendants()) do
@@ -431,7 +483,9 @@ function LocationManager.Assign(player, job)
 					for _, part in ipairs(clone:GetDescendants()) do
 						if part:IsA("BasePart") then part.Anchored = true end
 					end
-					colorizeClone(clone)
+					if pad:GetAttribute("RandomColor") == true then
+						colorizeClone(clone)
+					end
 					table.insert(cloneList, clone)
 				else
 					warn("[LocationManager] No damage variants in", furnitureKey)
@@ -579,11 +633,12 @@ FurniturePieceRepaired.OnServerEvent:Connect(function(player, pieceIndex)
 		fixedClone.Parent = assignment.slotModel
 		local taggedModel = assignment.taggedModels and assignment.taggedModels[pieceIndex]
 		if taggedModel then
-			local tagPivot   = taggedModel:GetPivot()
-			local _, tagSize = taggedModel:GetBoundingBox()
-			local tagBaseY   = tagPivot.Position.Y - tagSize.Y / 2
-			local _, fixSize = fixedClone:GetBoundingBox()
-			fixedClone:PivotTo(CFrame.new(tagPivot.X, tagBaseY + fixSize.Y / 2, tagPivot.Z) * tagPivot.Rotation)
+			local bbCF, tagSize = taggedModel:GetBoundingBox()
+			local tagBaseY      = bbCF.Position.Y - tagSize.Y / 2
+			local originCF      = getOriginCF(taggedModel)
+			local tagRotation   = CFrame.fromMatrix(Vector3.zero, originCF.XVector, originCF.YVector, originCF.ZVector)
+			local _, fixSize    = fixedClone:GetBoundingBox()
+			fixedClone:PivotTo(CFrame.new(bbCF.X, tagBaseY + fixSize.Y / 2, bbCF.Z) * tagRotation)
 		end
 		for _, desc in ipairs(fixedClone:GetDescendants()) do
 			if desc:IsA("BasePart") then desc.Anchored = true end

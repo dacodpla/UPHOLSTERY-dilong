@@ -70,20 +70,20 @@ local function populateBoard(jobs)
         card.Name    = "JobCard_" .. job.id
         card.Visible = true
 
-        -- Build location string for this job
-        local locationText
+        -- Bespoke jobs show their specific location; procedural jobs show all locations
+        -- registered for that tier (the actual slot is chosen randomly among them at accept time).
+        local displayName
         if job.locationOverride then
-            locationText = splitCamelCase(job.locationOverride)
+            displayName = splitCamelCase(job.locationOverride)
         else
             local locs = _locationsByTier[job.tier] or {}
             local names = {}
             for _, n in ipairs(locs) do
                 table.insert(names, splitCamelCase(n))
             end
-            locationText = table.concat(names, " / ")
+            displayName = #names > 0 and table.concat(names, " / ") or job.name
         end
-
-        card:WaitForChild("JobName").Text    = locationText ~= "" and locationText or job.name
+        card:WaitForChild("JobName").Text    = displayName
         card:WaitForChild("JobDetails").Text = job.details
         card:WaitForChild("PayLabel").Text       = "$" .. tostring(job.pay)
         card:WaitForChild("FollowersLabel").Text = "+" .. tostring(job.followers) .. " followers"
