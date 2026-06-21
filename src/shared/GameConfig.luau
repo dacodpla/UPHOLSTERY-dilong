@@ -58,6 +58,7 @@ return {
 		deviationTolerance      = 32,
 		perfectMaxDeviationFrac = 0.35,
 		goodMaxDeviationFrac    = 0.70,
+		missBudget              = 2.5,   -- seconds of full-overshoot tolerance before fail
 		trailLength             = 36,
 	},
 
@@ -285,7 +286,8 @@ return {
 			StapleGunning = { stapleCountMin=3, stapleCountMax=5, barSpeed=0.45,
 			                  goodZoneWidth=0.15, perfectZoneWidth=0.07 },
 			SeamStitching = { segmentCountMin=3, segmentCountMax=4,
-			                  deviationTolerance=48, timePerSegment=12 },
+			                  deviationTolerance=48, timePerSegment=12,
+			                  missBudget=4.0, perfectMaxDeviationFrac=0.55, goodMaxDeviationFrac=0.88 },
 			FoamPadding   = { pieceCount=3, timeLimit=65, perfectMinRatio=1.0, goodMinRatio=0.67 },
 		},
 		Medium = {
@@ -298,7 +300,8 @@ return {
 			                  goodZoneWidth=0.08, perfectZoneWidth=0.035,
 			                  barSpeedRampUp=0.06 },
 			SeamStitching = { segmentCountMin=8, segmentCountMax=12,
-			                  deviationTolerance=20, timePerSegment=7 },
+			                  deviationTolerance=20, timePerSegment=7,
+			                  missBudget=1.8, perfectMaxDeviationFrac=0.18, goodMaxDeviationFrac=0.45 },
 			FoamPadding   = { pieceCount=7, timeLimit=35, perfectMinRatio=1.0, goodMinRatio=0.80 },
 		},
 	},

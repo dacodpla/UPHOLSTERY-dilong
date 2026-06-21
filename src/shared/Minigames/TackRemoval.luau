@@ -16,6 +16,7 @@
 ]]
 
 local TweenService = game:GetService("TweenService")
+local RunService   = game:GetService("RunService")
 local GameConfig   = require(game:GetService("ReplicatedStorage"):WaitForChild("Shared"):WaitForChild("GameConfig"))
 local SFX          = require(game:GetService("ReplicatedStorage"):WaitForChild("Shared"):WaitForChild("SFXPlayer"))
 
@@ -46,37 +47,8 @@ local COL_HIT_GOOD     = Color3.fromRGB(90, 180, 230)
 local COL_HIT_OK       = Color3.fromRGB(180, 180, 180)
 local COL_MISS         = Color3.fromRGB(220, 60, 60)
 local COL_GOLD         = Color3.fromRGB(210, 170, 60)
+local COL_WARN         = Color3.fromRGB(230, 170, 50)
 local COL_WHITE        = Color3.fromRGB(255, 255, 255)
-local COL_PILL_BG      = Color3.fromRGB(0, 0, 0)
-local COL_MUTED        = Color3.fromRGB(160, 150, 170)
-
--- ── HUD pill builder ──────────────────────────────────────────────────────
-
-local function makePill(parent, w, h, posX, posY, anchorX, anchorY)
-	local f = Instance.new("Frame")
-	f.Size = UDim2.new(0, w, 0, h)
-	f.Position = UDim2.fromScale(posX, posY)
-	f.AnchorPoint = Vector2.new(anchorX or 0, anchorY or 0)
-	f.BackgroundColor3 = COL_PILL_BG
-	f.BackgroundTransparency = 0.38
-	f.BorderSizePixel = 0
-	f.Parent = parent
-	Instance.new("UICorner", f).CornerRadius = UDim.new(0, 10)
-	table.insert(_instances, f)
-	return f
-end
-
-local function makeLabel(parent, text, size, color, font)
-	local l = Instance.new("TextLabel")
-	l.Size = UDim2.fromScale(1, 1)
-	l.BackgroundTransparency = 1
-	l.Text = text
-	l.TextColor3 = color or COL_WHITE
-	l.Font = font or Enum.Font.GothamBold
-	l.TextSize = size or 18
-	l.Parent = parent
-	return l
-end
 
 -- ── Floating hit-quality text ──────────────────────────────────────────────
 
@@ -119,27 +91,77 @@ function TackRemoval.Start(container, config)
 	local approachTime = p.approachTime
 	local spawnGap    = p.tackSpawnGap
 
-	-- HUD
-	local timerPill = makePill(container, 100, 48, 0.03, 0.03, 0, 0)
-	local timerLabel = makeLabel(timerPill, "—", 30, COL_WHITE)
-	timerLabel.TextXAlignment = Enum.TextXAlignment.Center
-
-	local titlePill = makePill(container, 240, 40, 0.5, 0.03, 0.5, 0)
-	makeLabel(titlePill, "PULL THE TACKS", 17, COL_GOLD)
-
-	local hitsLabel = makeLabel(
-		makePill(container, 120, 48, 0.97, 0.03, 1, 0),
-		"0 / " .. tackCount, 26, COL_GOLD
-	)
-
 	local score    = 0
 	local maxScore = tackCount * 3
 	local hits     = 0
-	local elapsed  = 0
 
-	-- Time display: total game duration based on how many tacks there are
 	local totalDuration = (tackCount - 1) * spawnGap + approachTime + 0.6
-	timerLabel.Text = math.ceil(totalDuration) .. "s"
+
+	-- Compact centred HUD pill
+	local hudBar = Instance.new("Frame")
+	hudBar.Size               = UDim2.new(0.62, 0, 0, 40)
+	hudBar.AnchorPoint        = Vector2.new(0.5, 0)
+	hudBar.Position           = UDim2.new(0.5, 0, 0, 140)
+	hudBar.BackgroundColor3   = Color3.fromRGB(0, 0, 0)
+	hudBar.BackgroundTransparency = 0.18
+	hudBar.BorderSizePixel    = 0
+	hudBar.Parent             = container
+	table.insert(_instances, hudBar)
+	Instance.new("UICorner", hudBar).CornerRadius = UDim.new(1, 0)
+
+	local timerLabel = Instance.new("TextLabel")
+	timerLabel.Size               = UDim2.new(0, 48, 1, 0)
+	timerLabel.Position           = UDim2.new(0, 10, 0, 0)
+	timerLabel.BackgroundTransparency = 1
+	timerLabel.Text               = tostring(math.ceil(totalDuration))
+	timerLabel.TextColor3         = COL_WHITE
+	timerLabel.Font               = Enum.Font.GothamBold
+	timerLabel.TextSize           = 19
+	timerLabel.TextXAlignment     = Enum.TextXAlignment.Center
+	timerLabel.Parent             = hudBar
+
+	local timerTrack = Instance.new("Frame")
+	timerTrack.Size             = UDim2.new(1, -142, 0, 7)
+	timerTrack.Position         = UDim2.new(0, 66, 0.5, -3)
+	timerTrack.BackgroundColor3 = Color3.fromRGB(45, 40, 60)
+	timerTrack.BorderSizePixel  = 0
+	timerTrack.Parent           = hudBar
+	Instance.new("UICorner", timerTrack).CornerRadius = UDim.new(1, 0)
+
+	local timerBar = Instance.new("Frame")
+	timerBar.Size             = UDim2.fromScale(1, 1)
+	timerBar.BackgroundColor3 = COL_WHITE
+	timerBar.BorderSizePixel  = 0
+	timerBar.Parent           = timerTrack
+	Instance.new("UICorner", timerBar).CornerRadius = UDim.new(1, 0)
+
+	local hitsLabel = Instance.new("TextLabel")
+	hitsLabel.Size               = UDim2.new(0, 64, 1, 0)
+	hitsLabel.Position           = UDim2.new(1, -72, 0, 0)
+	hitsLabel.BackgroundTransparency = 1
+	hitsLabel.Text               = "0 / " .. tackCount
+	hitsLabel.TextColor3         = COL_GOLD
+	hitsLabel.Font               = Enum.Font.GothamBold
+	hitsLabel.TextSize           = 18
+	hitsLabel.TextXAlignment     = Enum.TextXAlignment.Center
+	hitsLabel.Parent             = hudBar
+
+	local startClock = os.clock()
+	local barConn = RunService.Heartbeat:Connect(function()
+		if _finished then return end
+		local ratio = math.max(0, 1 - (os.clock() - startClock) / totalDuration)
+		timerBar.Size = UDim2.fromScale(ratio, 1)
+	end)
+	table.insert(_connections, barConn)
+
+	local vignette = Instance.new("Frame")
+	vignette.Size                   = UDim2.fromScale(1, 1)
+	vignette.BackgroundColor3       = Color3.fromRGB(0, 0, 0)
+	vignette.BackgroundTransparency = 1
+	vignette.ZIndex                 = 1
+	vignette.BorderSizePixel        = 0
+	vignette.Parent                 = container
+	table.insert(_instances, vignette)
 
 	local function finishGame()
 		if _finished then return end
@@ -158,16 +180,16 @@ function TackRemoval.Start(container, config)
 		if _done then _done:Fire() end
 	end
 
-	-- Countdown display
 	task.spawn(function()
 		local timeLeft = totalDuration
 		while timeLeft > 0 and not _finished do
 			task.wait(1)
 			timeLeft = timeLeft - 1
-			timerLabel.Text = math.ceil(timeLeft) .. "s"
-			if timeLeft <= 5 then
-				timerLabel.TextColor3 = COL_MISS
-			end
+			timerLabel.Text = tostring(math.ceil(timeLeft))
+			local ratio = timeLeft / totalDuration
+			local col = ratio > 0.5 and COL_WHITE or ratio > 0.25 and COL_WARN or COL_MISS
+			timerLabel.TextColor3     = col
+			timerBar.BackgroundColor3 = col
 		end
 	end)
 
@@ -253,6 +275,10 @@ function TackRemoval.Start(container, config)
 				local progress = math.clamp((os.clock() - startTime) / approachTime, 0, 1)
 				hits = hits + 1
 				hitsLabel.Text = hits .. " / " .. tackCount
+				TweenService:Create(hitsLabel, TweenInfo.new(0.07), { TextSize = 24 }):Play()
+				task.delay(0.09, function()
+					TweenService:Create(hitsLabel, TweenInfo.new(0.18, Enum.EasingStyle.Back), { TextSize = 18 }):Play()
+				end)
 
 				local pts, flashCol, qualLabel
 				if progress >= p.perfectMinProgress then
@@ -269,6 +295,16 @@ function TackRemoval.Start(container, config)
 					qualLabel  = "OK"
 				end
 				score = score + pts
+
+				do
+					local vigCol = pts == 3 and Color3.fromRGB(230, 190, 60)
+					           or pts == 2 and Color3.fromRGB(90, 180, 230)
+					           or              Color3.fromRGB(140, 160, 210)
+					local vigTransp = pts == 3 and 0.70 or pts == 2 and 0.78 or 0.90
+					vignette.BackgroundColor3       = vigCol
+					vignette.BackgroundTransparency = vigTransp
+					TweenService:Create(vignette, TweenInfo.new(0.4), { BackgroundTransparency = 1 }):Play()
+				end
 
 				if pts == 3 then
 					SFX.Play("TackPerfect")
@@ -294,6 +330,9 @@ function TackRemoval.Start(container, config)
 				hitConn:Disconnect()
 
 				SFX.Play("TackMiss")
+				vignette.BackgroundColor3       = Color3.fromRGB(210, 60, 60)
+				vignette.BackgroundTransparency = 0.75
+				TweenService:Create(vignette, TweenInfo.new(0.4), { BackgroundTransparency = 1 }):Play()
 				tack.BackgroundColor3 = COL_MISS
 				showHitText(container, px, py - 0.03, "MISS", COL_MISS)
 				TweenService:Create(tack, TweenInfo.new(0.35), { BackgroundTransparency = 1 }):Play()

@@ -14,10 +14,11 @@
 	Result = "Fail" | "Pass" | "Good" | "Perfect"
 ]]
 
-local RunService   = game:GetService("RunService")
-local TweenService = game:GetService("TweenService")
-local GameConfig   = require(game:GetService("ReplicatedStorage"):WaitForChild("Shared"):WaitForChild("GameConfig"))
-local SFX          = require(game:GetService("ReplicatedStorage"):WaitForChild("Shared"):WaitForChild("SFXPlayer"))
+local RunService       = game:GetService("RunService")
+local TweenService     = game:GetService("TweenService")
+local UserInputService = game:GetService("UserInputService")
+local GameConfig       = require(game:GetService("ReplicatedStorage"):WaitForChild("Shared"):WaitForChild("GameConfig"))
+local SFX              = require(game:GetService("ReplicatedStorage"):WaitForChild("Shared"):WaitForChild("SFXPlayer"))
 
 local cfg   = GameConfig.StapleGunning
 local mgCfg = GameConfig.Minigame
@@ -35,48 +36,23 @@ local function disconnect()
 end
 
 -- ── Colours ───────────────────────────────────────────────────────────────
-local COL_PILL_BG   = Color3.fromRGB(0, 0, 0)
-local COL_GOLD      = Color3.fromRGB(210, 170, 60)
-local COL_WHITE     = Color3.fromRGB(255, 255, 255)
-local COL_TRACK     = Color3.fromRGB(20, 15, 30)
-local COL_GOOD_ZONE = Color3.fromRGB(60, 190, 90)
-local COL_PERF_ZONE = Color3.fromRGB(230, 200, 60)
-local COL_BAR       = Color3.fromRGB(235, 225, 210)
-local COL_BTN       = Color3.fromRGB(160, 40, 40)
-local COL_BTN_FLASH = Color3.fromRGB(215, 70, 70)
-local COL_HIT_PERF  = Color3.fromRGB(255, 220, 70)
-local COL_HIT_GOOD  = Color3.fromRGB(80, 220, 120)
-local COL_MISS      = Color3.fromRGB(220, 70, 70)
-local COL_DANGER    = Color3.fromRGB(220, 80, 80)
+local COL_GOLD       = Color3.fromRGB(210, 170,  60)
+local COL_WHITE      = Color3.fromRGB(255, 255, 255)
+local COL_TRACK      = Color3.fromRGB( 20,  15,  30)
+local COL_GOOD_ZONE  = Color3.fromRGB( 60, 190,  90)
+local COL_PERF_ZONE  = Color3.fromRGB(230, 200,  60)
+local COL_BAR        = Color3.fromRGB(235, 225, 210)
+local COL_BTN        = Color3.fromRGB(160,  40,  40)
+local COL_BTN_FLASH  = Color3.fromRGB(215,  70,  70)
+local COL_HIT_PERF   = Color3.fromRGB(255, 220,  70)
+local COL_HIT_GOOD   = Color3.fromRGB( 80, 220, 120)
+local COL_MISS       = Color3.fromRGB(220,  70,  70)
+local COL_DANGER     = Color3.fromRGB(220,  80,  80)
+local COL_WARN       = Color3.fromRGB(230, 170,  50)
+local COL_HUD_BG     = Color3.fromRGB(  0,   0,   0)
+local COL_BAR_TRACK  = Color3.fromRGB( 45,  40,  60)
 
--- ── HUD helpers ───────────────────────────────────────────────────────────
-
-local function makePill(parent, w, h, posX, posY, anchorX, anchorY)
-	local f = Instance.new("Frame")
-	f.Size = UDim2.new(0, w, 0, h)
-	f.Position = UDim2.fromScale(posX, posY)
-	f.AnchorPoint = Vector2.new(anchorX or 0, anchorY or 0)
-	f.BackgroundColor3 = COL_PILL_BG
-	f.BackgroundTransparency = 0.38
-	f.BorderSizePixel = 0
-	f.Parent = parent
-	Instance.new("UICorner", f).CornerRadius = UDim.new(0, 10)
-	table.insert(_instances, f)
-	return f
-end
-
-local function makeLabel(parent, text, size, color, xAlign)
-	local l = Instance.new("TextLabel")
-	l.Size = UDim2.fromScale(1, 1)
-	l.BackgroundTransparency = 1
-	l.Text = text
-	l.TextColor3 = color or COL_WHITE
-	l.Font = Enum.Font.GothamBold
-	l.TextSize = size or 18
-	if xAlign then l.TextXAlignment = xAlign end
-	l.Parent = parent
-	return l
-end
+-- ── Feedback label helper ─────────────────────────────────────────────────
 
 local function showFeedback(label, text, color)
 	label.Text = text
@@ -88,13 +64,11 @@ local function showFeedback(label, text, color)
 end
 
 -- ── Zone generation ───────────────────────────────────────────────────────
--- Returns an array of zone centres spread randomly across the track (0–1 scale).
--- Centres are evenly spaced with jitter so zones never heavily overlap.
 
 local function generateZones(count, goodW)
-	local zones   = {}
-	local usable  = 0.82  -- leave margins at each end
-	local step    = usable / count
+	local zones  = {}
+	local usable = 0.82
+	local step   = usable / count
 	for i = 1, count do
 		local base   = 0.09 + (i - 0.5) * step
 		local jitter = (math.random() - 0.5) * step * 0.45
@@ -107,118 +81,168 @@ end
 -- ── UI builder ────────────────────────────────────────────────────────────
 
 local function buildUI(container, zones, goodW, perfW, stapleCount, timeLimit)
-	-- HUD
-	local timerPill = makePill(container, 100, 48, 0.03, 0.03, 0, 0)
-	local timerLabel = makeLabel(timerPill, tostring(timeLimit) .. "s", 30, COL_WHITE)
-	timerLabel.TextXAlignment = Enum.TextXAlignment.Center
 
-	local titlePill = makePill(container, 300, 40, 0.5, 0.03, 0.5, 0)
-	makeLabel(titlePill, "FIRE THE STAPLE GUN", 17, COL_GOLD)
+	-- Full-screen flash vignette (above everything, normally invisible)
+	local vignette = Instance.new("Frame")
+	vignette.Size                   = UDim2.fromScale(1, 1)
+	vignette.BackgroundColor3       = COL_MISS
+	vignette.BackgroundTransparency = 1
+	vignette.BorderSizePixel        = 0
+	vignette.ZIndex                 = 1
+	vignette.Parent                 = container
+	table.insert(_instances, vignette)
 
-	local scorePill = makePill(container, 120, 48, 0.97, 0.03, 1, 0)
-	local scoreLabel = makeLabel(scorePill, "0 / " .. stapleCount, 26, COL_GOLD)
-	scoreLabel.TextXAlignment = Enum.TextXAlignment.Center
+	-- ── Compact centred HUD pill ──────────────────────────────────────────
+	-- Centred horizontally, pushed below Roblox's own top bar (~36 px).
+	-- Layout inside the pill:  [  27  |████████░░░|  0/3  ]
+	local hudBar = Instance.new("Frame")
+	hudBar.Size                 = UDim2.new(0.62, 0, 0, 40)
+	hudBar.AnchorPoint          = Vector2.new(0.5, 0)
+	hudBar.Position             = UDim2.new(0.5, 0, 0, 140)
+	hudBar.BackgroundColor3     = COL_HUD_BG
+	hudBar.BackgroundTransparency = 0.18
+	hudBar.BorderSizePixel      = 0
+	hudBar.Parent               = container
+	table.insert(_instances, hudBar)
+	Instance.new("UICorner", hudBar).CornerRadius = UDim.new(1, 0)
 
-	-- Track
+	-- Timer number (left side of pill)
+	local timerLabel = Instance.new("TextLabel")
+	timerLabel.Size                 = UDim2.new(0, 48, 1, 0)
+	timerLabel.Position             = UDim2.new(0, 10, 0, 0)
+	timerLabel.BackgroundTransparency = 1
+	timerLabel.Text                 = tostring(timeLimit)
+	timerLabel.TextColor3           = COL_WHITE
+	timerLabel.Font                 = Enum.Font.GothamBold
+	timerLabel.TextSize             = 19
+	timerLabel.TextXAlignment       = Enum.TextXAlignment.Center
+	timerLabel.Parent               = hudBar
+
+	-- Progress bar track (fills the centre span of the pill)
+	local timerTrack = Instance.new("Frame")
+	timerTrack.Size             = UDim2.new(1, -142, 0, 7)
+	timerTrack.Position         = UDim2.new(0, 66, 0.5, -3)
+	timerTrack.BackgroundColor3 = COL_BAR_TRACK
+	timerTrack.BorderSizePixel  = 0
+	timerTrack.Parent           = hudBar
+	Instance.new("UICorner", timerTrack).CornerRadius = UDim.new(1, 0)
+
+	local timerBar = Instance.new("Frame")
+	timerBar.Size             = UDim2.fromScale(1, 1)
+	timerBar.BackgroundColor3 = COL_WHITE
+	timerBar.BorderSizePixel  = 0
+	timerBar.Parent           = timerTrack
+	Instance.new("UICorner", timerBar).CornerRadius = UDim.new(1, 0)
+
+	-- Score (right side of pill)
+	local scoreLabel = Instance.new("TextLabel")
+	scoreLabel.Size                 = UDim2.new(0, 64, 1, 0)
+	scoreLabel.Position             = UDim2.new(1, -72, 0, 0)
+	scoreLabel.BackgroundTransparency = 1
+	scoreLabel.Text                 = "0 / " .. stapleCount
+	scoreLabel.TextColor3           = COL_GOLD
+	scoreLabel.Font                 = Enum.Font.GothamBold
+	scoreLabel.TextSize             = 18
+	scoreLabel.TextXAlignment       = Enum.TextXAlignment.Center
+	scoreLabel.Parent               = hudBar
+
+	-- ── Track ─────────────────────────────────────────────────────────────
 	local track = Instance.new("Frame")
-	track.Name = "Track"
-	track.Size = UDim2.new(0.84, 0, 0, 60)
-	track.AnchorPoint = Vector2.new(0.5, 0.5)
-	track.Position = UDim2.fromScale(0.5, 0.37)
+	track.Name             = "Track"
+	track.Size             = UDim2.new(0.84, 0, 0, 60)
+	track.AnchorPoint      = Vector2.new(0.5, 0.5)
+	track.Position         = UDim2.fromScale(0.5, 0.37)
 	track.BackgroundColor3 = COL_TRACK
-	track.BorderSizePixel = 0
+	track.BorderSizePixel  = 0
 	track.ClipsDescendants = true
-	track.Parent = container
+	track.Parent           = container
 	table.insert(_instances, track)
 	Instance.new("UICorner", track).CornerRadius = UDim.new(0.5, 0)
 
 	local trackStroke = Instance.new("UIStroke")
-	trackStroke.Color = Color3.fromRGB(55, 42, 82)
+	trackStroke.Color     = Color3.fromRGB(55, 42, 82)
 	trackStroke.Thickness = 1.5
-	trackStroke.Parent = track
+	trackStroke.Parent    = track
 
-	-- Render each zone pair
+	-- Zone pairs
 	for _, center in ipairs(zones) do
-		-- Good zone (outer, green)
 		local gZone = Instance.new("Frame")
-		gZone.Size = UDim2.new(goodW, 0, 1, 0)
-		gZone.AnchorPoint = Vector2.new(0.5, 0)
-		gZone.Position = UDim2.fromScale(center, 0)
-		gZone.BackgroundColor3 = COL_GOOD_ZONE
+		gZone.Size                  = UDim2.new(goodW, 0, 1, 0)
+		gZone.AnchorPoint           = Vector2.new(0.5, 0)
+		gZone.Position              = UDim2.fromScale(center, 0)
+		gZone.BackgroundColor3      = COL_GOOD_ZONE
 		gZone.BackgroundTransparency = 0.42
-		gZone.BorderSizePixel = 0
-		gZone.ZIndex = 2
-		gZone.Parent = track
+		gZone.BorderSizePixel       = 0
+		gZone.ZIndex                = 2
+		gZone.Parent                = track
 
-		-- Perfect zone (inner, gold)
 		local pZone = Instance.new("Frame")
-		pZone.Size = UDim2.new(perfW, 0, 1, 0)
-		pZone.AnchorPoint = Vector2.new(0.5, 0)
-		pZone.Position = UDim2.fromScale(center, 0)
-		pZone.BackgroundColor3 = COL_PERF_ZONE
+		pZone.Size                  = UDim2.new(perfW, 0, 1, 0)
+		pZone.AnchorPoint           = Vector2.new(0.5, 0)
+		pZone.Position              = UDim2.fromScale(center, 0)
+		pZone.BackgroundColor3      = COL_PERF_ZONE
 		pZone.BackgroundTransparency = 0.22
-		pZone.BorderSizePixel = 0
-		pZone.ZIndex = 3
-		pZone.Parent = track
+		pZone.BorderSizePixel       = 0
+		pZone.ZIndex                = 3
+		pZone.Parent                = track
 
-		-- Star label on perfect zone
 		local star = Instance.new("TextLabel")
-		star.Size = UDim2.fromScale(1, 0.9)
-		star.AnchorPoint = Vector2.new(0.5, 0.5)
-		star.Position = UDim2.fromScale(0.5, 0.5)
+		star.Size                = UDim2.fromScale(1, 0.9)
+		star.AnchorPoint         = Vector2.new(0.5, 0.5)
+		star.Position            = UDim2.fromScale(0.5, 0.5)
 		star.BackgroundTransparency = 1
-		star.Text = "★"
-		star.TextColor3 = COL_PERF_ZONE
-		star.Font = Enum.Font.GothamBold
-		star.TextSize = 14
-		star.TextTransparency = 0.15
-		star.ZIndex = 4
-		star.Parent = pZone
+		star.Text                = "★"
+		star.TextColor3          = COL_PERF_ZONE
+		star.Font                = Enum.Font.GothamBold
+		star.TextSize            = 14
+		star.TextTransparency    = 0.15
+		star.ZIndex              = 4
+		star.Parent              = pZone
 	end
 
 	-- Moving bar
 	local bar = Instance.new("Frame")
-	bar.Size = UDim2.new(0, 8, 1, -8)
-	bar.AnchorPoint = Vector2.new(0.5, 0.5)
-	bar.Position = UDim2.fromScale(0, 0.5)
+	bar.Size             = UDim2.new(0, 8, 1, -8)
+	bar.AnchorPoint      = Vector2.new(0.5, 0.5)
+	bar.Position         = UDim2.fromScale(0, 0.5)
 	bar.BackgroundColor3 = COL_BAR
-	bar.BorderSizePixel = 0
-	bar.ZIndex = 6
-	bar.Parent = track
+	bar.BorderSizePixel  = 0
+	bar.ZIndex           = 6
+	bar.Parent           = track
 	Instance.new("UICorner", bar).CornerRadius = UDim.new(0, 3)
 
-	-- FIRE button
+	-- ── FIRE button ───────────────────────────────────────────────────────
 	local fireBtn = Instance.new("TextButton")
-	fireBtn.Size = UDim2.new(0, 188, 0, 70)
-	fireBtn.AnchorPoint = Vector2.new(0.5, 0)
-	fireBtn.Position = UDim2.fromScale(0.5, 0.54)
+	fireBtn.Size             = UDim2.new(0, 188, 0, 70)
+	fireBtn.AnchorPoint      = Vector2.new(0.5, 0)
+	fireBtn.Position         = UDim2.fromScale(0.5, 0.54)
 	fireBtn.BackgroundColor3 = COL_BTN
-	fireBtn.TextColor3 = Color3.fromRGB(255, 245, 220)
-	fireBtn.Font = Enum.Font.GothamBold
-	fireBtn.TextSize = 30
-	fireBtn.Text = "FIRE"
-	fireBtn.BorderSizePixel = 0
-	fireBtn.ZIndex = 2
-	fireBtn.Parent = container
+	fireBtn.TextColor3       = Color3.fromRGB(255, 245, 220)
+	fireBtn.Font             = Enum.Font.GothamBold
+	fireBtn.TextSize         = 30
+	fireBtn.Text             = "FIRE"
+	fireBtn.BorderSizePixel  = 0
+	fireBtn.ZIndex           = 2
+	fireBtn.Parent           = container
 	table.insert(_instances, fireBtn)
 	Instance.new("UICorner", fireBtn).CornerRadius = UDim.new(0, 12)
 	Instance.new("UIStroke", fireBtn).Color = Color3.fromRGB(200, 55, 55)
 
-	-- Feedback label
+	-- Feedback label (below fire button)
 	local feedback = Instance.new("TextLabel")
-	feedback.Size = UDim2.new(0, 170, 0, 38)
-	feedback.AnchorPoint = Vector2.new(0.5, 0)
-	feedback.Position = UDim2.fromScale(0.5, 0.82)
+	feedback.Size              = UDim2.new(0, 170, 0, 38)
+	feedback.AnchorPoint       = Vector2.new(0.5, 0)
+	feedback.Position          = UDim2.fromScale(0.5, 0.82)
 	feedback.BackgroundTransparency = 1
-	feedback.Text = ""
-	feedback.TextColor3 = COL_GOLD
-	feedback.Font = Enum.Font.GothamBold
-	feedback.TextSize = 28
-	feedback.TextTransparency = 1
-	feedback.Parent = container
+	feedback.Text              = ""
+	feedback.TextColor3        = COL_GOLD
+	feedback.Font              = Enum.Font.GothamBold
+	feedback.TextSize          = 28
+	feedback.TextTransparency  = 1
+	feedback.Parent            = container
 	table.insert(_instances, feedback)
 
-	return bar, fireBtn, scoreLabel, timerLabel, feedback
+	return bar, fireBtn, scoreLabel, timerLabel, timerBar, feedback, vignette
 end
 
 -- ── Public interface ──────────────────────────────────────────────────────
@@ -244,14 +268,13 @@ function StapleGunning.Start(container, config)
 		perfW = perfW * mgCfg.fragileMultiplier
 	end
 
-	-- Generate random zone positions for this run
 	local zones = generateZones(p.zoneCount, goodW)
 
-	local bar, fireBtn, scoreLabel, timerLabel, feedback =
+	local bar, fireBtn, scoreLabel, timerLabel, timerBar, feedback, vignette =
 		buildUI(container, zones, goodW, perfW, stapleCount, timeLimit)
 
-	-- Randomise bar start
-	local barPos       = math.random() * 0.8 + 0.1
+	local startClock = os.clock()
+	local barPos     = math.random() * 0.8 + 0.1
 	local direction    = math.random() < 0.5 and 1 or -1
 	local currentSpeed = p.barSpeed
 	local staplesFired = 0
@@ -293,10 +316,9 @@ function StapleGunning.Start(container, config)
 		if _done then _done:Fire() end
 	end
 
-	local fireConn = fireBtn.Activated:Connect(function()
+	local function onFire()
 		if _finished then return end
 
-		-- Check all zones: perfect takes priority over good
 		local pts = 0
 		local feedText, feedCol
 
@@ -323,6 +345,18 @@ function StapleGunning.Start(container, config)
 		scoreLabel.Text = staplesFired .. " / " .. stapleCount
 		showFeedback(feedback, feedText, feedCol)
 
+		-- Score pop: briefly bump TextSize then settle back
+		TweenService:Create(scoreLabel, TweenInfo.new(0.07), { TextSize = 30 }):Play()
+		task.delay(0.09, function()
+			TweenService:Create(scoreLabel, TweenInfo.new(0.18, Enum.EasingStyle.Back), { TextSize = 22 }):Play()
+		end)
+
+		-- Screen vignette flash: colour encodes the result
+		local vigCol = pts == 2 and COL_HIT_PERF or pts == 1 and COL_HIT_GOOD or COL_MISS
+		vignette.BackgroundColor3      = vigCol
+		vignette.BackgroundTransparency = 0.78
+		TweenService:Create(vignette, TweenInfo.new(0.35), { BackgroundTransparency = 1 }):Play()
+
 		-- SFX
 		if pts == 2 then
 			SFX.Play("StaplePerfect")
@@ -347,17 +381,39 @@ function StapleGunning.Start(container, config)
 			task.wait(0.5)
 			if _done then _done:Fire() end
 		end
+	end
+
+	-- Fire on mouse down (not Activated/release) for zero input lag
+	local fireConn  = fireBtn.MouseButton1Down:Connect(onFire)
+	-- Spacebar / Enter for keyboard players
+	local inputConn = UserInputService.InputBegan:Connect(function(input, gpe)
+		if gpe then return end
+		if input.KeyCode == Enum.KeyCode.Space or input.KeyCode == Enum.KeyCode.Return then
+			onFire()
+		end
 	end)
 	table.insert(_connections, fireConn)
+	table.insert(_connections, inputConn)
 
-	-- Global timer
+	-- Bar depletes smoothly every frame — no jumps, no loops.
+	local barConn = RunService.Heartbeat:Connect(function()
+		if _finished then return end
+		local ratio = math.max(0, 1 - (os.clock() - startClock) / (timeLimit))
+		timerBar.Size = UDim2.fromScale(ratio, 1)
+	end)
+	table.insert(_connections, barConn)
+
+	-- Number + colour update every second.
 	task.spawn(function()
 		local remaining = timeLimit
 		while remaining > 0 and not _finished do
 			task.wait(1)
 			remaining = remaining - 1
-			timerLabel.Text = remaining .. "s"
-			if remaining <= 7 then timerLabel.TextColor3 = COL_DANGER end
+			timerLabel.Text = tostring(remaining)
+			local ratio = remaining / timeLimit
+			local col = ratio > 0.5 and COL_WHITE or ratio > 0.25 and COL_WARN or COL_DANGER
+			timerLabel.TextColor3     = col
+			timerBar.BackgroundColor3 = col
 		end
 		if not _finished then finishGame() end
 	end)

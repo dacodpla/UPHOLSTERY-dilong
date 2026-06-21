@@ -14,6 +14,7 @@
 	Result = "Fail" | "Pass" | "Good" | "Perfect"
 ]]
 
+local RunService        = game:GetService("RunService")
 local UserInputService  = game:GetService("UserInputService")
 local TweenService      = game:GetService("TweenService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
@@ -54,9 +55,10 @@ local PIECE_DEFS = {
 }
 
 -- ── Colours ───────────────────────────────────────────────────────────────
-local COL_PILL_BG    = Color3.fromRGB(  0,   0,   0)
 local COL_GOLD       = Color3.fromRGB(210, 170,  60)
 local COL_WHITE      = Color3.fromRGB(255, 255, 255)
+local COL_WARN       = Color3.fromRGB(230, 170,  50)
+local COL_HUD_BG     = Color3.fromRGB( 20,  16,  30)
 local COL_DANGER     = Color3.fromRGB(220,  80,  80)
 local COL_CANVAS     = Color3.fromRGB( 28,  20,  42)
 local COL_MOLD_EMPTY = Color3.fromRGB( 58,  44,  82)
@@ -182,47 +184,18 @@ function FoamPadding.Start(container, config)
 		pieceState[i] = { cells = cells, color = pd.color, placed = false }
 	end
 
-	-- ── HUD pills ────────────────────────────────────────────────────────
-
-	local function makePill(parent, w, h, px, py, ax, ay)
-		local f = Instance.new("Frame")
-		f.Size = UDim2.new(0, w, 0, h)
-		f.Position = UDim2.fromScale(px, py)
-		f.AnchorPoint = Vector2.new(ax or 0, ay or 0)
-		f.BackgroundColor3 = COL_PILL_BG
-		f.BackgroundTransparency = 0.38
-		f.BorderSizePixel = 0
-		f.ZIndex = 10
-		f.Parent = parent
-		Instance.new("UICorner", f).CornerRadius = UDim.new(0, 10)
-		table.insert(_instances, f)
-		return f
-	end
-
-	local function makeLabel(parent, text, size, col)
-		local l = Instance.new("TextLabel")
-		l.Size = UDim2.fromScale(1, 1)
-		l.BackgroundTransparency = 1
-		l.Text = text
-		l.TextColor3 = col or COL_WHITE
-		l.Font = Enum.Font.GothamBold
-		l.TextSize = size or 18
-		l.TextXAlignment = Enum.TextXAlignment.Center
-		l.Parent = parent
-		return l
-	end
-
 	-- ── Canvas ────────────────────────────────────────────────────────────
 
 	local canvas = Instance.new("Frame")
 	canvas.Name = "Canvas"
-	canvas.Size = UDim2.new(0.90, 0, 0.86, 0)
+	canvas.Size = UDim2.new(0.90, 0, 0.80, 0)
 	canvas.AnchorPoint = Vector2.new(0.5, 0.5)
-	canvas.Position = UDim2.fromScale(0.5, 0.54)
+	canvas.Position = UDim2.fromScale(0.5, 0.60)
 	canvas.BackgroundColor3 = COL_CANVAS
 	canvas.BackgroundTransparency = 0.18
 	canvas.BorderSizePixel = 0
 	canvas.ClipsDescendants = false
+	canvas.ZIndex           = 2
 	canvas.Parent = container
 	table.insert(_instances, canvas)
 	Instance.new("UICorner", canvas).CornerRadius = UDim.new(0, 14)
@@ -242,18 +215,59 @@ function FoamPadding.Start(container, config)
 	local TRAY_H_FRAC = 0.22
 	local TRAY_GAP    = 8
 	local SIDE_PAD    = 12
-	local TOP_PAD     = 65   -- room for HUD pills at top of canvas
+	local TOP_PAD     = 8
 
-	-- ── HUD pills (inside canvas, above the grid) ─────────────────────────
+	-- ── Compact centered HUD pill (in container, above canvas) ────────────
 
-	local timerPill  = makePill(canvas, 100, 48, 0.03, 0.01, 0, 0)
-	local timerLabel = makeLabel(timerPill, timeLimit .. "s", 30)
+	local hudBar = Instance.new("Frame")
+	hudBar.Size                   = UDim2.new(0.62, 0, 0, 40)
+	hudBar.AnchorPoint            = Vector2.new(0.5, 0)
+	hudBar.Position               = UDim2.new(0.5, 0, 0, 140)
+	hudBar.BackgroundColor3       = COL_HUD_BG
+	hudBar.BackgroundTransparency = 0.18
+	hudBar.BorderSizePixel        = 0
+	hudBar.Parent                 = container
+	table.insert(_instances, hudBar)
+	Instance.new("UICorner", hudBar).CornerRadius = UDim.new(0, 10)
 
-	local titlePill = makePill(canvas, 260, 40, 0.5, 0.01, 0.5, 0)
-	makeLabel(titlePill, "FIT THE FOAM", 17, COL_GOLD)
+	local timerLabel = Instance.new("TextLabel")
+	timerLabel.Size                   = UDim2.new(0, 48, 1, 0)
+	timerLabel.Position               = UDim2.new(0, 10, 0, 0)
+	timerLabel.BackgroundTransparency = 1
+	timerLabel.Text                   = tostring(timeLimit)
+	timerLabel.TextColor3             = COL_WHITE
+	timerLabel.Font                   = Enum.Font.GothamBold
+	timerLabel.TextSize               = 19
+	timerLabel.TextXAlignment         = Enum.TextXAlignment.Center
+	timerLabel.Parent                 = hudBar
 
-	local progPill  = makePill(canvas, 170, 48, 0.97, 0.01, 1, 0)
-	local progLabel = makeLabel(progPill, "0 / " .. totalMoldCells, 15, COL_GOLD)
+	local timerTrack = Instance.new("Frame")
+	timerTrack.Size               = UDim2.new(1, -142, 0, 7)
+	timerTrack.Position           = UDim2.new(0, 66, 0.5, -3)
+	timerTrack.BackgroundColor3   = Color3.fromRGB(45, 40, 60)
+	timerTrack.BackgroundTransparency = 0
+	timerTrack.BorderSizePixel    = 0
+	timerTrack.Parent             = hudBar
+	Instance.new("UICorner", timerTrack).CornerRadius = UDim.new(0, 3)
+
+	local timerBar = Instance.new("Frame")
+	timerBar.Size               = UDim2.fromScale(1, 1)
+	timerBar.BackgroundColor3   = COL_WHITE
+	timerBar.BorderSizePixel    = 0
+	timerBar.Parent             = timerTrack
+	Instance.new("UICorner", timerBar).CornerRadius = UDim.new(0, 3)
+
+	local progLabel = Instance.new("TextLabel")
+	progLabel.Size                   = UDim2.new(0, 64, 1, 0)
+	progLabel.AnchorPoint            = Vector2.new(1, 0)
+	progLabel.Position               = UDim2.new(1, -8, 0, 0)
+	progLabel.BackgroundTransparency = 1
+	progLabel.Text                   = "0 / " .. totalMoldCells
+	progLabel.TextColor3             = COL_GOLD
+	progLabel.Font                   = Enum.Font.GothamBold
+	progLabel.TextSize               = 18
+	progLabel.TextXAlignment         = Enum.TextXAlignment.Center
+	progLabel.Parent                 = hudBar
 
 	local trayPxH   = math.floor(cvH * TRAY_H_FRAC)
 	local gridAreaH = cvH - trayPxH - TRAY_GAP - TOP_PAD
@@ -514,6 +528,10 @@ function FoamPadding.Start(container, config)
 		ps.placed   = true
 		filledCells = filledCells + #ps.cells
 		progLabel.Text = filledCells .. " / " .. totalMoldCells
+		TweenService:Create(progLabel, TweenInfo.new(0.07), { TextSize = 24 }):Play()
+		task.delay(0.09, function()
+			TweenService:Create(progLabel, TweenInfo.new(0.18, Enum.EasingStyle.Back), { TextSize = 18 }):Play()
+		end)
 		SFX.Play("FoamSnap")
 
 		-- Dim the card
@@ -691,13 +709,52 @@ function FoamPadding.Start(container, config)
 		if _done then _done:Fire() end
 	end
 
+	local startClock = os.clock()
+	local barConn = RunService.Heartbeat:Connect(function()
+		if _finished then return end
+		local ratio = math.max(0, 1 - (os.clock() - startClock) / timeLimit)
+		timerBar.Size = UDim2.fromScale(ratio, 1)
+	end)
+	table.insert(_connections, barConn)
+
+	local COL_VIG_YELLOW = Color3.fromRGB(230, 190, 50)
+	local COL_VIG_GREEN  = Color3.fromRGB(70,  210, 90)
+	local COL_VIG_RED    = Color3.fromRGB(210,  70, 70)
+
+	local vignette = Instance.new("Frame")
+	vignette.Size                   = UDim2.fromScale(1, 1)
+	vignette.BackgroundColor3       = COL_VIG_YELLOW
+	vignette.BackgroundTransparency = 0.88
+	vignette.ZIndex                 = 1
+	vignette.BorderSizePixel        = 0
+	vignette.Parent                 = container
+	table.insert(_instances, vignette)
+
+	local vigConn = RunService.Heartbeat:Connect(function()
+		if _finished then return end
+		local elapsed = math.clamp((os.clock() - startClock) / timeLimit, 0, 1)
+		local color
+		if elapsed < 0.4 then
+			color = COL_VIG_YELLOW:Lerp(COL_VIG_GREEN, elapsed / 0.4)
+		elseif elapsed < 0.6 then
+			color = COL_VIG_GREEN
+		else
+			color = COL_VIG_GREEN:Lerp(COL_VIG_RED, (elapsed - 0.6) / 0.4)
+		end
+		vignette.BackgroundColor3 = color
+	end)
+	table.insert(_connections, vigConn)
+
 	task.spawn(function()
 		local remaining = timeLimit
 		while remaining > 0 and not _finished do
 			task.wait(1)
 			remaining = remaining - 1
-			timerLabel.Text = remaining .. "s"
-			if remaining <= 8 then timerLabel.TextColor3 = COL_DANGER end
+			timerLabel.Text = tostring(remaining)
+			local ratio = remaining / timeLimit
+			local col = ratio > 0.5 and COL_WHITE or ratio > 0.25 and COL_WARN or COL_DANGER
+			timerLabel.TextColor3     = col
+			timerBar.BackgroundColor3 = col
 		end
 		if not _finished then finishGame() end
 	end)

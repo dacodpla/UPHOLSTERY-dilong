@@ -46,6 +46,7 @@ remoteFunction("RequestLocationsByTier")
 -- Admin
 remote("AdminSpawnJob")
 remoteFunction("AdminRequestLocations")
+remote("AdminSetStat")   -- dev: ("reputation"|"usd", value)
 
 -- Teleport (used by LocationManager)
 remote("TeleportToLocation")

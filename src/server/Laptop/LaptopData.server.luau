@@ -54,6 +54,22 @@ RequestLocationsByTier.OnServerInvoke = function(_player)
 	return LocationManager.GetLocationsByTier()
 end
 
+local AdminSetStat = remotesFolder:WaitForChild("AdminSetStat")
+AdminSetStat.OnServerEvent:Connect(function(player, statName, value)
+	if type(statName) ~= "string" or type(value) ~= "number" then return end
+	local pd = player:FindFirstChild("PlayerData")
+	if not pd then return end
+	if statName == "reputation" then
+		local rv = pd:FindFirstChild("reputation")
+		if rv then
+			rv.Value = math.clamp(value, 0, 5)
+		end
+	elseif statName == "usd" then
+		local uv = pd:FindFirstChild("usd")
+		if uv then uv.Value = math.max(0, uv.Value + math.floor(value)) end
+	end
+end)
+
 -- ── Player cleanup ────────────────────────────────────────────────────────
 
 Players.PlayerRemoving:Connect(function(player)
