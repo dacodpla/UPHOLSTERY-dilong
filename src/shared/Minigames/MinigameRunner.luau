@@ -151,28 +151,77 @@ end
 -- Merges GameConfig[minigameName] + difficulty overrides into config.params.
 -- Returns config unchanged when no difficulty is set (base values used via cfg).
 
-local function buildParams(minigameName, config)
-	local difficulty = config.difficulty
-	if not difficulty then return config end
+-- Applies active perk effects to a minigame param table.
+-- Mutates `params` in place. Only effects that apply to this minigame run.
+local function applyPerkEffects(minigameName, params, effects)
+	if not effects then return end
 
-	local overrides
-	if type(difficulty) == "string" then
-		local preset = GameConfig.DifficultyPresets[difficulty]
-		if not preset then
-			warn("[MinigameRunner] Unknown difficulty preset: '" .. difficulty .. "'")
-			return config
+	if minigameName == "TackRemoval" then
+		if effects.approachTimeBonus then
+			params.approachTime = (params.approachTime or 0) + effects.approachTimeBonus
 		end
-		overrides = preset[minigameName]
-	elseif type(difficulty) == "table" then
-		overrides = difficulty[minigameName]
+		if effects.tackSpawnGapBonus then
+			params.tackSpawnGap = (params.tackSpawnGap or 0) * (1 + effects.tackSpawnGapBonus)
+		end
+		if effects.tackCountReduction then
+			params.tackCountMin = math.max(1, (params.tackCountMin or 1) - effects.tackCountReduction)
+			params.tackCountMax = math.max(params.tackCountMin, (params.tackCountMax or 1) - effects.tackCountReduction)
+		end
+	elseif minigameName == "StapleGunning" then
+		if effects.zoneWidthMultiplier then
+			params.goodZoneWidth    = (params.goodZoneWidth    or 0) * effects.zoneWidthMultiplier
+			params.perfectZoneWidth = (params.perfectZoneWidth or 0) * effects.zoneWidthMultiplier
+		end
+		if effects.barSpeedReduction then
+			params.barSpeed = math.max(0.05, (params.barSpeed or 0) - effects.barSpeedReduction)
+		end
+		if effects.disableRampUp then
+			params.barSpeedRampUp = 0
+		end
+	elseif minigameName == "SeamStitching" then
+		if effects.deviationToleranceBonus then
+			params.deviationTolerance = (params.deviationTolerance or 0) + effects.deviationToleranceBonus
+		end
+		if effects.autoSnapToStart then
+			params.autoSnapToStart = true
+		end
+	elseif minigameName == "FoamPadding" then
+		if effects.pieceCountReduction then
+			params.pieceCount = math.max(1, (params.pieceCount or 1) - effects.pieceCountReduction)
+		end
+		if effects.timeLimitBonus then
+			params.timeLimit = (params.timeLimit or 0) + effects.timeLimitBonus
+		end
+	end
+end
+
+local function buildParams(minigameName, config)
+	local base = GameConfig[minigameName]
+	local params = {}
+	for k, v in pairs(base) do params[k] = v end
+
+	-- Apply difficulty preset overrides
+	local difficulty = config.difficulty
+	if difficulty then
+		local overrides
+		if type(difficulty) == "string" then
+			local preset = GameConfig.DifficultyPresets[difficulty]
+			if preset then overrides = preset[minigameName] end
+		elseif type(difficulty) == "table" then
+			overrides = difficulty[minigameName]
+		end
+		if overrides then
+			for k, v in pairs(overrides) do params[k] = v end
+		end
 	end
 
-	if not overrides then return config end  -- no entry for this minigame → base values
+	-- Apply active perk effects on top
+	applyPerkEffects(minigameName, params, config.activeEffects)
 
-	local base   = GameConfig[minigameName]
-	local params = {}
-	for k, v in pairs(base)      do params[k] = v end
-	for k, v in pairs(overrides) do params[k] = v end
+	-- Fragile override from Fragile Specialist perk
+	if config.activeEffects and config.activeEffects.fragileMultiplierOverride and config.fragile then
+		params._fragileMultiplierOverride = config.activeEffects.fragileMultiplierOverride
+	end
 
 	local merged = {}
 	for k, v in pairs(config) do merged[k] = v end

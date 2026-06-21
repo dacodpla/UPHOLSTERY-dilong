@@ -1,368 +1,216 @@
--- ============================================================
---  ShopProducts.lua
---  ModuleScript — ReplicatedStorage/Data/ShopProducts
---  UPHOLSTERY! — v7.0 Compatible
---
---  Berisi data dummy untuk semua produk yang bisa dibeli
---  menggunakan in-game Coins (bukan Robux).
---
---  Struktur per produk:
---    id          : string  — unique key, dipakai DataStore & logic
---    name        : string  — display name di UI
---    description : string  — tooltip / deskripsi singkat
---    category    : string  — "Tool" | "JobManagement" | "Efficiency" | "Reputation"
---    price       : number  — harga dalam Coins
---    icon        : string  — rbxassetid placeholder (ganti di Creator Hub)
---    effect      : table   — data efek yang dibaca oleh sistem terkait
---    oneTimeUse  : bool    — true = habis setelah dipakai (consumable)
---    requiresTier: string? — nil = semua tier bisa beli; atau "Mid"/"Premium"/"Prestige"
---    unlockedBy  : string? — nil = langsung tersedia; atau id Story Job / milestone
--- ============================================================
+--[[
+	ShopData / Perk Catalog
+	ModuleScript — ReplicatedStorage.Shared.Data.ShopData
+	Single source of truth for both the shop UI and the PerkSystem effect lookup.
 
-local ShopProducts = {}
+	Per-perk schema:
+		id            : string  - unique key
+		name          : string  - display name
+		grade         : "Bolt" | "Bespoke"
+		category      : "MinigameTool" | "Economic" | "Follower" | "Reputation"
+		              | "Protection" | "Board" | "Wildcard"
+		minigame      : string? - only for MinigameTool category
+		price         : number  - cost per single charge
+		description   : string
+		effect        : table   - merged into MinigameRunner params or post-job calc
+		condition     : table?  - e.g. { minResult = "Good" } for Bespoke perks
+		requiresRep   : number? - rep threshold to purchase
+		requiresTier  : string? - post-launch tier gate (Premium+)
+]]
 
--- ─────────────────────────────────────────────
---  KATEGORI 1 — TOOL UPGRADES
---  Memperlebar tolerance / mempercepat minigame.
---  Sesuai GDD: tidak boleh memberikan stat advantage
---  besar — hanya QoL dan pengurangan frustrasi.
--- ─────────────────────────────────────────────
-ShopProducts.Tools = {
+local ShopData = {}
 
-    {
-        id              = "tool_curved_needle",
-        name            = "Curved Needle",
-        description     = "Memperlebar toleransi jalur di minigame Seam Stitching. "
-                       .. "Sedikit lebih memaafkan saat tangan bergerak cepat.",
-        category        = "Tool",
-        price           = 500,
-        icon            = "rbxassetid://0000000001",   -- ganti dengan assetId asli
-        oneTimeUse      = false,
-        requiresTier    = nil,
-        unlockedBy      = nil,
-        effect = {
-            targetMinigame  = "SeamStitching",
-            toleranceBonus  = 0.20,    -- +20% lebar jalur toleransi
-        },
-    },
+ShopData.All = {}
 
-    {
-        id              = "tool_foam_press_kit",
-        name            = "Foam Press Kit",
-        description     = "Set penjepit busa yang memudahkan penempatan potongan foam "
-                       .. "di minigame Foam Padding. Rotasi terasa lebih presisi.",
-        category        = "Tool",
-        price           = 800,
-        icon            = "rbxassetid://0000000002",
-        oneTimeUse      = false,
-        requiresTier    = nil,
-        unlockedBy      = nil,
-        effect = {
-            targetMinigame  = "FoamPadding",
-            toleranceBonus  = 0.20,    -- +20% snap tolerance saat drag & rotate
-        },
-    },
-
-    {
-        id              = "tool_speed_stapler",
-        name            = "Speed Stapler",
-        description     = "Staple gun ergonomis yang mempersingkat durasi bar di "
-                       .. "minigame Staple Gunning. Lebih sedikit ketukan, hasil sama.",
-        category        = "Tool",
-        price           = 650,
-        icon            = "rbxassetid://0000000003",
-        oneTimeUse      = false,
-        requiresTier    = nil,
-        unlockedBy      = nil,
-        effect = {
-            targetMinigame  = "StapleGunning",
-            durationReduction = 0.15,  -- bar bergerak 15% lebih lambat (lebih mudah)
-        },
-    },
-
-    {
-        id              = "tool_grip_gloves",
-        name            = "Grip Gloves",
-        description     = "Sarung tangan anti-slip yang menstabilkan input drag "
-                       .. "di Foam Padding. Mengurangi efek jitter pada layar sentuh.",
-        category        = "Tool",
-        price           = 400,
-        icon            = "rbxassetid://0000000004",
-        oneTimeUse      = false,
-        requiresTier    = nil,
-        unlockedBy      = nil,
-        effect = {
-            targetMinigame  = "FoamPadding",
-            jitterReduction = 0.30,    -- filter 30% noise pada input drag
-        },
-    },
-
-    {
-        id              = "tool_needle_threader",
-        name            = "Needle Threader",
-        description     = "Alat bantu yang menempatkan jarum otomatis di titik awal "
-                       .. "yang optimal saat Seam Stitching dimulai. Hemat waktu setup.",
-        category        = "Tool",
-        price           = 300,
-        icon            = "rbxassetid://0000000005",
-        oneTimeUse      = false,
-        requiresTier    = nil,
-        unlockedBy      = nil,
-        effect = {
-            targetMinigame  = "SeamStitching",
-            autoSnapToStart = true,    -- cursor mulai tepat di titik awal jalur
-        },
-    },
-
-    {
-        id              = "tool_professional_shears",
-        name            = "Professional Shears",
-        description     = "Gunting profesional yang diperlukan untuk minigame "
-                       .. "Fabric Cutting (Update 1). Wajib dimiliki untuk job Premium ke atas.",
-        category        = "Tool",
-        price           = 1200,
-        icon            = "rbxassetid://0000000006",
-        oneTimeUse      = false,
-        requiresTier    = "Premium",
-        unlockedBy      = "update_1_launch",   -- tersedia saat Update 1 dirilis
-        effect = {
-            targetMinigame  = "FabricCutting",
-            unlocks         = true,            -- tanpa ini minigame tidak bisa dimulai
-        },
-    },
-
-}
-
--- ─────────────────────────────────────────────
---  KATEGORI 2 — JOB MANAGEMENT
---  Membantu pemain mengelola job board yang kompetitif.
---  Efek berupa informational advantage ringan —
---  tidak menggandakan pay atau follower.
--- ─────────────────────────────────────────────
-ShopProducts.JobManagement = {
-
-    {
-        id              = "job_alert_ping",
-        name            = "Job Alert Ping",
-        description     = "Aktifkan notifikasi di HP in-game saat Hot Job muncul di board, "
-                       .. "0.5 detik sebelum animasi border-nya selesai. Aktif 24 jam.",
-        category        = "JobManagement",
-        price           = 200,
-        icon            = "rbxassetid://0000000007",
-        oneTimeUse      = false,
-        requiresTier    = nil,
-        unlockedBy      = nil,
-        effect = {
-            notifyOnHotJob      = true,
-            notifyLeadTimeMs    = 500,     -- notif 500ms lebih awal dari animasi selesai
-            durationHours       = 24,
-        },
-    },
-
-    {
-        id              = "job_deadline_extension",
-        name            = "Deadline Extension Token",
-        description     = "Tambahkan 30 detik pada job bertipe Urgent. "
-                       .. "Sekali pakai — gunakan dengan bijak.",
-        category        = "JobManagement",
-        price           = 350,
-        icon            = "rbxassetid://0000000008",
-        oneTimeUse      = true,            -- consumable
-        requiresTier    = nil,
-        unlockedBy      = nil,
-        effect = {
-            deadlineExtensionSeconds = 30,
-            appliesToModifier        = "Urgent",
-        },
-    },
-
-    {
-        id              = "job_reroll",
-        name            = "Job Re-Roll",
-        description     = "Kembalikan 1 job yang sudah kamu klaim ke pool tanpa "
-                       .. "penalti reputasi. Berguna kalau salah klaim job yang terlalu sulit.",
-        category        = "JobManagement",
-        price           = 150,
-        icon            = "rbxassetid://0000000009",
-        oneTimeUse      = true,            -- consumable
-        requiresTier    = nil,
-        unlockedBy      = nil,
-        effect = {
-            returnJobToPool     = true,
-            reputationPenalty   = 0,       -- override penalti abandon normal (−1.5)
-        },
-    },
-
-    {
-        id              = "job_sticky_note",
-        name            = "Sticky Notes",
-        description     = "Tandai 1 job di board sebagai 'watching'. "
-                       .. "Dapat notifikasi jika job tersebut hampir expire atau hampir diambil orang lain.",
-        category        = "JobManagement",
-        price           = 180,
-        icon            = "rbxassetid://0000000010",
-        oneTimeUse      = false,
-        requiresTier    = nil,
-        unlockedBy      = nil,
-        effect = {
-            watchSlots              = 1,   -- jumlah job yang bisa di-watch sekaligus
-            notifyOnNearExpiry      = true,
-            notifyOnNearClaim       = true,
-            nearExpiryThresholdSec  = 15,
-        },
-    },
-
-}
-
--- ─────────────────────────────────────────────
---  KATEGORI 3 — EFFICIENCY & COMFORT
---  QoL murni. Tidak ada gameplay advantage langsung.
---  Sesuai design pillar "chill game" di GDD.
--- ─────────────────────────────────────────────
-ShopProducts.Efficiency = {
-
-    {
-        id              = "eff_tool_pouch",
-        name            = "Tool Pouch",
-        description     = "Tas alat terorganisir yang mempersingkat animasi 'ambil tool' "
-                       .. "sebelum minigame dimulai. Kecil tapi terasa.",
-        category        = "Efficiency",
-        price           = 700,
-        icon            = "rbxassetid://0000000011",
-        oneTimeUse      = false,
-        requiresTier    = nil,
-        unlockedBy      = nil,
-        effect = {
-            toolPickupAnimationReduction = 0.40,  -- animasi 40% lebih cepat
-        },
-    },
-
-    {
-        id              = "eff_work_playlist",
-        name            = "Work Playlist",
-        description     = "Aktifkan playlist musik lo-fi khusus UPHOLSTERY! "
-                       .. "selama kamu di lokasi klien. Murni kosmetik — tapi bikin mood.",
-        category        = "Efficiency",
-        price           = 250,
-        icon            = "rbxassetid://0000000012",
-        oneTimeUse      = false,
-        requiresTier    = nil,
-        unlockedBy      = nil,
-        effect = {
-            cosmetic        = true,
-            ambientMusicId  = "rbxassetid://0000000099",  -- upload track di Creator Hub
-        },
-    },
-
-    {
-        id              = "eff_rush_delivery_coins",
-        name            = "Rush Delivery (Coins)",
-        description     = "Skip timer pengiriman tool ke lokasi klien. "
-                       .. "Versi coins lebih mahal dari versi Robux — tapi tidak perlu Robux.",
-        category        = "Efficiency",
-        price           = 400,              -- lebih mahal dari versi Robux (R$15 ≈ ~150 coins eq)
-        icon            = "rbxassetid://0000000013",
-        oneTimeUse      = true,
-        requiresTier    = nil,
-        unlockedBy      = nil,
-        effect = {
-            skipToolDeliveryTimer = true,
-        },
-    },
-
-}
-
--- ─────────────────────────────────────────────
---  KATEGORI 4 — REPUTASI & KLIEN
---  Membantu menjaga hubungan dengan klien.
---  Tidak menggantikan skill — hanya mengurangi punishment.
--- ─────────────────────────────────────────────
-ShopProducts.Reputation = {
-
-    {
-        id              = "rep_apology_note",
-        name            = "Apology Note",
-        description     = "Kirim surat permintaan maaf ke klien setelah abandon job. "
-                       .. "Mengurangi penalti reputasi dari −1.5 menjadi −0.8 bintang.",
-        category        = "Reputation",
-        price           = 500,
-        icon            = "rbxassetid://0000000014",
-        oneTimeUse      = true,
-        requiresTier    = nil,
-        unlockedBy      = nil,
-        effect = {
-            abandonPenaltyOverride = -0.8,   -- GDD default: -1.5
-            appliesToEvent         = "AbandonJob",
-        },
-    },
-
-    {
-        id              = "rep_thank_you_package",
-        name            = "Thank You Package",
-        description     = "Hadiahkan paket terima kasih ke 1 klien pilihan setelah job selesai. "
-                       .. "Bonus +0.25 bintang reputasi untuk klien tersebut.",
-        category        = "Reputation",
-        price           = 300,
-        icon            = "rbxassetid://0000000015",
-        oneTimeUse      = true,
-        requiresTier    = nil,
-        unlockedBy      = nil,
-        effect = {
-            reputationBonus = 0.25,
-            targetClient    = nil,   -- diisi runtime oleh ShopHandler saat pemain memilih klien
-        },
-    },
-
-}
-
--- ─────────────────────────────────────────────
---  HELPER: Flat list semua produk (untuk UI search / loop)
--- ─────────────────────────────────────────────
-ShopProducts.All = {}
-for _, category in pairs({ ShopProducts.Tools, ShopProducts.JobManagement, ShopProducts.Efficiency, ShopProducts.Reputation }) do
-    for _, product in ipairs(category) do
-        ShopProducts.All[product.id] = product
-    end
+local function add(perk)
+	ShopData.All[perk.id] = perk
 end
 
--- ─────────────────────────────────────────────
---  HELPER: Cari produk berdasarkan id
---  Contoh: ShopProducts.GetById("tool_curved_needle")
--- ─────────────────────────────────────────────
-function ShopProducts.GetById(id: string)
-    return ShopProducts.All[id]
+-- ── MINIGAME TOOLS ─────────────────────────────────────────────────────────
+
+add({
+	id="tack_magnet_bolt", name="Tack Magnet", grade="Bolt", category="MinigameTool",
+	minigame="TackRemoval", price=250,
+	description="Approach time +0.5s",
+	effect={ approachTimeBonus=0.5 },
+})
+add({
+	id="tack_magnet_bespoke", name="Tack Magnet", grade="Bespoke", category="MinigameTool",
+	minigame="TackRemoval", price=750, requiresRep=1.5,
+	description="Approach time +1.0s AND tack spawn gap wider",
+	effect={ approachTimeBonus=1.0, tackSpawnGapBonus=0.5 },
+})
+add({
+	id="sharp_eye_bolt", name="Sharp Eye", grade="Bolt", category="MinigameTool",
+	minigame="TackRemoval", price=300,
+	description="Tack count -2",
+	effect={ tackCountReduction=2 },
+})
+
+add({
+	id="staple_guide_bolt", name="Staple Guide", grade="Bolt", category="MinigameTool",
+	minigame="StapleGunning", price=300,
+	description="Zone widths +20%",
+	effect={ zoneWidthMultiplier=1.20 },
+})
+add({
+	id="staple_guide_bespoke", name="Staple Guide", grade="Bespoke", category="MinigameTool",
+	minigame="StapleGunning", price=900, requiresRep=2.0,
+	description="Zone widths +35% AND no ramp-up",
+	effect={ zoneWidthMultiplier=1.35, disableRampUp=true },
+})
+add({
+	id="grip_wrap_bolt", name="Grip Wrap", grade="Bolt", category="MinigameTool",
+	minigame="StapleGunning", price=350,
+	description="Bar speed -0.10",
+	effect={ barSpeedReduction=0.10 },
+})
+
+add({
+	id="curved_needle_bolt", name="Curved Needle", grade="Bolt", category="MinigameTool",
+	minigame="SeamStitching", price=250,
+	description="Deviation tolerance +8",
+	effect={ deviationToleranceBonus=8 },
+})
+add({
+	id="curved_needle_bespoke", name="Curved Needle", grade="Bespoke", category="MinigameTool",
+	minigame="SeamStitching", price=750, requiresRep=1.5,
+	description="Deviation tolerance +16 AND auto-snaps to path start",
+	effect={ deviationToleranceBonus=16, autoSnapToStart=true },
+})
+
+add({
+	id="foam_press_kit_bolt", name="Foam Press Kit", grade="Bolt", category="MinigameTool",
+	minigame="FoamPadding", price=350,
+	description="Piece count -1, time +8s",
+	effect={ pieceCountReduction=1, timeLimitBonus=8 },
+})
+add({
+	id="foam_press_kit_bespoke", name="Foam Press Kit", grade="Bespoke", category="MinigameTool",
+	minigame="FoamPadding", price=1000, requiresRep=2.0,
+	description="Piece count -2, time +15s",
+	effect={ pieceCountReduction=2, timeLimitBonus=15 },
+})
+
+-- ── ECONOMIC ───────────────────────────────────────────────────────────────
+
+add({
+	id="premium_invoice_bolt", name="Premium Invoice", grade="Bolt", category="Economic",
+	price=400,
+	description="+5% pay on any completion",
+	effect={ payMultiplier=0.05 },
+})
+add({
+	id="premium_invoice_bespoke", name="Premium Invoice", grade="Bespoke", category="Economic",
+	price=1100, requiresRep=2.0,
+	description="+12% pay on Good or better",
+	effect={ payMultiplier=0.12 }, condition={ minResult="Good" },
+})
+add({
+	id="rush_surcharge_bolt", name="Rush Surcharge", grade="Bolt", category="Economic",
+	price=500,
+	description="+8% pay if done before 75% time (currently +8% flat)",
+	effect={ payMultiplier=0.08 },
+})
+
+-- ── FOLLOWER ───────────────────────────────────────────────────────────────
+
+add({
+	id="portfolio_shot_bolt", name="Portfolio Shot", grade="Bolt", category="Follower",
+	price=350,
+	description="+10% followers on completion",
+	effect={ followerMultiplier=0.10 },
+})
+add({
+	id="portfolio_shot_bespoke", name="Portfolio Shot", grade="Bespoke", category="Follower",
+	price=900, requiresRep=2.0,
+	description="+25% followers on completion",
+	effect={ followerMultiplier=0.25 },
+})
+add({
+	id="word_of_mouth_bolt", name="Word of Mouth", grade="Bolt", category="Follower",
+	price=450,
+	description="+8% followers on Good or better",
+	effect={ followerMultiplier=0.08 }, condition={ minResult="Good" },
+})
+add({
+	id="word_of_mouth_bespoke", name="Word of Mouth", grade="Bespoke", category="Follower",
+	price=1300, requiresRep=2.5,
+	description="+20% followers on Good or better AND next Direct Offer refreshes",
+	effect={ followerMultiplier=0.20, refreshDirectOffer=true }, condition={ minResult="Good" },
+})
+
+-- ── REPUTATION ─────────────────────────────────────────────────────────────
+
+add({
+	id="thank_you_card_bolt", name="Thank You Card", grade="Bolt", category="Reputation",
+	price=400,
+	description="+0.03 rep on any completion",
+	effect={ repBonus=0.03 },
+})
+add({
+	id="thank_you_card_bespoke", name="Thank You Card", grade="Bespoke", category="Reputation",
+	price=1100, requiresRep=1.5,
+	description="+0.08 rep on Perfect only",
+	effect={ repBonus=0.08 }, condition={ minResult="Perfect" },
+})
+
+-- ── PROTECTION ─────────────────────────────────────────────────────────────
+
+add({
+	id="safety_net_bolt", name="Safety Net", grade="Bolt", category="Protection",
+	price=500,
+	description="Fail rep penalty -25%",
+	effect={ failPenaltyMultiplier=0.75 },
+})
+add({
+	id="safety_net_bespoke", name="Safety Net", grade="Bespoke", category="Protection",
+	price=1400, requiresRep=2.5,
+	description="Fail rep penalty -45% AND abandon penalty -20%",
+	effect={ failPenaltyMultiplier=0.55, abandonPenaltyMultiplier=0.80 },
+})
+add({
+	id="fragile_specialist_bolt", name="Fragile Specialist", grade="Bolt", category="Protection",
+	price=600,
+	description="Fragile multiplier 0.6 -> 0.72",
+	effect={ fragileMultiplierOverride=0.72 },
+})
+add({
+	id="fragile_specialist_bespoke", name="Fragile Specialist", grade="Bespoke", category="Protection",
+	price=1600, requiresRep=3.0,
+	description="Fragile multiplier 0.6 -> 0.82",
+	effect={ fragileMultiplierOverride=0.82 },
+})
+
+-- ── WILDCARD ───────────────────────────────────────────────────────────────
+
+add({
+	id="second_wind_bolt", name="Second Wind", grade="Bolt", category="Wildcard",
+	price=450,
+	description="After fail, next job's rep loss halved",
+	effect={ nextJobRepLossMultiplier=0.5 },
+})
+
+-- ── HELPERS ────────────────────────────────────────────────────────────────
+
+function ShopData.GetById(id)
+	return ShopData.All[id]
 end
 
--- ─────────────────────────────────────────────
---  HELPER: Ambil semua produk dalam 1 kategori
---  Contoh: ShopProducts.GetByCategory("Tool")
--- ─────────────────────────────────────────────
-function ShopProducts.GetByCategory(categoryName: string): { [number]: any }
-    local result = {}
-    for _, product in pairs(ShopProducts.All) do
-        if product.category == categoryName then
-            table.insert(result, product)
-        end
-    end
-    return result
+function ShopData.GetByCategory(category)
+	local out = {}
+	for _, p in pairs(ShopData.All) do
+		if p.category == category then table.insert(out, p) end
+	end
+	table.sort(out, function(a, b)
+		if a.name ~= b.name then return a.name < b.name end
+		return a.grade < b.grade
+	end)
+	return out
 end
 
--- ─────────────────────────────────────────────
---  HELPER: Filter produk berdasarkan tier pemain
---  tierOrder dipakai untuk perbandingan tier
--- ─────────────────────────────────────────────
-local tierOrder = { Starter = 1, Mid = 2, Premium = 3, Prestige = 4 }
-
-function ShopProducts.GetAvailableForTier(playerTier: string): { [number]: any }
-    local playerLevel = tierOrder[playerTier] or 1
-    local result = {}
-    for _, product in pairs(ShopProducts.All) do
-        local req = product.requiresTier
-        if req == nil or (tierOrder[req] and tierOrder[req] <= playerLevel) then
-            table.insert(result, product)
-        end
-    end
-    return result
+function ShopData.GetCategories()
+	return { "MinigameTool", "Economic", "Follower", "Reputation", "Protection", "Wildcard" }
 end
 
-return ShopProducts
+return ShopData

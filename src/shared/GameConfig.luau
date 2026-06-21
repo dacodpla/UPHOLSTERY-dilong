@@ -268,9 +268,69 @@ return {
 			Perfect  =  0.20,
 			Good     =  0.10,
 			Pass     =  0.05,
-			Fail     = -0.10,
-			Abandon  = -0.15,
 		},
+		-- Tier-scaled penalties per GDD §11.1
+		failByTier = {
+			Starter   = -0.03,
+			Mid       = -0.05,
+			Premium   = -0.10,
+			Prestige  = -0.15,
+			Exclusive = -0.22,
+			Elite     = -0.30,
+			Special   = -0.30,
+		},
+		abandonByTier = {
+			Starter   = -0.05,
+			Mid       = -0.08,
+			Premium   = -0.15,
+			Prestige  = -0.22,
+			Exclusive = -0.32,
+			Elite     = -0.45,
+			Special   = -0.45,
+		},
+		-- Milestone rep thresholds for toolbox slot unlocks
+		slotUnlockRep = { 0, 0, 0, 1.5, 3.0 }, -- slot N unlocks at this rep
+		-- Tier range table for Direct Offers (GDD §3.2)
+		directOfferRules = {
+			{ minRep=1.0, maxRep=1.9, count=1, refreshSec=240, tiers={"Mid","Premium"} },
+			{ minRep=2.0, maxRep=3.4, count=2, refreshSec=180, tiers={"Premium","Exclusive"} },
+			{ minRep=3.5, maxRep=4.4, count=2, refreshSec=150, tiers={"Exclusive","Elite"} },
+			{ minRep=4.5, maxRep=5.0, count=3, refreshSec=120, tiers={"Elite","Special"} },
+		},
+	},
+
+	HotJobs = {
+		intervalMin  = 300,   -- 5 minutes
+		intervalMax  = 480,   -- 8 minutes
+		countdownSec = 10,
+		payMultiplier     = 3.0,
+		followerBonus     = 0.75,
+		tiers = { "Mid", "Premium", "Prestige" },  -- pool for hot job tier roll
+	},
+
+	DailyContracts = {
+		-- Fixed pool; 3 random per day, seeded by date so all server players share
+		pool = {
+			{ id="complete_4_rare",   description="Complete 4 Premium+ jobs today",
+			  goal={ kind="jobs", minTier="Premium", count=4 },
+			  reward={ kind="usd", amount=500 } },
+			{ id="perfect_2_fragile", description="Get Perfect on 2 Fragile jobs",
+			  goal={ kind="perfects", fragileOnly=true, count=2 },
+			  reward={ kind="perkCharge", perkId="curved_needle_bespoke", qty=1 } },
+			{ id="earn_3000",         description="Earn $3,000 in a single session",
+			  goal={ kind="earnUsd", amount=3000 },
+			  reward={ kind="perkCharge", perkId="word_of_mouth_bespoke", qty=1 } },
+			{ id="perfect_5_any",     description="Get Perfect on 5 jobs of any tier",
+			  goal={ kind="perfects", count=5 },
+			  reward={ kind="usd", amount=300 } },
+			{ id="finish_10_jobs",    description="Complete any 10 jobs today",
+			  goal={ kind="jobs", count=10 },
+			  reward={ kind="usd", amount=400 } },
+			{ id="three_minigame_chain", description="Complete a job with a 3+ minigame chain",
+			  goal={ kind="minigameChain", minLength=3, count=1 },
+			  reward={ kind="usd", amount=250 } },
+		},
+		dailyCount = 3,
 	},
 
 	-- =========================================================

@@ -14,7 +14,8 @@ local TweenService      = game:GetService("TweenService")
 local RunService        = game:GetService("RunService")
 local PPS               = game:GetService("ProximityPromptService")
 
-local SFX = require(ReplicatedStorage:WaitForChild("Shared"):WaitForChild("SFXPlayer"))
+local SFX      = require(ReplicatedStorage:WaitForChild("Shared"):WaitForChild("SFXPlayer"))
+local ShopData = require(ReplicatedStorage:WaitForChild("Shared"):WaitForChild("Data"):WaitForChild("ShopData"))
 
 local player = Players.LocalPlayer
 
@@ -35,6 +36,8 @@ local SubmitJobResult        = Remotes:WaitForChild("SubmitJobResult")
 local AbandonJob             = Remotes:WaitForChild("AbandonJob")
 local FurniturePieceRepaired = Remotes:WaitForChild("FurniturePieceRepaired")
 local StartMinigame          = Remotes:WaitForChild("StartMinigame")
+local RequestActiveEffects   = Remotes:WaitForChild("RequestActiveEffects")
+local JobRewardNotify        = Remotes:WaitForChild("JobRewardNotify")
 
 -- ── Dev HUD ───────────────────────────────────────────────────────────────
 
@@ -122,6 +125,8 @@ local _minigameActive  = false  -- guard: only one minigame runs at a time
 local _firstHubTeleport = true  -- loading screen covers the first arrival; skip irisClose
 local _slotModel     = nil   -- parent of cloneList[1]; used for door highlight
 local _doorHighlight = nil
+local _jobStartTime  = nil   -- os.clock() when TeleportToLocation fires
+local _pendingReward = nil   -- data from JobRewardNotify; shown after iris opens at hub
 
 -- ── Helpers ───────────────────────────────────────────────────────────────
 
@@ -154,6 +159,193 @@ local function clearAllHighlights()
 	end
 end
 
+-- ── Debrief overlay ──────────────────────────────────────────────────────
+
+local DEBRIEF_COLORS = {
+	Perfect = Color3.fromRGB(255, 210,  60),
+	Good    = Color3.fromRGB( 90, 180, 220),
+	Pass    = Color3.fromRGB(160, 140, 120),
+	Fail    = Color3.fromRGB(180,  60,  60),
+	Abandon = Color3.fromRGB(200, 130,  50),
+}
+
+local _debriefGui = Instance.new("ScreenGui")
+_debriefGui.Name         = "JobDebrief"
+_debriefGui.DisplayOrder = 18
+_debriefGui.ResetOnSpawn = false
+_debriefGui.Parent       = player:WaitForChild("PlayerGui")
+
+local _debriefCard = nil
+
+local function fmtTime(secs)
+	secs = math.max(0, math.floor(secs))
+	return string.format("%d:%02d", math.floor(secs / 60), secs % 60)
+end
+
+local function showDebrief(data, durationSec)
+	if _debriefCard then _debriefCard:Destroy(); _debriefCard = nil end
+
+	local col = DEBRIEF_COLORS[data.result] or Color3.fromRGB(200, 200, 200)
+
+	local card = Instance.new("Frame")
+	card.Size                   = UDim2.new(0, 320, 0, 10)  -- height grows with rows
+	card.AnchorPoint            = Vector2.new(0.5, 0.5)
+	card.Position               = UDim2.new(0.5, 0, 0.5, 0)
+	card.BackgroundColor3       = Color3.fromRGB(14, 16, 22)
+	card.BackgroundTransparency = 1
+	card.BorderSizePixel        = 0
+	card.Parent                 = _debriefGui
+	_debriefCard = card
+
+	local corner = Instance.new("UICorner")
+	corner.CornerRadius = UDim.new(0, 12)
+	corner.Parent = card
+
+	local stroke = Instance.new("UIStroke")
+	stroke.Color     = col
+	stroke.Thickness = 2
+	stroke.Parent    = card
+
+	local layout = Instance.new("UIListLayout")
+	layout.SortOrder        = Enum.SortOrder.LayoutOrder
+	layout.Padding          = UDim.new(0, 0)
+	layout.HorizontalAlignment = Enum.HorizontalAlignment.Center
+	layout.Parent = card
+
+	local pad = Instance.new("UIPadding")
+	pad.PaddingLeft   = UDim.new(0, 20)
+	pad.PaddingRight  = UDim.new(0, 20)
+	pad.PaddingTop    = UDim.new(0, 16)
+	pad.PaddingBottom = UDim.new(0, 16)
+	pad.Parent = card
+
+	local function row(text, color, size, order, bold)
+		local lbl = Instance.new("TextLabel")
+		lbl.Size               = UDim2.new(1, 0, 0, size + 6)
+		lbl.BackgroundTransparency = 1
+		lbl.Text               = text
+		lbl.TextColor3         = color or Color3.new(1, 1, 1)
+		lbl.Font               = bold and Enum.Font.GothamBold or Enum.Font.Gotham
+		lbl.TextSize           = size
+		lbl.TextXAlignment     = Enum.TextXAlignment.Left
+		lbl.LayoutOrder        = order
+		lbl.Parent             = card
+		return lbl
+	end
+
+	local function divider(order)
+		local f = Instance.new("Frame")
+		f.Size             = UDim2.new(1, 0, 0, 1)
+		f.BackgroundColor3 = Color3.fromRGB(60, 65, 75)
+		f.BorderSizePixel  = 0
+		f.LayoutOrder      = order
+		f.Parent           = card
+	end
+
+	-- Result badge
+	local resultLabels = {
+		Perfect = "✦  PERFECT!",
+		Good    = "✓  GOOD",
+		Pass    = "✓  PASS",
+		Fail    = "✗  FAIL",
+		Abandon = "—  ABANDONED",
+	}
+	row(resultLabels[data.result] or data.result:upper(), col, 22, 1, true)
+	row(data.jobName or "?", Color3.fromRGB(200, 200, 200), 13, 2, false)
+
+	divider(3)
+
+	-- Stats: sequential LayoutOrder counter so variable perk rows don't break layout
+	local ord = 4
+
+	-- Pay: show base → boosted when perk multiplier applied
+	local pay     = data.pay or 0
+	local payBonus = data.payBonus or 0
+	if payBonus > 0 then
+		row(string.format("$%d  base pay", pay - payBonus), Color3.fromRGB(130, 130, 130), 12, ord, false); ord += 1
+		row(string.format("$%d  earned  ★", pay), Color3.fromRGB(120, 220, 120), 14, ord, false); ord += 1
+	elseif pay > 0 then
+		row(string.format("$%d  earned", pay), Color3.fromRGB(120, 220, 120), 14, ord, false); ord += 1
+	else
+		row("$0  earned", Color3.fromRGB(140, 140, 140), 14, ord, false); ord += 1
+	end
+
+	-- Followers: show base → boosted when perk multiplier applied
+	local followers = data.followers or 0
+	local follBonus = data.followerBonus or 0
+	if follBonus > 0 then
+		row(string.format("+%d  base followers", followers - follBonus), Color3.fromRGB(130, 130, 130), 12, ord, false); ord += 1
+		row(string.format("+%d  followers  ★", followers), Color3.fromRGB(100, 180, 240), 14, ord, false); ord += 1
+	else
+		local follColor = followers > 0 and Color3.fromRGB(100, 180, 240) or Color3.fromRGB(140, 140, 140)
+		row(string.format("+%d  followers", followers), follColor, 14, ord, false); ord += 1
+	end
+
+	-- Rep change (already reflects perk repBonus via applyRewards)
+	if data.repDelta then
+		local repColor = data.repDelta >= 0 and Color3.fromRGB(220, 180, 80) or Color3.fromRGB(200, 100, 100)
+		row(string.format("Rep  %+.2f", data.repDelta), repColor, 14, ord, false); ord += 1
+	end
+
+	-- Time
+	row("⏱  " .. fmtTime(durationSec), Color3.fromRGB(180, 180, 180), 13, ord, false); ord += 1
+
+	-- Active perks with remaining charge status
+	if data.perkIds and #data.perkIds > 0 then
+		divider(ord); ord += 1
+		for _, perkId in ipairs(data.perkIds) do
+			local perk      = ShopData.GetById(perkId)
+			local perkName  = perk and (perk.name .. " " .. (perk.grade or "")) or perkId
+			local remaining = data.perkChargesAfter and data.perkChargesAfter[perkId]
+			local chargeText, chargeCol
+			if remaining == nil then
+				chargeText = perkName
+				chargeCol  = Color3.fromRGB(220, 160, 40)
+			elseif remaining == 0 then
+				chargeText = perkName .. "  DEPLETED"
+				chargeCol  = Color3.fromRGB(200, 80, 80)
+			else
+				chargeText = perkName .. "  ×" .. remaining .. " left"
+				chargeCol  = Color3.fromRGB(120, 200, 120)
+			end
+			row(chargeText, chargeCol, 12, ord, false); ord += 1
+		end
+	end
+
+	divider(ord); ord += 1
+
+	-- Continue button
+	local btn = Instance.new("TextButton")
+	btn.Size               = UDim2.new(1, 0, 0, 36)
+	btn.BackgroundColor3   = col
+	btn.Text               = "Continue"
+	btn.TextColor3         = Color3.fromRGB(10, 10, 15)
+	btn.Font               = Enum.Font.GothamBold
+	btn.TextSize           = 14
+	btn.BorderSizePixel    = 0
+	btn.LayoutOrder        = ord
+	btn.AutoButtonColor    = true
+	btn.Parent             = card
+	Instance.new("UICorner", btn).CornerRadius = UDim.new(0, 8)
+
+	-- Resize card to fit content
+	layout:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
+		card.Size = UDim2.new(0, 320, 0, layout.AbsoluteContentSize.Y + 32)
+	end)
+	card.Size = UDim2.new(0, 320, 0, layout.AbsoluteContentSize.Y + 32)
+
+	-- Fade in
+	TweenService:Create(card, TweenInfo.new(0.2), { BackgroundTransparency = 0.08 }):Play()
+
+	btn.Activated:Connect(function()
+		if _debriefCard then _debriefCard:Destroy(); _debriefCard = nil end
+	end)
+end
+
+JobRewardNotify.OnClientEvent:Connect(function(data)
+	_pendingReward = data
+end)
+
 -- ── Remote handlers ───────────────────────────────────────────────────────
 
 TeleportToLocation.OnClientEvent:Connect(function(cframe, job, cloneList, locationName)
@@ -168,6 +360,7 @@ TeleportToLocation.OnClientEvent:Connect(function(cframe, job, cloneList, locati
 		_repairedCount = 0
 		_totalPieces   = #(cloneList or {})
 		_currentJob    = job
+		_jobStartTime  = os.clock()
 		_locationName  = locationName and locationName:gsub("(%l)(%u)", "%1 %2") or (job.name or "?")
 		_multiPiece    = _totalPieces > 1
 		clearAllHighlights()
@@ -273,7 +466,14 @@ StartMinigame.OnClientEvent:Connect(function(pieceIndex)
 	if humanoid then humanoid.WalkSpeed = 0; humanoid.JumpHeight = 0 end
 	if hrp      then hrp.AssemblyLinearVelocity = Vector3.zero end
 
-	local config = { fragile = _currentJob.fragile == true, toolBonus = 0, difficulty = _currentJob.difficulty }
+	local activeEffects = nil
+	pcall(function() activeEffects = RequestActiveEffects:InvokeServer() end)
+	local config = {
+		fragile       = _currentJob.fragile == true,
+		toolBonus     = 0,
+		difficulty    = _currentJob.difficulty,
+		activeEffects = activeEffects,
+	}
 	local result
 
 	if not _multiPiece then
@@ -342,6 +542,14 @@ TeleportToHub.OnClientEvent:Connect(function(cframe)
 		end
 		task.wait(0.5)
 		hideHUD()
+		-- Show debrief if a reward notification arrived during the job
+		if _pendingReward then
+			local duration   = _jobStartTime and math.floor(os.clock() - _jobStartTime) or 0
+			_jobStartTime    = nil
+			local reward     = _pendingReward
+			_pendingReward   = nil
+			showDebrief(reward, duration)
+		end
 	end)
 end)
 

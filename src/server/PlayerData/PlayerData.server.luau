@@ -1,17 +1,23 @@
 local Players           = game:GetService("Players")
 local DataStoreService  = game:GetService("DataStoreService")
+local ServerScriptService = game:GetService("ServerScriptService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local GameConfig      = require(ReplicatedStorage:WaitForChild("Shared"):WaitForChild("GameConfig"))
-local PlayerDataStore = DataStoreService:GetDataStore("PlayerData_v1")
+local PlayerDataStore = DataStoreService:GetDataStore("PlayerData_v2")
+
+local PerkSystem = require(ServerScriptService:WaitForChild("PerkSystem"))
 
 local function savePlayerData(player)
 	local pd = player:FindFirstChild("PlayerData")
 	if not pd then return end
+	local loadout, perkCharges = PerkSystem.SerializeForSave(player)
 	local data = {
-		usd        = (pd:FindFirstChild("usd")        or { Value = 0   }).Value,
-		followers  = (pd:FindFirstChild("followers")  or { Value = 0   }).Value,
-		reputation = (pd:FindFirstChild("reputation") or { Value = 0.0 }).Value,
+		usd         = (pd:FindFirstChild("usd")        or { Value = 0   }).Value,
+		followers   = (pd:FindFirstChild("followers")  or { Value = 0   }).Value,
+		reputation  = (pd:FindFirstChild("reputation") or { Value = 0.0 }).Value,
+		loadout     = loadout,
+		perkCharges = perkCharges,
 	}
 	local ok, err = pcall(function()
 		PlayerDataStore:SetAsync("Player_" .. player.UserId, data)
@@ -50,7 +56,16 @@ Players.PlayerAdded:Connect(function(player)
 		if saved.reputation then reputation.Value  = saved.reputation end
 	elseif not ok then
 		warn("[PlayerData] Load failed for", player.Name, ":", saved)
+		saved = nil
 	end
+
+	-- Bootstrap perk/toolbox data using restored saved values (or fresh if none)
+	PerkSystem.SetupPlayerData(player, saved)
+
+	-- Watch reputation for slot unlocks
+	reputation.Changed:Connect(function()
+		PerkSystem.RefreshSlotCount(player)
+	end)
 end)
 
 Players.PlayerRemoving:Connect(savePlayerData)

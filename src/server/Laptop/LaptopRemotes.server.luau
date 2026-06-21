@@ -29,6 +29,7 @@ remote("AcceptJob")
 remote("SubmitJobResult")
 remote("AbandonJob")
 remote("JobBoardRefresh")
+remote("JobRewardNotify")   -- server → client after every job end (success/fail/abandon)
 
 -- Talkogram feed
 remoteFunction("RequestFeed")
@@ -53,3 +54,29 @@ remote("TeleportToHub")
 remote("LocationFull")
 remote("FurniturePieceRepaired")
 remote("StartMinigame")
+
+-- Perks / Toolbox (Phase 3)
+remoteFunction("RequestPerkInventory")
+remoteFunction("RequestLoadout")
+remoteFunction("RequestActiveEffects")
+remote("EquipPerk")
+remote("UnequipPerk")
+remote("LoadoutChanged")
+
+-- Shop (Phase 4)
+remoteFunction("RequestShopCatalog")
+remote("PurchasePerk")
+remote("PurchaseResult")
+
+-- Direct Offers (Phase 5)
+remoteFunction("RequestDirectOffers")
+remote("AcceptDirectOffer")
+remote("DirectOffersChanged")
+
+-- Hot Jobs (Phase 6)
+remote("HotJobCountdown")
+
+-- Daily Contracts (Phase 7)
+remoteFunction("RequestDailyContracts")
+remote("ClaimDailyReward")
+remote("DailyContractsChanged")
