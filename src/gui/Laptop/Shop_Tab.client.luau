@@ -98,3 +98,35 @@ showDetail = function(product)
 	if BuyButton then BuyButton.Text  = product.price .. " Cash" end
 	ItemDetail.Visible = true
 end
+
+-- ============================================================
+--  PEMBELIAN — klik BuyButton -> minta server beli produk terpilih
+--  >>> BUAT MANUAL: RemoteFunction "BuyItem" di ReplicatedStorage <<<
+-- ============================================================
+if BuyButton then
+	local BuyItem = ReplicatedStorage:WaitForChild("BuyItem", 15)
+	if not BuyItem then
+		warn("[Shop_Tab] RemoteFunction 'BuyItem' belum ada di ReplicatedStorage — tombol beli nonaktif.")
+	else
+		local buying = false
+		BuyButton.MouseButton1Click:Connect(function()
+			if buying or not selectedProduct then return end
+			buying = true
+			BuyButton.Active = false
+
+			local product = selectedProduct
+			local ok, success, message = pcall(function()
+				return BuyItem:InvokeServer(product.id)
+			end)
+
+			if ok then
+				print("[Shop_Tab] beli", product.id, "->", success, message)
+			else
+				warn("[Shop_Tab] gagal memanggil BuyItem:", success)
+			end
+
+			BuyButton.Active = true
+			buying = false
+		end)
+	end
+end
