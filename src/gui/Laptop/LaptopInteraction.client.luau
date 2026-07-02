@@ -11,10 +11,11 @@
 
 -- ini create variable
 
-local Players = game:GetService("Players")
-local RunService = game:GetService("RunService")
+local Players                = game:GetService("Players")
+local RunService             = game:GetService("RunService")
+local UserInputService       = game:GetService("UserInputService")
 local ProximityPromptService = game:GetService("ProximityPromptService")
-local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local ReplicatedStorage      = game:GetService("ReplicatedStorage")
 
 local player = Players.LocalPlayer
 local PlayerGui = player:WaitForChild("PlayerGui")
@@ -97,6 +98,9 @@ end)
 
 LaptopGui:GetPropertyChangedSignal("Enabled"):Connect(function()
 	ProximityPromptService.Enabled = not LaptopGui.Enabled
+	if LaptopGui.Enabled then
+		UserInputService.MouseBehavior = Enum.MouseBehavior.Default
+	end
 end)
 
 -- ── Distance check: close UI if player walks away from ALL laptops ────────

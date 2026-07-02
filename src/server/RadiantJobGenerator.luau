@@ -257,6 +257,12 @@ function RadiantJobGenerator.Generate(count, allowedTiers)
 		local flavor     = pickRandom(flavorPool)
 		local details    = flavor .. " (" .. table.concat(damageLabels, ", ") .. ")"
 
+		-- Physics workflow fields
+		local physCfg    = GameConfig.PhysicsWorkflow
+		local fullChance = (physCfg.workflowFullChance[jobTier] or 1.0)
+		local workflow   = (math.random() < fullChance) and "full" or "half"
+		local finishType = (math.random() < 0.5) and "stitch" or "staple"
+
 		table.insert(jobs, {
 			id         = i,   -- reassigned by LaptopData with a server-unique ID
 			name       = jobName,
@@ -269,6 +275,8 @@ function RadiantJobGenerator.Generate(count, allowedTiers)
 			minigames  = minigames,
 			difficulty = cfg.difficulty,
 			fragile    = cfg.fragile,
+			workflow   = workflow,    -- "full" or "half" — controls which tools spawn
+			finishType = finishType,  -- "stitch" or "staple" — which finishing minigame
 		})
 	end
 

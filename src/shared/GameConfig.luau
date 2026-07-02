@@ -156,11 +156,11 @@ return {
 	JobTierOrder = { "Special", "Elite", "Exclusive", "Prestige", "Premium", "Mid", "Starter" },
 
 	-- Each entry maps a visible damage label to the minigame that fixes it.
+	-- FoamPadding removed: foam placement is now physical (drop Sponge on furniture).
+	-- StapleGunning / SeamStitching are selected randomly per job via finishType.
 	JobDamagePool = {
-		{ label = "tack damage",   minigame = "TackRemoval"   },
-		{ label = "loose staples", minigame = "StapleGunning" },
-		{ label = "foam collapse", minigame = "FoamPadding"   },
-		{ label = "torn seam",     minigame = "SeamStitching" },
+		{ label = "tack damage", minigame = "TackRemoval"   },
+		{ label = "torn seam",   minigame = "SeamStitching" },
 	},
 
 	-- One-line client flavor texts shown in the job details field.
@@ -334,6 +334,52 @@ return {
 			                  timePerSegment=7,
 			                  missBudget=1.2, perfectMaxDeviationFrac=0.18, goodMaxDeviationFrac=0.45 },
 			FoamPadding   = { pieceCount=7, timeLimit=35, perfectMinRatio=1.0, goodMinRatio=0.80 },
+		},
+	},
+
+	-- =========================================================
+	-- PHYSICS WORKFLOW  (drop-to-trigger repair system)
+	-- =========================================================
+	PhysicsWorkflow = {
+		-- Radius (studs) from furniture bounding-box centre for tool snapping.
+		snapRadius = 5,
+
+		-- Silent-timer grading: par time per furniture piece, keyed by tier.
+		parTimeByTier = {
+			Starter   = 60,
+			Mid       = 50,
+			Premium   = 45,
+			Prestige  = 40,
+			Exclusive = 35,
+			Elite     = 30,
+			Special   = 30,
+		},
+
+		-- elapsed / parTime ratio → grade. < Perfect = Perfect, < Good = Good, etc.
+		gradeThresholds = {
+			Perfect = 0.80,
+			Good    = 1.00,
+			Pass    = 1.40,
+			-- > 1.40 = Fail
+		},
+
+		-- Tools spawned per furniture piece by workflow.
+		-- finishType ("stitch" or "staple") tool is appended automatically.
+		toolsByWorkflow = {
+			full = { "TackRemover", "Sponge", "Cloth" },
+			half = { "Cloth" },
+		},
+
+		-- Workflow distribution per tier (probability of "full"; remainder = "half").
+		-- Premium and above are always full.
+		workflowFullChance = {
+			Starter  = 0.5,
+			Mid      = 0.5,
+			Premium  = 1.0,
+			Prestige = 1.0,
+			Exclusive = 1.0,
+			Elite    = 1.0,
+			Special  = 1.0,
 		},
 	},
 

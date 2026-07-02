@@ -1,4 +1,4 @@
--- src/client/GrabController.luau
+-- src/gui/Gameplay/GrabController.client.luau
 
 local Players           = game:GetService("Players")
 local RunService        = game:GetService("RunService")
@@ -13,54 +13,115 @@ local Remotes = require(Shared:WaitForChild("GrabRemotes")).Get()
 local LocalPlayer = Players.LocalPlayer
 
 local state = {
-	isHolding         = false,
-	heldPart          = nil,
-	hoveredPart       = nil,
-	selectionBoxHover = nil,
-	selectionBoxHeld  = nil,
-	canGrab           = true,
+	isHolding      = false,
+	heldPart       = nil,
+	hoveredPart    = nil,
+	highlightHover = nil,
+	highlightHeld  = nil,
+	canGrab        = true,
 }
+
+local _enabled = true   -- set false during GUI minigames
+
+local hideItemName   -- forward declared; defined after BillboardGui setup below
+local showItemName   -- forward declared; defined after BillboardGui setup below
 
 -- ── Highlights ────────────────────────────────────────────────────────────────
 
+local function resolveHighlightTarget(part)
+	local parent = part.Parent
+	if parent and parent:IsA("Model") and not parent:IsA("WorldRoot") then
+		return parent
+	end
+	return part
+end
+
 local function clearHoverHighlight()
-	if state.selectionBoxHover then
-		state.selectionBoxHover:Destroy()
-		state.selectionBoxHover = nil
+	if state.highlightHover then
+		state.highlightHover:Destroy()
+		state.highlightHover = nil
 	end
 	state.hoveredPart = nil
+	hideItemName()
 end
 
 local function createHoverHighlight(part)
 	clearHoverHighlight()
 	state.hoveredPart = part
-	local sb = Instance.new("SelectionBox")
-	sb.Adornee             = part
-	sb.Color3              = Color3.fromRGB(255, 255, 255)
-	sb.LineThickness       = 0.05
-	sb.SurfaceTransparency = 0.75
-	sb.SurfaceColor3       = Color3.fromRGB(180, 210, 255)
-	sb.Parent              = workspace.CurrentCamera
-	state.selectionBoxHover = sb
+	local h = Instance.new("Highlight")
+	h.Adornee             = resolveHighlightTarget(part)
+	h.FillTransparency    = 1
+	h.OutlineColor        = Color3.fromRGB(255, 255, 255)
+	h.OutlineTransparency = 0
+	h.Parent              = workspace.CurrentCamera
+	state.highlightHover  = h
+	showItemName(part, Color3.fromRGB(240, 230, 200))
 end
 
 local function clearHeldHighlight()
-	if state.selectionBoxHeld then
-		state.selectionBoxHeld:Destroy()
-		state.selectionBoxHeld = nil
+	if state.highlightHeld then
+		state.highlightHeld:Destroy()
+		state.highlightHeld = nil
 	end
 end
 
 local function createHeldHighlight(part)
 	clearHeldHighlight()
-	local sb = Instance.new("SelectionBox")
-	sb.Adornee             = part
-	sb.Color3              = Color3.fromRGB(255, 200, 0)
-	sb.LineThickness       = 0.04
-	sb.SurfaceTransparency = 0.85
-	sb.SurfaceColor3       = Color3.fromRGB(255, 200, 0)
-	sb.Parent              = workspace.CurrentCamera
-	state.selectionBoxHeld = sb
+	local h = Instance.new("Highlight")
+	h.Adornee             = resolveHighlightTarget(part)
+	h.FillTransparency    = 1
+	h.OutlineColor        = Color3.fromRGB(255, 210, 80)
+	h.OutlineTransparency = 0
+	h.Parent              = workspace.CurrentCamera
+	state.highlightHeld   = h
+end
+
+-- ── Item name label ──────────────────────────────────────────────────────────
+-- Shows the hovered/held item's name as a BillboardGui anchored to the object.
+-- White = hovering, gold = holding.
+
+local function toDisplayName(name)
+	return name:gsub("(%l)(%u)", "%1 %2")
+end
+
+local _nameBoard = Instance.new("BillboardGui")
+_nameBoard.Name        = "GrabItemName"
+_nameBoard.Size        = UDim2.new(0, 160, 0, 30)
+_nameBoard.StudsOffset = Vector3.new(0.8, 1.4, 0)
+_nameBoard.MaxDistance = 30
+_nameBoard.AlwaysOnTop = false
+_nameBoard.Enabled     = false
+_nameBoard.Parent      = LocalPlayer:WaitForChild("PlayerGui")
+
+local _nameBg = Instance.new("Frame")
+_nameBg.Size                   = UDim2.fromScale(1, 1)
+_nameBg.BackgroundColor3       = Color3.fromRGB(10, 8, 16)
+_nameBg.BackgroundTransparency = 0.25
+_nameBg.BorderSizePixel        = 0
+_nameBg.Parent                 = _nameBoard
+Instance.new("UICorner", _nameBg).CornerRadius = UDim.new(0, 6)
+
+local _nameLabel = Instance.new("TextLabel")
+_nameLabel.Name                   = "NameText"
+_nameLabel.Size                   = UDim2.fromScale(1, 1)
+_nameLabel.BackgroundTransparency = 1
+_nameLabel.Text                   = ""
+_nameLabel.TextColor3             = Color3.fromRGB(240, 230, 200)
+_nameLabel.Font                   = Enum.Font.GothamBold
+_nameLabel.TextSize               = 13
+_nameLabel.Parent                 = _nameBg
+
+showItemName = function(part, color)
+	local target = resolveHighlightTarget(part)
+	_nameBoard.Adornee    = target
+	_nameLabel.Text       = toDisplayName(target.Name)
+	_nameLabel.TextColor3 = color
+	_nameBoard.Enabled    = true
+end
+
+hideItemName = function()
+	_nameBoard.Enabled = false
+	_nameBoard.Adornee = nil
 end
 
 -- ── Raycast helpers ───────────────────────────────────────────────────────────
@@ -72,10 +133,6 @@ local function getRaycastParams()
 	return params
 end
 
--- WYSIWYG raycast: always fires from the CAMERA through the mouse cursor so
--- the hit is exactly what the player sees on screen.  A long range (200 studs)
--- ensures the ray reaches objects regardless of how far the camera is zoomed out
--- in third-person.  Reach is enforced separately via isInRange().
 local function castFromMouse()
 	local camera   = workspace.CurrentCamera
 	local mousePos = UserInputService:GetMouseLocation()
@@ -83,9 +140,6 @@ local function castFromMouse()
 	return workspace:Raycast(ray.Origin, ray.Direction.Unit * 200, getRaycastParams())
 end
 
--- Returns true when the hit position is within grab range of the character.
--- Using the hit position (not part centre) matches what the player physically
--- moused-over and stays consistent with the server's HRP-distance check.
 local function isInRange(result)
 	local character = LocalPlayer.Character
 	local hrp = character and character:FindFirstChild("HumanoidRootPart")
@@ -106,13 +160,11 @@ local function isGrabbableClient(part)
 end
 
 -- ── Carry target ──────────────────────────────────────────────────────────────
--- Mouse ray direction from camera, origin anchored at HRP so the object stays
--- in front of the character in both first- and third-person.
 
 local function getCarryTarget()
-	local camera   = workspace.CurrentCamera
+	local camera    = workspace.CurrentCamera
 	local character = LocalPlayer.Character
-	local hrp = character and character:FindFirstChild("HumanoidRootPart")
+	local hrp       = character and character:FindFirstChild("HumanoidRootPart")
 
 	local mousePos = UserInputService:GetMouseLocation()
 	local ray      = camera:ScreenPointToRay(mousePos.X, mousePos.Y)
@@ -140,6 +192,7 @@ end
 -- ── Actions ───────────────────────────────────────────────────────────────────
 
 local function tryGrab()
+	if not _enabled then return end
 	if not state.canGrab then return end
 	state.canGrab = false
 
@@ -150,6 +203,9 @@ local function tryGrab()
 	end
 
 	Remotes.RequestGrab:FireServer(result.Instance)
+	task.delay(2, function()
+		if not state.canGrab then state.canGrab = true end
+	end)
 end
 
 local function release()
@@ -180,6 +236,7 @@ Remotes.GrabConfirmed.OnClientEvent:Connect(function(resolvedPart)
 	state.canGrab   = true
 	clearHoverHighlight()
 	createHeldHighlight(resolvedPart)
+	showItemName(resolvedPart, Color3.fromRGB(255, 210, 60))
 end)
 
 Remotes.GrabFailed.OnClientEvent:Connect(function(_reason)
@@ -196,24 +253,33 @@ end)
 
 -- ── Input ─────────────────────────────────────────────────────────────────────
 
+local THROW_HOLD_THRESHOLD = 0.35
+local _rmbDownTime = 0
+
 UserInputService.InputBegan:Connect(function(input, gameProcessed)
+	if not _enabled then return end
 	if gameProcessed then return end
 
-	if input.KeyCode == Config.GRAB_KEY then
-		if state.isHolding then release() else tryGrab() end
+	if input.UserInputType == Enum.UserInputType.MouseButton1 then
+		if not state.isHolding then tryGrab() end
 		return
 	end
 
-	if input.KeyCode == Config.THROW_KEY and state.isHolding then
-		throw()
+	if input.UserInputType == Enum.UserInputType.MouseButton2 and state.isHolding then
+		_rmbDownTime = os.clock()
 		return
 	end
+end)
 
-	if Config.USE_MOUSE_THROW
-		and input.UserInputType == Enum.UserInputType.MouseButton1
-		and state.isHolding
-	then
-		throw()
+UserInputService.InputEnded:Connect(function(input, gameProcessed)
+	if gameProcessed then return end
+
+	if input.UserInputType == Enum.UserInputType.MouseButton2 and state.isHolding then
+		if (os.clock() - _rmbDownTime) >= THROW_HOLD_THRESHOLD then
+			throw()
+		else
+			release()
+		end
 	end
 end)
 
@@ -221,6 +287,10 @@ end)
 
 RunService.Heartbeat:Connect(function()
 	if state.isHolding and state.heldPart then
+		if not state.heldPart.Parent then
+			clearHeldState()
+			return
+		end
 		local target       = getCarryTarget()
 		local displacement = target - state.heldPart.Position
 		local dist         = displacement.Magnitude
@@ -232,26 +302,76 @@ RunService.Heartbeat:Connect(function()
 		end
 		state.heldPart.AssemblyAngularVelocity = Vector3.zero
 	end
+end)
 
-	-- Hover highlight: only show on grabbable parts within reach.
-	if not state.isHolding then
-		local result    = castFromMouse()
-		local hitPart   = result and result.Instance
-		local grabbable = hitPart
-			and hitPart:IsA("BasePart")
-			and isGrabbableClient(hitPart)
-			and isInRange(result)
+-- Hover highlight runs on RenderStepped (60 Hz)
+RunService.RenderStepped:Connect(function()
+	if state.isHolding then return end
+	if not _enabled then
+		if state.hoveredPart then clearHoverHighlight() end
+		return
+	end
 
-		if grabbable and hitPart ~= state.hoveredPart then
-			createHoverHighlight(hitPart)
-		elseif not grabbable and state.hoveredPart then
-			clearHoverHighlight()
-		end
+	if state.hoveredPart and not state.hoveredPart.Parent then
+		clearHoverHighlight()
+	end
+
+	local result    = castFromMouse()
+	local hitPart   = result and result.Instance
+	local grabbable = hitPart
+		and hitPart:IsA("BasePart")
+		and isGrabbableClient(hitPart)
+		and isInRange(result)
+
+	local resolvedTarget = grabbable and resolveHighlightTarget(hitPart)
+	local currentAdornee = state.highlightHover and state.highlightHover.Adornee
+
+	if grabbable and resolvedTarget ~= currentAdornee then
+		createHoverHighlight(hitPart)
+	elseif not grabbable and state.hoveredPart then
+		clearHoverHighlight()
 	end
 end)
+
+-- ── Bridge: expose SetEnabled to GameplayClient via BindableEvent ─────────────
+-- GameplayClient fires this bridge when it needs to block/restore grab input.
+
+local _bridge = Instance.new("BindableEvent")
+_bridge.Name   = "GrabControllerBridge"
+_bridge.Parent = LocalPlayer:WaitForChild("PlayerGui")
 
 -- ── Public API ────────────────────────────────────────────────────────────────
 
 local GrabController = {}
+
 function GrabController.Init() end
+
+function GrabController.SetEnabled(val: boolean)
+	_enabled = val
+	if not val and state.isHolding then
+		release()
+	end
+	if not val then
+		clearHoverHighlight()
+	end
+end
+
+function GrabController.IsHolding()
+	return state.isHolding
+end
+
+function GrabController.GetHoverName()
+	local part = state.hoveredPart
+	if not part then return nil end
+	local parent = part.Parent
+	if parent and parent:IsA("Model") and not parent:IsA("WorldRoot") then
+		return parent.Name
+	end
+	return part.Name
+end
+
+_bridge.Event:Connect(function(val)
+	GrabController.SetEnabled(val)
+end)
+
 return GrabController

@@ -32,7 +32,7 @@ local function resolveGrabbable(hitPart)
 		if current:IsA("Model") and CollectionService:HasTag(current, Config.GRABBABLE_TAG) then
 			local root = current.PrimaryPart
 				or current:FindFirstChildWhichIsA("BasePart")
-				or hitPart  -- fallback: the part the raycast actually hit
+				or hitPart
 			return root, current
 		end
 		current = current.Parent
@@ -59,7 +59,7 @@ local function recordLastHolder(entry, player)
 	pcall(function()
 		local part   = entry.heldPart
 		local parent = part and part.Parent
-		if part then lastHolder[part] = player end
+		if part   then lastHolder[part]   = player end
 		if parent and parent:IsA("Model") and not parent:IsA("WorldRoot") then
 			lastHolder[parent] = player
 		end
@@ -74,12 +74,10 @@ local function cleanupPlayer(player)
 
 	pcall(function() entry.ancestryConn:Disconnect() end)
 
-	-- Restore collision groups for every part we changed
 	for part, origGroup in pairs(entry.originalCollisionGroups) do
 		pcall(function() part.CollisionGroup = origGroup end)
 	end
 
-	-- Give physics ownership back to server for every part we unanchored
 	for _, part in ipairs(entry.unanchoredParts) do
 		pcall(function() part:SetNetworkOwner(nil) end)
 	end
@@ -95,12 +93,10 @@ local function onRequestGrab(player, hitPart)
 	local userId = player.UserId
 
 	if grabState[userId] then
-		warn("GrabHandler: GrabFailed(AlreadyHolding) for " .. player.Name)
 		Remotes.GrabFailed:FireClient(player, "AlreadyHolding")
 		return
 	end
 
-	-- Rate limit — must fire GrabFailed so canGrab is restored on the client
 	local now = tick()
 	if lastGrabTime[userId] and (now - lastGrabTime[userId]) < Config.GRAB_COOLDOWN then
 		Remotes.GrabFailed:FireClient(player, "Cooldown")
@@ -110,14 +106,12 @@ local function onRequestGrab(player, hitPart)
 
 	local resolved, grabbableEntity = resolveGrabbable(hitPart)
 	if not resolved then
-		warn("GrabHandler: GrabFailed(NotGrabbable) — " .. hitPart.Name .. " has no Grabbable ancestor")
 		Remotes.GrabFailed:FireClient(player, "NotGrabbable")
 		return
 	end
 
 	for _, entry in pairs(grabState) do
 		if entry.heldPart == resolved then
-			warn("GrabHandler: GrabFailed(AlreadyHeld) for " .. resolved.Name)
 			Remotes.GrabFailed:FireClient(player, "AlreadyHeld")
 			return
 		end
@@ -126,24 +120,20 @@ local function onRequestGrab(player, hitPart)
 	local character = player.Character
 	local hrp = character and character:FindFirstChild("HumanoidRootPart")
 	if not hrp then
-		warn("GrabHandler: GrabFailed(NotAlive) for " .. player.Name)
 		Remotes.GrabFailed:FireClient(player, "NotAlive")
 		return
 	end
 
 	if (hrp.Position - resolved.Position).Magnitude > Config.MAX_GRAB_DISTANCE_SVR then
-		warn("GrabHandler: GrabFailed(TooFar) for " .. player.Name .. " grabbing " .. resolved.Name)
 		Remotes.GrabFailed:FireClient(player, "TooFar")
 		return
 	end
 
 	if resolved.AssemblyMass > Config.MAX_OBJECT_MASS then
-		warn("GrabHandler: GrabFailed(TooHeavy) — " .. resolved.Name .. " mass=" .. resolved.AssemblyMass)
 		Remotes.GrabFailed:FireClient(player, "TooHeavy")
 		return
 	end
 
-	-- Unanchor all BaseParts inside the TAGGED entity only.
 	local unanchoredParts = {}
 	if grabbableEntity then
 		if grabbableEntity:IsA("Model") then
@@ -159,7 +149,6 @@ local function onRequestGrab(player, hitPart)
 		end
 	end
 
-	-- Set GROUP_HELD on every BasePart in the entity; record originals for cleanup.
 	local originalCollisionGroups = {}
 	local entityParts = {}
 	if grabbableEntity then
@@ -178,16 +167,11 @@ local function onRequestGrab(player, hitPart)
 		part.CollisionGroup = Config.GROUP_HELD
 	end
 
-	-- Give the player physics ownership of every unanchored part.
-	-- For welded assemblies, Roblox requires SetNetworkOwner on the assembly ROOT —
-	-- calling it on a non-root part throws. By trying every part we guarantee the
-	-- true root gets the call, regardless of which part Roblox chose as root.
 	local anyOwned = false
 	for _, part in ipairs(unanchoredParts) do
 		local ok = pcall(function() part:SetNetworkOwner(player) end)
 		if ok then anyOwned = true end
 	end
-	-- Also try resolved (may not be in unanchoredParts if it was already unanchored)
 	local ok = pcall(function() resolved:SetNetworkOwner(player) end)
 	if ok then anyOwned = true end
 
@@ -198,7 +182,6 @@ local function onRequestGrab(player, hitPart)
 		for part, origGroup in pairs(originalCollisionGroups) do
 			pcall(function() part.CollisionGroup = origGroup end)
 		end
-		warn("GrabHandler: GrabFailed(PhysicsError) — SetNetworkOwner failed for all parts of " .. resolved.Name)
 		Remotes.GrabFailed:FireClient(player, "PhysicsError")
 		return
 	end
@@ -233,21 +216,19 @@ local function onRequestThrow(player, throwDir)
 	local entry = grabState[player.UserId]
 	if not entry then return end
 
-	-- Validate direction sent from client
 	local dir = Vector3.new(0, 0, -1)
 	if typeof(throwDir) == "Vector3"
 		and throwDir.Magnitude > 0.001
-		and throwDir.X == throwDir.X  -- NaN guard
+		and throwDir.X == throwDir.X
 	then
 		dir = throwDir.Unit
 	end
 
-	local heldPart              = entry.heldPart
-	local unanchoredParts       = entry.unanchoredParts
+	local heldPart                = entry.heldPart
+	local unanchoredParts         = entry.unanchoredParts
 	local originalCollisionGroups = entry.originalCollisionGroups
-	local speed                 = Config.THROW_SPEED
+	local speed                   = Config.THROW_SPEED
 
-	-- Clean up grab state (collision groups, ancestry watcher, table entry)
 	recordLastHolder(entry, player)
 	pcall(function() entry.ancestryConn:Disconnect() end)
 	for part, origGroup in pairs(originalCollisionGroups) do
@@ -255,10 +236,6 @@ local function onRequestThrow(player, throwDir)
 	end
 	grabState[player.UserId] = nil
 
-	-- Reclaim physics ownership and apply throw velocity in the same execution.
-	-- The previous task.delay approach left a gap between SetNetworkOwner and the
-	-- velocity write — during that gap the part had no authoritative velocity and
-	-- visibly froze mid-air.  Doing both in one tick eliminates that window.
 	for _, part in ipairs(unanchoredParts) do
 		pcall(function() part:SetNetworkOwner(nil) end)
 	end
@@ -317,9 +294,8 @@ end
 function GrabHandler.GetHeldEntity(player)
 	local entry = grabState[player.UserId]
 	if not entry then return nil end
-	local part = entry.heldPart
+	local part   = entry.heldPart
 	local parent = part.Parent
-	-- Exclude WorldRoot (Workspace) — it inherits from Model but is not a game object
 	if parent and parent:IsA("Model") and not parent:IsA("WorldRoot") then
 		return parent
 	end

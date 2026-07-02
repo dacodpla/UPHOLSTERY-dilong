@@ -12,18 +12,15 @@ return {
 	MAX_OBJECT_MASS       = 5000,
 
 	-- Carry position: hrp.Position + (0, CARRY_HEIGHT, 0) + mouseAimDir * CARRY_DISTANCE
-	-- Mouse aim direction is derived from camera:ScreenPointToRay at the cursor position.
 	CARRY_DISTANCE  = 5,
-	CARRY_HEIGHT    = 1.5,    -- studs above HRP center; R15 HRP sits at hip level
+	CARRY_HEIGHT    = 1.5,
 
 	-- Carry velocity: speed = clamp(displacement * CARRY_SPEED, 0, MAX_CARRY_SPEED)
-	-- Cap prevents the initial lunge (large displacement on grab) from causing overshoot jitter.
 	CARRY_SPEED     = 20,
 	MAX_CARRY_SPEED = 30,
 
 	-- Throw velocity (studs/s). Applied client-side then re-applied server-side in the
-	-- same tick as ownership transfer, so there is no freeze gap.
-	-- THROW_UP_BIAS adds a slight upward arc so the object doesn't just skid along the floor.
+	-- same tick as ownership transfer so there is no freeze gap.
 	THROW_SPEED   = 40,
 	THROW_UP_BIAS = 0.15,
 

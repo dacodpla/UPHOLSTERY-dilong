@@ -63,3 +63,8 @@ remote("EquipPerk")          -- client → server: (slotIndex, perkId)
 remote("UnequipPerk")        -- client → server: (slotIndex)
 remote("LoadoutChanged")     -- server → client: (loadout, charges)
 remote("BurnPerkCharges")    -- client → server: burn all equipped charges at job start
+
+-- Physics workflow (drop-to-trigger repair system)
+remote("SofaStateChanged")              -- server → client: (pieceIndex, stateName)
+remote("ReportPhysicsMinigameResult")   -- client → server: (pieceIndex)
+remote("PhysicsJobGrade")               -- server → client: (grade string) when all pieces complete

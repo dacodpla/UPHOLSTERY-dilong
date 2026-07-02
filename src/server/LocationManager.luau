@@ -35,7 +35,17 @@ local TeleportToLocation     = remotesFolder:WaitForChild("TeleportToLocation")
 local TeleportToHub          = remotesFolder:WaitForChild("TeleportToHub")
 local LocationFull           = remotesFolder:WaitForChild("LocationFull")
 local FurniturePieceRepaired = remotesFolder:WaitForChild("FurniturePieceRepaired")
-local StartMinigame          = remotesFolder:WaitForChild("StartMinigame")
+
+-- SlotPhysicsService: lazy-required to avoid circular dependency.
+-- LocationManager.Assign calls RegisterSlot; SlotPhysicsService lazily
+-- requires us for HandlePieceRepaired.
+local _slotPhysicsService = nil
+local function getSlotPhysicsService()
+	if not _slotPhysicsService then
+		_slotPhysicsService = require(script.Parent:WaitForChild("SlotPhysicsService"))
+	end
+	return _slotPhysicsService
+end
 
 -- ── Internal state ────────────────────────────────────────────────────────
 
@@ -351,29 +361,9 @@ function LocationManager.Assign(player, job)
 		end
 	end
 	local isTagBased      = #repairableModels > 0
-	local cloneList       = {}
-	local repairPrompts   = {}
+	local cloneList         = {}
 	local taggedModelsList  = {}
 	local furnitureKeysList = {}
-
-	local function attachRepairPrompt(i, anchor)
-		local rp = Instance.new("ProximityPrompt")
-		rp.Name                  = "RepairPrompt"
-		rp.ActionText            = "Repair"
-		rp.ObjectText            = job.name
-		rp.MaxActivationDistance = 10
-		rp.RequiresLineOfSight   = false
-		rp.Exclusivity           = Enum.ProximityPromptExclusivity.AlwaysShow
-		rp.Style                 = Enum.ProximityPromptStyle.Custom
-		rp.Enabled               = true
-		rp.Parent                = anchor
-		repairPrompts[i]         = rp
-		rp.Triggered:Connect(function(triggeringPlayer)
-			if not _playerAssignment[triggeringPlayer] then return end
-			rp.Enabled = false
-			StartMinigame:FireClient(triggeringPlayer, i)
-		end)
-	end
 
 	if isTagBased then
 		local cap = _maxFurniture[chosenName]
@@ -463,12 +453,7 @@ function LocationManager.Assign(player, job)
 					if part:IsA("BasePart") then anchor = part; break end
 				end
 			end
-			if anchor then
-				attachRepairPrompt(i, anchor)
-				print(("[LocationManager]   Tag piece %d '%s' → %s"):format(i, furnitureKey, taggedModel.Name))
-			else
-				warn(("[LocationManager]   Damaged clone for '%s' has no BasePart — prompt skipped"):format(furnitureKey))
-			end
+			print(("[LocationManager]   Tag piece %d '%s' → %s"):format(i, furnitureKey, taggedModel.Name))
 		end
 	else
 		-- Pad-based: clone Damaged_X variants from ServerStorage onto FurniturePad_N
@@ -501,16 +486,6 @@ function LocationManager.Assign(player, job)
 				end
 			end
 		end
-		-- RepairPrompts on the pad parts (not on the furniture model itself)
-		for i = 1, #cloneList do
-			local pad = slotModel:FindFirstChild("FurniturePad_" .. i, true)
-			if pad and pad:IsA("BasePart") then
-				attachRepairPrompt(i, pad)
-				print(("[LocationManager]   Piece %d RepairPrompt on FurniturePad_%d"):format(i, i))
-			else
-				warn(("[LocationManager]   FurniturePad_%d not found — RepairPrompt skipped"):format(i))
-			end
-		end
 	end
 
 	-- Add DoorPrompt to the Handle part inside the Door model so player can exit or abandon
@@ -541,69 +516,42 @@ function LocationManager.Assign(player, job)
 		fixedClones   = {},
 		furnitureKeys = isTagBased and furnitureKeysList or (job.furniture or {}),
 		taggedModels  = taggedModelsList,
-		repairPrompts = repairPrompts,
 		doorPrompt    = doorPromptInstance,
 		tagBased      = isTagBased,
 	}
 
-	-- Teleport player; send full clone list so client wires a prompt per piece
+	-- Register the slot with the physics service so drop detection and state machines run.
 	local spawnPad = slotModel:FindFirstChild("SpawnPad", true)
-	local cframe   = spawnPad and spawnPad.CFrame or slotModel:GetPivot()
-	TeleportToLocation:FireClient(player, cframe, job, cloneList, chosenName)
+	local spawnCF  = spawnPad and spawnPad.CFrame or slotModel:GetPivot()
+
+	local piecesForPhysics = {}
+	for i, clone in ipairs(cloneList) do
+		piecesForPhysics[i] = { clone = clone }
+	end
+
+	getSlotPhysicsService().RegisterSlot(player, {
+		job             = job,
+		pieces          = piecesForPhysics,
+		spawnCF         = spawnCF,
+		onPieceComplete = function(pieceIndex)
+			LocationManager.HandlePieceRepaired(player, pieceIndex)
+		end,
+	})
+
+	-- Teleport player; send full clone list so client can build the checklist HUD
+	TeleportToLocation:FireClient(player, spawnCF, job, cloneList, chosenName)
 
 	print(("[LocationManager] Assigned %s → %s Slot_%d"):format(player.Name, chosenName, chosenIndex))
 	return true
 end
 
-function LocationManager.Release(player)
-	local assignment = _playerAssignment[player]
-	if not assignment then return end
-
-	-- Clear immediately so door/events can't double-fire
-	_playerAssignment[player] = nil
-
-	-- Teleport first — iris transition plays while the slot is still behind it
-	TeleportToHub:FireClient(player, PlayerHouseManager.GetHouseCFrame(player))
-
-	-- Delay destruction so the model persists through the transition (iris ~1s + buffer)
-	local slotModel = assignment.slotModel
-	local pool      = _pool[assignment.locationName]
-	local slotIndex = assignment.slotIndex
-	local locName   = assignment.locationName
-
-	task.delay(4, function()
-		if slotModel and slotModel.Parent then slotModel:Destroy() end
-		if pool then pool[slotIndex] = nil end
-	end)
-
-	print(("[LocationManager] Released %s from %s Slot_%d"):format(
-		player.Name, locName, slotIndex
-	))
-end
-
--- ── Auto-release on disconnect ─────────────────────────────────────────────
-
-Players.PlayerRemoving:Connect(function(player)
-	local assignment = _playerAssignment[player]
-	if not assignment then return end
-	-- Player is gone — no teleport needed, just destroy the slot clone
-	if assignment.slotModel and assignment.slotModel.Parent then
-		assignment.slotModel:Destroy()
-	end
-	local pool = _pool[assignment.locationName]
-	if pool then pool[assignment.slotIndex] = nil end
-	_playerAssignment[player] = nil
-	print(("[LocationManager] Cleaned up slot for disconnected player %s"):format(player.Name))
-end)
-
--- ── FurniturePieceRepaired: swap damaged clone → Default model ────────────
-
-FurniturePieceRepaired.OnServerEvent:Connect(function(player, pieceIndex)
+-- HandlePieceRepaired is called both by SlotPhysicsService (physics workflow)
+-- and by FurniturePieceRepaired.OnServerEvent (legacy path, kept for compatibility).
+function LocationManager.HandlePieceRepaired(player, pieceIndex)
 	local assignment = _playerAssignment[player]
 	if not assignment then return end
 	if type(pieceIndex) ~= "number" then return end
 
-	-- Extract colors from the damaged clone before destroying it
 	local fabricColor, frameColor
 	local damagedClone = assignment.clones[pieceIndex]
 	if damagedClone and damagedClone.Parent then
@@ -630,7 +578,6 @@ FurniturePieceRepaired.OnServerEvent:Connect(function(player, pieceIndex)
 	end
 
 	if assignment.tagBased then
-		-- Tag-based: clone Default from FurnitureModels and place at tagged model's position
 		local furnitureFolder = ServerStorage:FindFirstChild("FurnitureModels")
 		local typeFolder      = furnitureFolder and furnitureFolder:FindFirstChild(furnitureKey)
 		local defaultModel    = typeFolder and typeFolder:FindFirstChild("Default")
@@ -655,14 +602,63 @@ FurniturePieceRepaired.OnServerEvent:Connect(function(player, pieceIndex)
 		applyColors(fixedClone)
 		assignment.fixedClones[pieceIndex] = fixedClone
 	else
-		-- Pad-based: place Default on the FurniturePad
 		local fixedClone = placeFurnitureDefault(assignment.slotModel, furnitureKey, pieceIndex)
 		if fixedClone then
 			applyColors(fixedClone)
 			assignment.fixedClones[pieceIndex] = fixedClone
 		end
 	end
-	-- All prompts are enabled from the start (free-order repair) — no sequential enabling needed
+end
+
+function LocationManager.Release(player)
+	local assignment = _playerAssignment[player]
+	if not assignment then return end
+
+	-- Clear immediately so door/events can't double-fire
+	_playerAssignment[player] = nil
+
+	-- Unregister the physics slot so the heartbeat stops scanning for this player
+	getSlotPhysicsService().UnregisterSlot(player)
+
+	-- Teleport first — iris transition plays while the slot is still behind it
+	TeleportToHub:FireClient(player, PlayerHouseManager.GetHouseCFrame(player))
+
+	-- Delay destruction so the model persists through the transition (iris ~1s + buffer)
+	local slotModel = assignment.slotModel
+	local pool      = _pool[assignment.locationName]
+	local slotIndex = assignment.slotIndex
+	local locName   = assignment.locationName
+
+	task.delay(4, function()
+		if slotModel and slotModel.Parent then slotModel:Destroy() end
+		if pool then pool[slotIndex] = nil end
+	end)
+
+	print(("[LocationManager] Released %s from %s Slot_%d"):format(
+		player.Name, locName, slotIndex
+	))
+end
+
+-- ── Auto-release on disconnect ─────────────────────────────────────────────
+
+Players.PlayerRemoving:Connect(function(player)
+	local assignment = _playerAssignment[player]
+	if not assignment then return end
+	_playerAssignment[player] = nil
+	getSlotPhysicsService().UnregisterSlot(player)
+	-- Player is gone — no teleport needed, just destroy the slot clone
+	if assignment.slotModel and assignment.slotModel.Parent then
+		assignment.slotModel:Destroy()
+	end
+	local pool = _pool[assignment.locationName]
+	if pool then pool[assignment.slotIndex] = nil end
+	print(("[LocationManager] Cleaned up slot for disconnected player %s"):format(player.Name))
+end)
+
+-- ── FurniturePieceRepaired: legacy remote path — delegates to HandlePieceRepaired ─
+
+FurniturePieceRepaired.OnServerEvent:Connect(function(player, pieceIndex)
+	LocationManager.HandlePieceRepaired(player, pieceIndex)
 end)
 
 return LocationManager

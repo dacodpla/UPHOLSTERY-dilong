@@ -18,11 +18,13 @@
 
 local MinigameRunner = {}
 
-local TweenService  = game:GetService("TweenService")
-local Lighting      = game:GetService("Lighting")
-local Players       = game:GetService("Players")
-local SFX           = require(game:GetService("ReplicatedStorage"):WaitForChild("Shared"):WaitForChild("SFXPlayer"))
-local GameConfig    = require(game:GetService("ReplicatedStorage"):WaitForChild("Shared"):WaitForChild("GameConfig"))
+local TweenService     = game:GetService("TweenService")
+local Lighting         = game:GetService("Lighting")
+local Players          = game:GetService("Players")
+local RunService       = game:GetService("RunService")
+local UserInputService = game:GetService("UserInputService")
+local SFX              = require(game:GetService("ReplicatedStorage"):WaitForChild("Shared"):WaitForChild("SFXPlayer"))
+local GameConfig       = require(game:GetService("ReplicatedStorage"):WaitForChild("Shared"):WaitForChild("GameConfig"))
 
 -- ── Module registry ───────────────────────────────────────────────────────
 -- Pre-require all modules now so their module-level PreloadAsync calls run behind
@@ -257,7 +259,11 @@ function MinigameRunner.Run(minigameName, config)
 	_activeMinigame = minigame
 	_isCancelling   = false
 
+	RunService:BindToRenderStep("MinigameMouseUnlock",
+		Enum.RenderPriority.Camera.Value + 1,
+		function() UserInputService.MouseBehavior = Enum.MouseBehavior.Default end)
 	minigame.Start(container, merged)
+	RunService:UnbindFromRenderStep("MinigameMouseUnlock")
 
 	local wasCancelled = _isCancelling
 	local result = minigame.GetResult()
@@ -279,6 +285,10 @@ function MinigameRunner.RunChain(minigameNames, config)
 	showGui(gui)
 	local results = {}
 
+	RunService:BindToRenderStep("MinigameMouseUnlock",
+		Enum.RenderPriority.Camera.Value + 1,
+		function() UserInputService.MouseBehavior = Enum.MouseBehavior.Default end)
+
 	for _, name in ipairs(minigameNames) do
 		for _, child in ipairs(container:GetChildren()) do
 			child:Destroy()
@@ -298,6 +308,7 @@ function MinigameRunner.RunChain(minigameNames, config)
 		_isCancelling   = false
 
 		if wasCancelled then
+			RunService:UnbindFromRenderStep("MinigameMouseUnlock")
 			removeBlur()
 			gui:Destroy()
 			return nil
@@ -308,6 +319,7 @@ function MinigameRunner.RunChain(minigameNames, config)
 		task.wait(0.35)
 	end
 
+	RunService:UnbindFromRenderStep("MinigameMouseUnlock")
 	removeBlur()
 	gui:Destroy()
 	return results

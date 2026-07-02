@@ -30,6 +30,13 @@ local LocationManager = require(script.Parent.Parent:WaitForChild("LocationManag
 local PerkSystem = require(script.Parent.Parent:WaitForChild("PerkSystem", 10)
 	or error("[LaptopData] PerkSystem ModuleScript not found in ServerScriptService"))
 
+-- ── GrabHandler ───────────────────────────────────────────────────────────
+-- Must be initialised before any slot is registered so collision groups and
+-- player hooks are active from the first job assignment.
+local GrabHandler = require(script.Parent.Parent:WaitForChild("GrabHandler", 10)
+	or error("[LaptopData] GrabHandler ModuleScript not found in ServerScriptService"))
+GrabHandler.Init()
+
 -- ── Init sub-modules ──────────────────────────────────────────────────────
 
 TalkogramHandler.Init(remotesFolder)

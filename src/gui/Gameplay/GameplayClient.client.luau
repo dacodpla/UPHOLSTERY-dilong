@@ -12,6 +12,7 @@ local Players           = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local TweenService      = game:GetService("TweenService")
 local RunService        = game:GetService("RunService")
+local UserInputService  = game:GetService("UserInputService")
 local PPS               = game:GetService("ProximityPromptService")
 
 local SFX = require(ReplicatedStorage:WaitForChild("Shared"):WaitForChild("SFXPlayer"))
@@ -31,12 +32,13 @@ local Remotes                = ReplicatedStorage:WaitForChild("LaptopRemotes")
 local TeleportToLocation     = Remotes:WaitForChild("TeleportToLocation")
 local TeleportToHub          = Remotes:WaitForChild("TeleportToHub")
 local LocationFull           = Remotes:WaitForChild("LocationFull")
-local SubmitJobResult        = Remotes:WaitForChild("SubmitJobResult")
-local AbandonJob             = Remotes:WaitForChild("AbandonJob")
-local FurniturePieceRepaired = Remotes:WaitForChild("FurniturePieceRepaired")
-local StartMinigame          = Remotes:WaitForChild("StartMinigame")
-local GetActiveEffects       = Remotes:WaitForChild("GetActiveEffects")
-local BurnPerkCharges        = Remotes:WaitForChild("BurnPerkCharges")
+local SubmitJobResult             = Remotes:WaitForChild("SubmitJobResult")
+local AbandonJob                  = Remotes:WaitForChild("AbandonJob")
+local StartMinigame               = Remotes:WaitForChild("StartMinigame")
+local BurnPerkCharges             = Remotes:WaitForChild("BurnPerkCharges")
+local SofaStateChanged            = Remotes:WaitForChild("SofaStateChanged")
+local ReportPhysicsMinigameResult = Remotes:WaitForChild("ReportPhysicsMinigameResult")
+local PhysicsJobGrade             = Remotes:WaitForChild("PhysicsJobGrade")
 
 -- ── Dev HUD ───────────────────────────────────────────────────────────────
 
@@ -113,18 +115,22 @@ end
 
 -- ── State ─────────────────────────────────────────────────────────────────
 
-local _pieceResults    = {}   -- [pieceIndex] = result string once that piece is repaired
-local _repairedCount   = 0    -- how many pieces have been repaired this job
-local _totalPieces     = 0    -- total pieces for the current job
-local _highlights      = {}   -- Highlight instances indexed by piece number
-local _currentJob      = nil  -- job table for the current active assignment
-local _locationName    = "?"  -- display name of the current job location
-local _multiPiece      = false
-local _minigameActive  = false  -- guard: only one minigame runs at a time
-local _firstHubTeleport = true  -- loading screen covers the first arrival; skip irisClose
-local _slotModel     = nil   -- parent of cloneList[1]; used for door highlight
-local _doorHighlight = nil
-local _cloneList     = {}   -- furniture Model refs for the current job (indexed by pieceIndex)
+local _pieceResults     = {}   -- [pieceIndex] = result string once that piece is repaired (legacy)
+local _repairedCount    = 0    -- how many pieces have been marked Complete by SofaStateChanged
+local _totalPieces      = 0    -- total pieces for the current job
+local _highlights       = {}   -- Highlight instances indexed by piece number
+local _currentJob       = nil  -- job table for the current active assignment
+local _locationName     = "?"  -- display name of the current job location
+local _multiPiece       = false
+local _minigameActive   = false  -- guard: only one minigame runs at a time
+local _firstHubTeleport = true   -- loading screen covers the first arrival; skip irisClose
+local _slotModel        = nil    -- parent of cloneList[1]; used for door highlight
+local _doorHighlight    = nil
+local _physicsGrade     = nil    -- grade string received from PhysicsJobGrade; used as final result
+local _cloneList          = {}   -- furniture clones for the current job
+local _pieceBillboards    = {}   -- [pieceIndex] = BillboardGui floating above each piece
+local _hoveredPieceIndex  = nil  -- which piece the mouse is currently over (for billboard visibility)
+local _furnitureRayParams = nil  -- RaycastParams that includes only _cloneList descendants
 
 -- ── Helpers ───────────────────────────────────────────────────────────────
 
@@ -135,72 +141,6 @@ end
 
 local function hideHUD()
 	hudLabel.Visible = false
-end
-
-local function spawnPoof(model)
-	local cf, sz
-	pcall(function() cf, sz = model:GetBoundingBox() end)
-	if not cf then cf = model:GetPivot(); sz = Vector3.new(2, 1, 2) end
-	local center  = cf.Position
-	local maxDim  = math.max(sz.X, sz.Y, sz.Z)
-	local minDim  = math.min(sz.X, sz.Y, sz.Z)
-	local rng     = Random.new()
-
-	local COLORS = {
-		Color3.fromRGB(255, 255, 255),
-		Color3.fromRGB(200, 235, 255),
-		Color3.fromRGB(255, 235, 160),
-		Color3.fromRGB(180, 255, 200),
-		Color3.fromRGB(255, 200, 230),
-	}
-
-	-- Neon white flash that swells to engulf the whole model then vanishes
-	local flash = Instance.new("Part")
-	flash.Shape        = Enum.PartType.Ball
-	flash.Size         = Vector3.new(minDim * 0.3, minDim * 0.3, minDim * 0.3)
-	flash.Anchored     = true
-	flash.CanCollide   = false
-	flash.CastShadow   = false
-	flash.Material     = Enum.Material.Neon
-	flash.Color        = Color3.fromRGB(255, 255, 255)
-	flash.Transparency = 0.1
-	flash.Position     = center
-	flash.Parent       = workspace
-	TweenService:Create(flash,
-		TweenInfo.new(0.22, Enum.EasingStyle.Quad, Enum.EasingDirection.Out),
-		{ Size = Vector3.new(maxDim * 3, maxDim * 3, maxDim * 3), Transparency = 1 }
-	):Play()
-	task.delay(0.25, function() if flash.Parent then flash:Destroy() end end)
-
-	-- 14 puff balls scattered across the full furniture footprint
-	for i = 1, 14 do
-		local p = Instance.new("Part")
-		p.Shape        = Enum.PartType.Ball
-		p.Size         = Vector3.new(minDim * 0.25, minDim * 0.25, minDim * 0.25)
-		p.Anchored     = true
-		p.CanCollide   = false
-		p.CastShadow   = false
-		p.Material     = Enum.Material.SmoothPlastic
-		p.Color        = COLORS[(i - 1) % #COLORS + 1]
-		p.Transparency = 0.05
-		p.Position     = center + Vector3.new(
-			rng:NextNumber(-sz.X * 0.55, sz.X * 0.55),
-			rng:NextNumber(-sz.Y * 0.3,  sz.Y * 0.5),
-			rng:NextNumber(-sz.Z * 0.55, sz.Z * 0.55)
-		)
-		p.Parent = workspace
-		local finalSize = maxDim * rng:NextNumber(0.8, 1.1)
-		local drift = Vector3.new(
-			rng:NextNumber(-sz.X * 0.7, sz.X * 0.7),
-			rng:NextNumber(sz.Y * 0.9,  sz.Y * 2.2),
-			rng:NextNumber(-sz.Z * 0.7, sz.Z * 0.7)
-		)
-		TweenService:Create(p,
-			TweenInfo.new(rng:NextNumber(0.45, 0.65), Enum.EasingStyle.Quad, Enum.EasingDirection.Out),
-			{ Size = Vector3.new(finalSize, finalSize, finalSize), Transparency = 1, Position = p.Position + drift }
-		):Play()
-		task.delay(0.7, function() if p.Parent then p:Destroy() end end)
-	end
 end
 
 local function moveCharacter(cframe)
@@ -223,6 +163,110 @@ local function clearAllHighlights()
 	end
 end
 
+-- ── Piece-state BillboardGuis ─────────────────────────────────────────────
+-- Each furniture piece gets a floating label showing what the player needs to do next.
+-- Labels appear when the player is within 30 studs and update automatically.
+
+local BILLBOARD_STATE_TEXT = {
+	NeedsTacks  = "▸ Remove Tacks",
+	NeedsSponge = "▸ Apply Foam",
+	NeedsCloth  = "▸ Apply Fabric",
+	NeedsFinish = "▸ Stitch / Staple",
+	Complete    = "✓ Done",
+}
+local BILLBOARD_STATE_COLOR = {
+	NeedsTacks  = Color3.fromRGB(255, 175, 50),
+	NeedsSponge = Color3.fromRGB(255, 175, 50),
+	NeedsCloth  = Color3.fromRGB(255, 175, 50),
+	NeedsFinish = Color3.fromRGB(255, 175, 50),
+	Complete    = Color3.fromRGB(80,  220, 110),
+}
+
+local function buildPieceBillboards(cloneList)
+	for _, bb in ipairs(_pieceBillboards) do
+		if bb and bb.Parent then bb:Destroy() end
+	end
+	_pieceBillboards    = {}
+	_hoveredPieceIndex  = nil
+
+	-- Determine the correct first state from the job's workflow type.
+	-- "full" jobs start with tack removal; "half" jobs skip to fabric.
+	local initialState = (_currentJob and _currentJob.workflow == "half")
+		and "NeedsCloth" or "NeedsTacks"
+
+	-- Build an Include raycast filter so hover-detection only hits furniture.
+	local includeList = {}
+	for _, clone in ipairs(cloneList or {}) do
+		if clone and clone.Parent then table.insert(includeList, clone) end
+	end
+	if #includeList > 0 then
+		_furnitureRayParams = RaycastParams.new()
+		_furnitureRayParams.FilterType = Enum.RaycastFilterType.Include
+		_furnitureRayParams.FilterDescendantsInstances = includeList
+	else
+		_furnitureRayParams = nil
+	end
+
+	for i, clone in ipairs(cloneList or {}) do
+		if clone and clone.Parent then
+			local bb = Instance.new("BillboardGui")
+			bb.Name        = "PieceState_" .. i
+			bb.Adornee     = clone
+			bb.Size        = UDim2.new(0, 190, 0, 36)
+			bb.StudsOffset = Vector3.new(0, 3.5, 0)
+			bb.MaxDistance = 60   -- large distance; Enabled controls visibility
+			bb.AlwaysOnTop = false
+			bb.Enabled     = false  -- hidden until player hovers this piece
+			bb.Parent      = player.PlayerGui
+
+			local bg = Instance.new("Frame")
+			bg.Size                   = UDim2.fromScale(1, 1)
+			bg.BackgroundColor3       = Color3.fromRGB(10, 8, 18)
+			bg.BackgroundTransparency = 0.15
+			bg.BorderSizePixel        = 0
+			bg.Parent                 = bb
+			Instance.new("UICorner", bg).CornerRadius = UDim.new(0, 8)
+
+			local lbl = Instance.new("TextLabel")
+			lbl.Name                   = "StateLabel"
+			lbl.Size                   = UDim2.fromScale(1, 1)
+			lbl.BackgroundTransparency = 1
+			lbl.Text                   = BILLBOARD_STATE_TEXT[initialState] or "—"
+			lbl.TextColor3             = BILLBOARD_STATE_COLOR[initialState]
+				or Color3.fromRGB(255, 175, 50)
+			lbl.Font                   = Enum.Font.GothamBold
+			lbl.TextSize               = 13
+			lbl.Parent                 = bg
+
+			_pieceBillboards[i] = bb
+		end
+	end
+end
+
+local function updatePieceBillboard(pieceIndex, stateName)
+	local bb = _pieceBillboards[pieceIndex]
+	if not bb then return end
+	local lbl = bb:FindFirstChild("StateLabel", true)
+	if not lbl then return end
+	lbl.Text       = BILLBOARD_STATE_TEXT[stateName]  or stateName
+	lbl.TextColor3 = BILLBOARD_STATE_COLOR[stateName] or Color3.fromRGB(200, 190, 170)
+	if stateName == "Complete" then
+		task.delay(1.5, function()
+			if bb and bb.Parent then bb:Destroy() end
+		end)
+		_pieceBillboards[pieceIndex] = nil
+	end
+end
+
+-- ── GrabController bridge ─────────────────────────────────────────────────
+-- GrabController is a separate LocalScript in the same folder; communicate
+-- via a BindableEvent that GrabController creates in PlayerGui.
+
+local function setGrabEnabled(val)
+	local bridge = player.PlayerGui:FindFirstChild("GrabControllerBridge")
+	if bridge then bridge:Fire(val) end
+end
+
 -- ── Remote handlers ───────────────────────────────────────────────────────
 
 TeleportToLocation.OnClientEvent:Connect(function(cframe, job, cloneList, locationName)
@@ -235,13 +279,15 @@ TeleportToLocation.OnClientEvent:Connect(function(cframe, job, cloneList, locati
 		-- Reset per-job state and move while screen is black
 		_pieceResults  = {}
 		_repairedCount = 0
+		_physicsGrade  = nil
 		_totalPieces   = #(cloneList or {})
 		_currentJob    = job
 		_locationName  = locationName and locationName:gsub("(%l)(%u)", "%1 %2") or (job.name or "?")
 		_multiPiece    = _totalPieces > 1
 		clearAllHighlights()
-		_slotModel  = cloneList and cloneList[1] and cloneList[1].Parent
-		_cloneList  = cloneList or {}
+		_cloneList = cloneList or {}
+		_slotModel = cloneList and cloneList[1] and cloneList[1].Parent
+		buildPieceBillboards(cloneList)
 		moveCharacter(cframe)
 		RunService.Heartbeat:Wait()
 
@@ -250,11 +296,7 @@ TeleportToLocation.OnClientEvent:Connect(function(cframe, job, cloneList, locati
 		PPS.MaxPromptsVisible = 1
 
 		-- Now visible: show HUD and highlights
-		if _multiPiece then
-			showHUD("📍 " .. _locationName .. "  |  repair all " .. _totalPieces .. " pieces, then use the door")
-		else
-			showHUD("📍 " .. _locationName .. "  |  walk to the furniture to begin")
-		end
+		showHUD("📍 " .. _locationName .. "  |  unpack the toolbox")
 
 		-- Highlight every piece (Highlight adorns the Model so it works even before parts replicate)
 		for i, clone in ipairs(cloneList or {}) do
@@ -285,17 +327,11 @@ TeleportToLocation.OnClientEvent:Connect(function(cframe, job, cloneList, locati
 					MinigameRunner.Cancel()
 					task.wait()  -- yield so the cancelled coroutine can clean up
 				end
-				-- Only submit if ALL pieces are repaired; partial completion = abandon
+				-- Only submit if ALL pieces are Complete; partial = abandon
 				if _repairedCount >= _totalPieces and _totalPieces > 0 then
-					local resultList = {}
-					for idx = 1, _totalPieces do
-						if _pieceResults[idx] then
-							table.insert(resultList, _pieceResults[idx])
-						end
-					end
-					local finalResult = #resultList == 1
-						and resultList[1]
-						or MinigameRunner.CollapseChainResult(resultList)
+					-- Physics workflow: grade comes from server speed measurement.
+					-- Fall back to "Pass" if the grade event hasn't arrived yet.
+					local finalResult = _physicsGrade or "Pass"
 					SFX.Play("JobSubmit")
 					SubmitJobResult:FireServer(_currentJob.id, finalResult)
 				else
@@ -304,6 +340,7 @@ TeleportToLocation.OnClientEvent:Connect(function(cframe, job, cloneList, locati
 				end
 				_pieceResults   = {}
 				_repairedCount  = 0
+				_physicsGrade   = nil
 				_minigameActive = false
 			end
 
@@ -321,22 +358,17 @@ TeleportToLocation.OnClientEvent:Connect(function(cframe, job, cloneList, locati
 	end)
 end)
 
--- Server fires this when a RepairPrompt is triggered (avoids client-side replication race)
-StartMinigame.OnClientEvent:Connect(function(pieceIndex)
+-- Server fires this when a tool drop triggers a GUI minigame (TackRemoval or finish minigame).
+-- Args: pieceIndex (number), minigameName (string), params (table — built server-side by SlotPhysicsService).
+-- After the run, we report back; state always advances unconditionally.
+StartMinigame.OnClientEvent:Connect(function(pieceIndex, minigameName, params)
 	if not _currentJob then return end
-	if _pieceResults[pieceIndex] ~= nil then return end  -- already repaired
-	if _minigameActive then return end                   -- another minigame is running
+	if _minigameActive then return end
 	_minigameActive = true
-	PPS.MaxPromptsVisible = 0
 
-	if _highlights[pieceIndex] then
-		_highlights[pieceIndex]:Destroy()
-		_highlights[pieceIndex] = nil
-	end
-
+	setGrabEnabled(false)
 	showHUD("🔧 " .. _locationName .. "  |  repair in progress...")
 
-	-- Freeze character for the duration of the minigame
 	local char     = player.Character
 	local humanoid = char and char:FindFirstChildWhichIsA("Humanoid")
 	local hrp      = char and char:FindFirstChild("HumanoidRootPart")
@@ -345,58 +377,32 @@ StartMinigame.OnClientEvent:Connect(function(pieceIndex)
 	if humanoid then humanoid.WalkSpeed = 0; humanoid.JumpHeight = 0 end
 	if hrp      then hrp.AssemblyLinearVelocity = Vector3.zero end
 
-	-- Determine which minigames will actually run this trigger
-	local minigamesToRun
-	if not _multiPiece then
-		minigamesToRun = _currentJob.minigames
-	else
-		local mg = _currentJob.minigames[pieceIndex] or _currentJob.minigames[1]
-		minigamesToRun = { mg }
-	end
+	BurnPerkCharges:FireServer({ minigameName })
 
-	-- Capture perk effects BEFORE burning (pre-burn state = what the player equipped)
-	local activeEffects = nil
-	local ok, effects = pcall(function() return GetActiveEffects:InvokeServer() end)
-	if ok and type(effects) == "table" then activeEffects = effects end
-	-- Burn charges only for perks that match the minigames being played
-	BurnPerkCharges:FireServer(minigamesToRun)
+	MinigameRunner.Run(minigameName, params or {})
 
-	local config = {
-		fragile       = _currentJob.fragile == true,
-		toolBonus     = 0,
-		difficulty    = _currentJob.difficulty,
-		activeEffects = activeEffects,
-	}
-	local result
-
-	if not _multiPiece then
-		-- Single piece: run the full minigame chain
-		if #_currentJob.minigames > 1 then
-			local results = MinigameRunner.RunChain(_currentJob.minigames, config)
-			result = results and MinigameRunner.CollapseChainResult(results) or nil
-		else
-			result = MinigameRunner.Run(_currentJob.minigames[1], config)
-		end
-	else
-		-- Multi-piece: run just this piece's assigned minigame
-		local minigameName = _currentJob.minigames[pieceIndex] or _currentJob.minigames[1]
-		result = MinigameRunner.Run(minigameName, config)
-	end
-
-	-- Restore movement
 	if humanoid then humanoid.WalkSpeed = savedWalkSpeed; humanoid.JumpHeight = savedJumpHeight end
-	PPS.MaxPromptsVisible = 1
+	setGrabEnabled(true)
 	_minigameActive = false
 
-	-- nil result means the minigame was cancelled via the door — don't count this piece
-	if result == nil then return end
+	-- Report result to server regardless of outcome — state advances unconditionally.
+	-- SofaStateChanged will arrive shortly and update _repairedCount + checklist HUD.
+	ReportPhysicsMinigameResult:FireServer(pieceIndex)
+	showHUD("📍 " .. _locationName .. "  |  drop items onto the furniture")
+end)
 
-	_pieceResults[pieceIndex] = result
+-- ── Physics state updates ──────────────────────────────────────────────────
+
+SofaStateChanged.OnClientEvent:Connect(function(pieceIndex, stateName)
+	updatePieceBillboard(pieceIndex, stateName)
+	if stateName ~= "Complete" then return end
+
 	_repairedCount += 1
 	SFX.Play("FurnitureFixed")
-	local poofModel = _cloneList[pieceIndex]
-	FurniturePieceRepaired:FireServer(pieceIndex)
-	if poofModel and poofModel.Parent then spawnPoof(poofModel) end
+	if _highlights[pieceIndex] then
+		_highlights[pieceIndex]:Destroy()
+		_highlights[pieceIndex] = nil
+	end
 
 	if _repairedCount >= _totalPieces then
 		showHUD("✅ " .. _locationName .. "  |  all done!  ·  use the door to leave")
@@ -416,8 +422,12 @@ StartMinigame.OnClientEvent:Connect(function(pieceIndex)
 			end
 		end
 	else
-		showHUD("✅ Piece " .. pieceIndex .. " done  ·  " .. (_totalPieces - _repairedCount) .. " left — keep going!")
+		showHUD("📍 " .. _locationName .. "  |  " .. (_totalPieces - _repairedCount) .. " piece(s) left")
 	end
+end)
+
+PhysicsJobGrade.OnClientEvent:Connect(function(grade)
+	_physicsGrade = grade
 end)
 
 TeleportToHub.OnClientEvent:Connect(function(cframe)
@@ -438,6 +448,13 @@ TeleportToHub.OnClientEvent:Connect(function(cframe)
 		end
 		task.wait(0.5)
 		hideHUD()
+		for _, bb in ipairs(_pieceBillboards) do
+			if bb and bb.Parent then bb:Destroy() end
+		end
+		_pieceBillboards    = {}
+		_cloneList          = {}
+		_hoveredPieceIndex  = nil
+		_furnitureRayParams = nil
 	end)
 end)
 
@@ -448,4 +465,45 @@ LocationFull.OnClientEvent:Connect(function()
 		if not hudLabel.Visible then return end
 		hideHUD()
 	end)
+end)
+
+-- ── Furniture hover detection ─────────────────────────────────────────────────
+-- Show the piece-state billboard only when the mouse cursor is over that piece.
+-- Runs every render frame so the label appears and disappears instantly on hover.
+
+RunService.RenderStepped:Connect(function()
+	if not _furnitureRayParams or not _currentJob then
+		-- Not in a job — ensure all piece billboards are hidden.
+		if _hoveredPieceIndex then
+			_hoveredPieceIndex = nil
+			for _, bb in ipairs(_pieceBillboards) do
+				if bb and bb.Parent then bb.Enabled = false end
+			end
+		end
+		return
+	end
+
+	local camera   = workspace.CurrentCamera
+	local mousePos = UserInputService:GetMouseLocation()
+	local ray      = camera:ScreenPointToRay(mousePos.X, mousePos.Y)
+	local result   = workspace:Raycast(ray.Origin, ray.Direction.Unit * 80, _furnitureRayParams)
+
+	local hitIndex = nil
+	if result then
+		for i, clone in ipairs(_cloneList) do
+			if clone and clone.Parent and result.Instance:IsDescendantOf(clone) then
+				hitIndex = i
+				break
+			end
+		end
+	end
+
+	if hitIndex ~= _hoveredPieceIndex then
+		_hoveredPieceIndex = hitIndex
+		for i, bb in ipairs(_pieceBillboards) do
+			if bb and bb.Parent then
+				bb.Enabled = (i == hitIndex)
+			end
+		end
+	end
 end)

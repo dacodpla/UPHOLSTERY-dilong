@@ -2,17 +2,17 @@
 -- Creates RemoteEvents on the server; waits for them on the client.
 -- Both sides call Get() to receive the same cached table.
 
-local RunService = game:GetService("RunService")
+local RunService        = game:GetService("RunService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local FOLDER_NAME = "GrabRemotes"
 
 local EVENT_NAMES = {
-	"RequestGrab",    -- C→S: (hitPart: BasePart)
-	"RequestRelease", -- C→S: ()
-	"RequestThrow",   -- C→S: (direction: Vector3)
-	"GrabConfirmed",  -- S→C: (carryPart: BasePart)
-	"GrabFailed",     -- S→C: (reason: string)
+	"RequestGrab",      -- C→S: (hitPart: BasePart)
+	"RequestRelease",   -- C→S: ()
+	"RequestThrow",     -- C→S: (direction: Vector3)
+	"GrabConfirmed",    -- S→C: (carryPart: BasePart)
+	"GrabFailed",       -- S→C: (reason: string)
 	"ReleaseConfirmed", -- S→C: ()
 	"ThrowConfirmed",   -- S→C: ()
 }
@@ -26,12 +26,12 @@ local function Get(): {[string]: RemoteEvent}
 
 	if RunService:IsServer() then
 		local folder = Instance.new("Folder")
-		folder.Name = FOLDER_NAME
+		folder.Name   = FOLDER_NAME
 		folder.Parent = ReplicatedStorage
 
 		for _, name in ipairs(EVENT_NAMES) do
 			local re = Instance.new("RemoteEvent")
-			re.Name = name
+			re.Name   = name
 			re.Parent = folder
 			cache[name] = re
 		end
