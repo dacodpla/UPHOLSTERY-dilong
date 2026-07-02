@@ -55,3 +55,11 @@ remote("TeleportToHub")
 remote("LocationFull")
 remote("FurniturePieceRepaired")
 remote("StartMinigame")
+
+-- Perk / Toolbox
+remoteFunction("GetLoadout")
+remoteFunction("GetActiveEffects")
+remote("EquipPerk")          -- client → server: (slotIndex, perkId)
+remote("UnequipPerk")        -- client → server: (slotIndex)
+remote("LoadoutChanged")     -- server → client: (loadout, charges)
+remote("BurnPerkCharges")    -- client → server: burn all equipped charges at job start

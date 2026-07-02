@@ -21,22 +21,8 @@ local RunService        = game:GetService("RunService")
 local UserInputService  = game:GetService("UserInputService")
 local TweenService      = game:GetService("TweenService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local ContentProvider   = game:GetService("ContentProvider")
 local GameConfig = require(ReplicatedStorage:WaitForChild("Shared"):WaitForChild("GameConfig"))
 local SFX        = require(ReplicatedStorage:WaitForChild("Shared"):WaitForChild("SFXPlayer"))
-
--- ── GuiAssets ─────────────────────────────────────────────────────────────
-local _needleImage = ""
-do
-	local assets    = ReplicatedStorage:WaitForChild("GuiAssets")
-	local needleObj = assets:WaitForChild("needle")
-	ContentProvider:PreloadAsync({ needleObj })
-	if needleObj:IsA("ImageLabel") or needleObj:IsA("ImageButton") then
-		_needleImage = needleObj.Image
-	elseif needleObj:IsA("Decal") or needleObj:IsA("Texture") then
-		_needleImage = needleObj.Texture
-	end
-end
 
 local cfg   = GameConfig.SeamStitching
 
@@ -365,19 +351,17 @@ local function buildUI(container, pathSegments)
 	Instance.new("UICorner", endMark).CornerRadius = UDim.new(1, 0)
 	table.insert(_instances, endMark)
 
-	-- Needle image — tip at bottom, AnchorPoint puts tip at the tracked position
-	local needle = Instance.new("ImageLabel")
-	needle.Name = "Needle"
-	needle.Size = UDim2.fromOffset(20, 130)
-	needle.AnchorPoint = Vector2.new(0.5, 0.95)
-	needle.Position = UDim2.fromScale(s[1], s[2])
-	needle.BackgroundTransparency = 1
-	needle.Image = _needleImage
-	needle.ImageColor3 = COL_NEEDLE
-	needle.ScaleType = Enum.ScaleType.Stretch
-	needle.BorderSizePixel = 0
-	needle.ZIndex = 6
-	needle.Parent = canvas
+	-- Needle — thin pill shape; tip sits at the tracked cursor position
+	local needle = Instance.new("Frame")
+	needle.Name             = "Needle"
+	needle.Size             = UDim2.fromOffset(10, 80)
+	needle.AnchorPoint      = Vector2.new(0.5, 0.95)
+	needle.Position         = UDim2.fromScale(s[1], s[2])
+	needle.BackgroundColor3 = COL_NEEDLE
+	needle.BorderSizePixel  = 0
+	needle.ZIndex           = 6
+	needle.Parent           = canvas
+	Instance.new("UICorner", needle).CornerRadius = UDim.new(1, 0)
 	table.insert(_instances, needle)
 
 	-- Thread dot at the eye of the needle (~20 % from the top of the image)
@@ -456,7 +440,7 @@ function SeamStitching.Start(container, config)
 			end
 		end
 		if _result ~= "Fail" then
-			needle.ImageColor3 = COL_NEEDLE
+			needle.BackgroundColor3 = COL_NEEDLE
 			meterFill.BackgroundColor3 = COL_METER_OK
 		end
 		SFX.Play("StitchComplete")
@@ -572,14 +556,14 @@ function SeamStitching.Start(container, config)
 
 		if budgetFrac >= 1 then
 			needle.Position = UDim2.fromScale(sx, sy)
-			needle.ImageColor3 = COL_TRAIL_BAD
+			needle.BackgroundColor3 = COL_TRAIL_BAD
 			finishGame("deviation")
 			return
 		end
 
 		addTrailDot(canvas, sx, sy, onPath)
 		needle.Position = UDim2.fromScale(sx, sy)
-		needle.ImageColor3 = onPath and COL_NEEDLE or COL_TRAIL_BAD
+		needle.BackgroundColor3 = onPath and COL_NEEDLE or COL_TRAIL_BAD
 
 		if now - lastStitchSfx >= 0.14 then
 			lastStitchSfx = now

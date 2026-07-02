@@ -35,6 +35,8 @@ local SubmitJobResult        = Remotes:WaitForChild("SubmitJobResult")
 local AbandonJob             = Remotes:WaitForChild("AbandonJob")
 local FurniturePieceRepaired = Remotes:WaitForChild("FurniturePieceRepaired")
 local StartMinigame          = Remotes:WaitForChild("StartMinigame")
+local GetActiveEffects       = Remotes:WaitForChild("GetActiveEffects")
+local BurnPerkCharges        = Remotes:WaitForChild("BurnPerkCharges")
 
 -- ── Dev HUD ───────────────────────────────────────────────────────────────
 
@@ -343,7 +345,28 @@ StartMinigame.OnClientEvent:Connect(function(pieceIndex)
 	if humanoid then humanoid.WalkSpeed = 0; humanoid.JumpHeight = 0 end
 	if hrp      then hrp.AssemblyLinearVelocity = Vector3.zero end
 
-	local config = { fragile = _currentJob.fragile == true, toolBonus = 0, difficulty = _currentJob.difficulty }
+	-- Determine which minigames will actually run this trigger
+	local minigamesToRun
+	if not _multiPiece then
+		minigamesToRun = _currentJob.minigames
+	else
+		local mg = _currentJob.minigames[pieceIndex] or _currentJob.minigames[1]
+		minigamesToRun = { mg }
+	end
+
+	-- Capture perk effects BEFORE burning (pre-burn state = what the player equipped)
+	local activeEffects = nil
+	local ok, effects = pcall(function() return GetActiveEffects:InvokeServer() end)
+	if ok and type(effects) == "table" then activeEffects = effects end
+	-- Burn charges only for perks that match the minigames being played
+	BurnPerkCharges:FireServer(minigamesToRun)
+
+	local config = {
+		fragile       = _currentJob.fragile == true,
+		toolBonus     = 0,
+		difficulty    = _currentJob.difficulty,
+		activeEffects = activeEffects,
+	}
 	local result
 
 	if not _multiPiece then

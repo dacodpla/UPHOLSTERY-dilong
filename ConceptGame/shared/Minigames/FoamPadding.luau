@@ -222,24 +222,12 @@ function FoamPadding.Start(container, config)
 	local timeLimit  = p.timeLimit
 	local pieceCount = p.pieceCount
 
-	-- Foam texture overlay (applied to placed piece cells and tray thumbnails)
-	local _foamImage = ""
-	local _foamObj   = ReplicatedStorage:WaitForChild("GuiAssets"):WaitForChild("foam")
-	if _foamObj:IsA("ImageLabel") or _foamObj:IsA("ImageButton") then
-		_foamImage = _foamObj.Image
-	elseif _foamObj:IsA("Decal") or _foamObj:IsA("Texture") then
-		_foamImage = _foamObj.Texture
-	end
-	game:GetService("ContentProvider"):PreloadAsync({ _foamObj })
-
 	local function addFoamTexture(frame, zIndex, initialTransp)
 		local img = Instance.new("ImageLabel")
 		img.Size                   = UDim2.fromScale(1, 1)
 		img.BackgroundTransparency = 1
-		img.Image                  = _foamImage
+		img.Image                  = ""
 		img.ImageTransparency      = initialTransp ~= nil and initialTransp or 0.55
-		img.ScaleType              = Enum.ScaleType.Stretch
-		img.ImageColor3            = Color3.new(1, 1, 1)
 		img.BorderSizePixel        = 0
 		img.ZIndex                 = zIndex
 		img.Parent                 = frame

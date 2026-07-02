@@ -131,6 +131,112 @@ ShopProducts.Tools = {
         },
     },
 
+    -- ── Bolt-tier perk charges (charge-based, equippable in Toolbox) ──────────
+
+    {
+        id          = "tack_magnet_bolt",
+        name        = "Tack Magnet",
+        grade       = "Bolt",
+        description = "Approach window +0.6 s — more time to click each tack.",
+        category    = "Tool",
+        minigame    = "TackRemoval",
+        price       = 250,
+        icon        = "rbxassetid://0000000020",
+        oneTimeUse  = true,
+        effect = { approachTimeBonus = 0.6 },
+    },
+
+    {
+        id          = "sharp_eye_bolt",
+        name        = "Sharp Eye",
+        grade       = "Bolt",
+        description = "Perfect threshold –8 % — easier to land a clean strike.",
+        category    = "Tool",
+        minigame    = "TackRemoval",
+        price       = 220,
+        icon        = "rbxassetid://0000000021",
+        oneTimeUse  = true,
+        effect = { perfectMinProgressReduction = 0.08 },
+    },
+
+    {
+        id          = "staple_guide_bolt",
+        name        = "Staple Guide",
+        grade       = "Bolt",
+        description = "Both landing zones 35 % wider — forgiving on fast triggers.",
+        category    = "Tool",
+        minigame    = "StapleGunning",
+        price       = 300,
+        icon        = "rbxassetid://0000000022",
+        oneTimeUse  = true,
+        effect = { zoneWidthMultiplier = 1.35 },
+    },
+
+    {
+        id          = "grip_wrap_bolt",
+        name        = "Grip Wrap",
+        grade       = "Bolt",
+        description = "Bar speed –0.12 — a calmer pace through every staple.",
+        category    = "Tool",
+        minigame    = "StapleGunning",
+        price       = 240,
+        icon        = "rbxassetid://0000000023",
+        oneTimeUse  = true,
+        effect = { barSpeedReduction = 0.12 },
+    },
+
+    {
+        id          = "curved_needle_bolt",
+        name        = "Curved Needle",
+        grade       = "Bolt",
+        description = "Deviation tolerance +25 % — the seam path forgives small drifts.",
+        category    = "Tool",
+        minigame    = "SeamStitching",
+        price       = 300,
+        icon        = "rbxassetid://0000000024",
+        oneTimeUse  = true,
+        effect = { deviationToleranceBonus = 0.25 },
+    },
+
+    {
+        id          = "linen_thread_bolt",
+        name        = "Linen Thread",
+        grade       = "Bolt",
+        description = "Miss budget +0.8 s — a little breathing room before a stitch fails.",
+        category    = "Tool",
+        minigame    = "SeamStitching",
+        price       = 200,
+        icon        = "rbxassetid://0000000025",
+        oneTimeUse  = true,
+        effect = { missBudgetBonus = 0.8 },
+    },
+
+    {
+        id          = "foam_press_kit_bolt",
+        name        = "Foam Press Kit",
+        grade       = "Bolt",
+        description = "One fewer foam piece — a lighter workload this job.",
+        category    = "Tool",
+        minigame    = "FoamPadding",
+        price       = 350,
+        icon        = "rbxassetid://0000000026",
+        oneTimeUse  = true,
+        effect = { pieceCountReduction = 1 },
+    },
+
+    {
+        id          = "layout_pins_bolt",
+        name        = "Layout Pins",
+        grade       = "Bolt",
+        description = "Time limit +15 s — pin the layout down and work at your own pace.",
+        category    = "Tool",
+        minigame    = "FoamPadding",
+        price       = 250,
+        icon        = "rbxassetid://0000000027",
+        oneTimeUse  = true,
+        effect = { timeLimitBonus = 15 },
+    },
+
 }
 
 -- ─────────────────────────────────────────────

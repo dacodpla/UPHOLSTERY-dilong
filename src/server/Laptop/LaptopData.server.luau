@@ -26,6 +26,10 @@ local RadiantJobGenerator = require(script.Parent.Parent:WaitForChild("RadiantJo
 local LocationManager = require(script.Parent.Parent:WaitForChild("LocationManager", 10)
 	or error("[LaptopData] LocationManager ModuleScript not found in ServerScriptService — did Rojo sync?"))
 
+-- ── PerkSystem ────────────────────────────────────────────────────────────
+local PerkSystem = require(script.Parent.Parent:WaitForChild("PerkSystem", 10)
+	or error("[LaptopData] PerkSystem ModuleScript not found in ServerScriptService"))
+
 -- ── Init sub-modules ──────────────────────────────────────────────────────
 
 TalkogramHandler.Init(remotesFolder)
@@ -38,12 +42,54 @@ local PurchaseTool            = remotesFolder:WaitForChild("PurchaseTool")
 local AdminRequestLocations   = remotesFolder:WaitForChild("AdminRequestLocations")
 local RequestLocationsByTier  = remotesFolder:WaitForChild("RequestLocationsByTier")
 
-RequestInventory.OnServerInvoke = function(_player)
-	return {}
+-- Returns perk inventory: {[perkId] = chargeCount}
+RequestInventory.OnServerInvoke = function(player)
+	return PerkSystem.GetCharges(player)
 end
 
 PurchaseTool.OnServerEvent:Connect(function(player, toolName)
 	print("[LaptopData] PurchaseTool from", player.Name, "tool =", toolName)
+end)
+
+-- ── Perk / Toolbox remote handlers ───────────────────────────────────────
+
+local GetLoadout       = remotesFolder:WaitForChild("GetLoadout")
+local GetActiveEffects = remotesFolder:WaitForChild("GetActiveEffects")
+local EquipPerk        = remotesFolder:WaitForChild("EquipPerk")
+local UnequipPerk      = remotesFolder:WaitForChild("UnequipPerk")
+local LoadoutChanged   = remotesFolder:WaitForChild("LoadoutChanged")
+local BurnPerkCharges  = remotesFolder:WaitForChild("BurnPerkCharges")
+
+local function fireLoadoutChanged(player)
+	LoadoutChanged:FireClient(player, PerkSystem.GetLoadout(player), PerkSystem.GetCharges(player))
+end
+
+GetLoadout.OnServerInvoke = function(player)
+	local pd = player:FindFirstChild("PlayerData")
+	local ts = pd and pd:FindFirstChild("toolboxSlots")
+	local maxSlots = ts and ts.Value or 3
+	return PerkSystem.GetLoadout(player), PerkSystem.GetCharges(player), maxSlots
+end
+
+GetActiveEffects.OnServerInvoke = function(player)
+	return PerkSystem.GetActiveEffects(player)
+end
+
+EquipPerk.OnServerEvent:Connect(function(player, slotIndex, perkId)
+	local ok = PerkSystem.Equip(player, slotIndex, perkId)
+	if ok then
+		fireLoadoutChanged(player)
+	end
+end)
+
+UnequipPerk.OnServerEvent:Connect(function(player, slotIndex)
+	PerkSystem.Unequip(player, slotIndex)
+	fireLoadoutChanged(player)
+end)
+
+BurnPerkCharges.OnServerEvent:Connect(function(player, minigameNames)
+	PerkSystem.BurnCharges(player, type(minigameNames) == "table" and minigameNames or nil)
+	fireLoadoutChanged(player)
 end)
 
 AdminRequestLocations.OnServerInvoke = function(_player)

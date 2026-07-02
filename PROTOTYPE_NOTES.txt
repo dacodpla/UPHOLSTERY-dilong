@@ -1,0 +1,225 @@
+================================================================================
+  UPHOLSTERY CONCEPT — PROTOTYPE NOTES
+  How it was built, what changed from the design doc, and how it works
+  Reference: CONCEPT_GAME_DESIGN.txt (Section B)
+================================================================================
+
+This document covers the prototype as it currently exists.
+Read alongside CONCEPT_GAME_DESIGN.txt, which describes the intended design.
+Deviations from the design doc are explicitly called out.
+
+
+--------------------------------------------------------------------------------
+  WHAT WAS BUILT (vs B15 MUST HAVE checklist)
+--------------------------------------------------------------------------------
+
+  [x] Grabbing system (GrabController + GrabHandler)
+  [x] NPC door interaction — knock, dialogue, door swing, fade + teleport
+  [x] Toolbox unpack — carry toolbox, unpack it, tools spawn nearby
+  [x] Sponge snap (drop near sofa at State 1 → poof, State → 2)
+  [x] Cloth snap (drop near sofa at State 2 → poof, State → 3)
+  [x] TackRemoval GUI (drop TackRemover near State 0 sofa → minigame)
+  [x] SeamStitching GUI (drop SewingNeedle near State 3 sofa → minigame)
+  [x] State 4 model swap: SofaDamaged destroyed, SofaClean cloned in
+  [x] Silent timer + result grade (Perfect / Good / Pass / Fail) on completion
+  [x] Exit door (ConceptExit tag → proximity prompt → kicks player)
+
+  Not yet built (B15 "add after" scope):
+  [ ] Multi-sofa jobs
+  [ ] StapleGun as 50/50 alternative to SewingNeedle
+  [ ] Knock-off mechanic (physics dislodging placed Sponge/Cloth)
+
+
+--------------------------------------------------------------------------------
+  KEY DEPARTURE FROM THE DESIGN DOC
+--------------------------------------------------------------------------------
+
+The design doc (B9, B5) describes tool interactions as HOLD-TO-TRIGGER:
+  "While held: ProximityPrompts appear on State 0 sofas."
+  "Player activates prompt on a sofa → GUI minigame plays."
+
+The prototype changed this to DROP-TO-TRIGGER for all four tools:
+
+  DESIGN DOC           →   PROTOTYPE
+  Hold TackRemover         Drop TackRemover near sofa cushion
+  + press F prompt         → poof, minigame starts automatically
+
+  Hold SewingNeedle        Drop SewingNeedle near sofa cushion
+  + press F prompt         → poof, minigame starts automatically
+
+  Carry/throw Sponge       Drop/throw Sponge near sofa cushion
+  + touch Cushion          → poof, state advances (unchanged mechanic,
+                             but must be NOT held to register)
+
+  Carry/throw Cloth        Same as Sponge
+
+Reason for change: the hold-to-prompt flow required ProximityPrompts on the
+sofa that activate mid-carry, which was unreliable (LOS blocking, held item
+occlusion, prompt z-fighting). Drop-to-trigger is more physical, matches the
+"Dusty Trip" feel of the design intent, and removes ProximityPrompt complexity
+entirely from the sofa surface.
+
+Side effect: on minigame Fail, the tool is already gone (it poofed on drop).
+The player would need a replacement. For the single-sofa prototype this has not
+been a practical issue.
+
+
+--------------------------------------------------------------------------------
+  THE STATE MACHINE (per sofa, server-owned)
+--------------------------------------------------------------------------------
+
+  State 0  DAMAGED      Drop TackRemover near Cushion → minigame (TackRemoval)
+  State 1  STRIPPED     Drop Sponge near Cushion → poof + advance
+  State 2  FOAM_PLACED  Drop Cloth near Cushion → poof + advance
+  State 3  CLOTH_PLACED Drop SewingNeedle near Cushion → minigame (SeamStitching)
+  State 4  COMPLETE     SofaDamaged destroyed, SofaClean cloned at same CFrame
+                        poof effect plays on SofaDamaged before swap
+
+All state is owned by the server (SofaStateService). The client is notified
+via SofaStateChanged remote event and caches the state for the HUD card.
+
+Drop detection runs at 15 Hz on the server (Heartbeat throttle). It scans
+CollectionService:GetTagged("Grabbable") for items that are:
+  - NOT currently held by any player
+  - within ConceptConfig.SnapRadius (3 studs) of any sofa's Cushion BasePart
+  - matching the expected item name for that sofa's current state
+
+"Last holder" is tracked in GrabHandler (updated on every release/throw) so
+SofaStateService can fire StartMinigame to the correct player after a drop.
+
+
+--------------------------------------------------------------------------------
+  SOFA CHECKLIST HUD
+--------------------------------------------------------------------------------
+
+When the player's mouse hovers over any ConceptSofa-tagged model, a small card
+appears below the cursor (alongside the item name label) showing the repair
+checklist for that sofa:
+
+  ✅  Remove Tacks
+  ❌  Place Sponge
+  ❌  Place Cloth
+  ❌  Sew Seam
+
+Steps show ✅ when the sofa's state has passed that step. The card updates in
+real time as SofaStateChanged events arrive from the server.
+
+
+--------------------------------------------------------------------------------
+  CURSOR HUD SYSTEM
+--------------------------------------------------------------------------------
+
+A single ScreenGui (CursorHint) follows the mouse with three stacked elements:
+
+  1. Item label       — shows the name of the item being held OR hovered
+                        (GrabController.GetHoverName() / GrabConfirmed event)
+
+  2. Prompt hint      — appears when the mouse raycast hits an object with a
+                        ProximityPrompt within MaxActivationDistance of the HRP.
+                        Shows "[ F ]  <ActionText>" and if the prompt has a
+                        RequiredItem attribute: "!  needs: <item>" on a second line.
+                        Uses a single castHUDRay() call shared with the sofa card.
+
+  3. Sofa card        — appears when the mouse raycast hits a ConceptSofa-tagged
+                        model. Shows the repair checklist described above.
+
+All three are hidden during an active minigame (SetMinigameActive(true)).
+The control guide (bottom-right corner) is also hidden during minigames.
+
+
+--------------------------------------------------------------------------------
+  POOF EFFECT
+--------------------------------------------------------------------------------
+
+Triggered when any tool or material is consumed (dropped on sofa, or sofa
+reaches State 4 and is replaced). Runs server-side so particles replicate to
+all clients automatically.
+
+Consists of:
+  - A neon white sphere that swells to 3x the model's max dimension then fades
+  - 14 coloured balls scattered across the model's bounding box that drift
+    upward and fade over ~0.65 seconds
+
+All poof parts are parented to workspace independently of the model, so they
+survive model:Destroy() called immediately after.
+
+
+--------------------------------------------------------------------------------
+  GRAB SYSTEM — WHAT IT DOES
+--------------------------------------------------------------------------------
+
+Client (GrabController):
+  - LMB to grab: raycasts from camera through mouse, checks CollectionService
+    "Grabbable" tag on hit part or any ancestor model, sends RequestGrab to server
+  - Heartbeat: drives held part position via AssemblyLinearVelocity toward a
+    carry target (HRP + mouse aim direction * CARRY_DISTANCE, CARRY_HEIGHT above)
+  - RenderStepped (60 Hz): hover highlight (white outline on grabbable objects),
+    highlight changes to amber when held. Compares resolved Model adornee to avoid
+    flicker when mouse moves between BaseParts of the same model.
+  - RMB tap: drop. RMB hold (0.35s): throw in camera look direction.
+
+Server (GrabHandler):
+  - Validates: not already held, not too heavy, player alive, within
+    MAX_GRAB_DISTANCE_SVR (20 studs)
+  - Unanchors the grabbed entity, sets collision group to HeldObjects (doesn't
+    collide with Players group), transfers NetworkOwner to the holding player
+  - AncestryChanged watcher auto-releases if the part leaves workspace
+  - Tracks lastHolder per entity (updated on every release/throw) for
+    drop-to-trigger mechanics in SofaStateService
+
+
+--------------------------------------------------------------------------------
+  FILE MAP
+--------------------------------------------------------------------------------
+
+  src/client/
+    init.client.luau      — requires GrabController, ConceptHUD, MinigameBridge
+    GrabController.luau   — grab, throw, hover highlight, carry physics
+    ConceptHUD.luau       — cursor hints, sofa card, fade, job result overlay,
+                            control guide, NPC animation handlers
+    MinigameBridge.luau   — receives StartMinigame, runs MinigameRunner,
+                            fires ReportMinigameResult back to server
+
+  src/server/
+    init.server.luau      — requires and inits all services in order
+    GrabHandler.luau      — server-authoritative grab validation + physics
+    SofaStateService.luau — sofa state machine, drop detection, minigame dispatch
+    DoorService.luau      — knock prompt, NPC dialogue, door tween, teleport
+    ToolboxService.luau   — toolbox carry + unpack prompt, tool spawning
+    JobService.luau       — timer start/stop, grade calculation, ShowJobResult
+    NPCService.luau       — ambient NPC animation
+    ExitService.luau      — exit door prompt (kicks player)
+
+  src/shared/
+    GrabConfig.luau       — grab tuning constants (distances, speeds, tags)
+    GrabRemotes.luau      — creates/fetches grab RemoteEvents
+    ConceptRemotes.luau   — creates/fetches concept-game RemoteEvents
+    ConceptConfig.luau    — prototype tuning (SnapRadius, par time, grade thresholds)
+    GameConfig.luau       — difficulty presets for minigames
+    SFXPlayer.luau        — plays named sounds from ReplicatedStorage.SFX
+    Minigames/
+      MinigameRunner.luau — orchestrates GUI overlay, blur, result
+      TackRemoval.luau    — osu-style tack clicking minigame
+      SeamStitching.luau  — free-drag needle path minigame
+      StapleGunning.luau  — moving bar timing minigame (not yet used)
+      FoamPadding.luau    — tetromino puzzle minigame (not used in concept)
+
+
+--------------------------------------------------------------------------------
+  STUDIO SETUP REQUIRED (CollectionService tags)
+--------------------------------------------------------------------------------
+
+  Tag              Applied to
+  ---------        ----------
+  Grabbable        Toolbox, Sponge, Cloth, SewingNeedle, TackRemover
+                   (on the Models in ServerStorage AND their workspace clones)
+  ConceptSofa      SofaDamaged Model in Workspace
+  ConceptDoor      Door BasePart (the door that the NPC opens)
+  ConceptNPC       The NPC Model
+  ConceptRoomSpawn Anchored invisible Part inside the repair room
+  ConceptExit      The exit door BasePart (or Model with a BasePart)
+
+  SofaDamaged must have a direct child BasePart named exactly "Cushion".
+  This is the drop-detection zone and the snap reference point.
+
+================================================================================

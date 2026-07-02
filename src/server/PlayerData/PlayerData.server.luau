@@ -19,11 +19,23 @@ local function savePlayerData(player)
 		end
 	end
 
+	-- save loadout (perk slots)
+	local loadoutData = {}
+	local ld = pd:FindFirstChild("loadout")
+	if ld then
+		for i = 1, 5 do
+			local slot = ld:FindFirstChild("Slot_" .. i)
+			loadoutData["Slot_" .. i] = slot and slot.Value or ""
+		end
+	end
+
 	local data = {
-		usd        = (pd:FindFirstChild("usd")        or { Value = 0   }).Value,
-		followers  = (pd:FindFirstChild("followers")  or { Value = 0   }).Value,
-		reputation = (pd:FindFirstChild("reputation") or { Value = 0.0 }).Value,
-		Inventory  = inventory,
+		usd          = (pd:FindFirstChild("usd")          or { Value = 0   }).Value,
+		followers    = (pd:FindFirstChild("followers")    or { Value = 0   }).Value,
+		reputation   = (pd:FindFirstChild("reputation")   or { Value = 0.0 }).Value,
+		toolboxSlots = (pd:FindFirstChild("toolboxSlots") or { Value = 3   }).Value,
+		Inventory    = inventory,
+		loadout      = loadoutData,
 	}
 	local ok, err = pcall(function()
 		PlayerDataStore:SetAsync("Player_" .. player.UserId, data)
@@ -57,19 +69,44 @@ Players.PlayerAdded:Connect(function(player)
 	Inventory.Name   = "Inventory"
 	Inventory.Parent = playerData
 
+	local toolboxSlots = Instance.new("IntValue")
+	toolboxSlots.Name   = "toolboxSlots"
+	toolboxSlots.Value  = 3
+	toolboxSlots.Parent = playerData
+
+	local loadout = Instance.new("Folder")
+	loadout.Name   = "loadout"
+	loadout.Parent = playerData
+	for i = 1, 5 do
+		local slot = Instance.new("StringValue")
+		slot.Name   = "Slot_" .. i
+		slot.Value  = ""
+		slot.Parent = loadout
+	end
+
 	local ok, saved = pcall(function()
 		return PlayerDataStore:GetAsync("Player_" .. player.UserId)
 	end)
 	if ok and saved then
-		if saved.usd        then usd.Value        = saved.usd        end
-		if saved.followers  then followers.Value   = saved.followers  end
-		if saved.reputation then reputation.Value  = saved.reputation end
+		if saved.usd          then usd.Value          = saved.usd          end
+		if saved.followers    then followers.Value     = saved.followers    end
+		if saved.reputation   then reputation.Value    = saved.reputation   end
+		if saved.toolboxSlots then toolboxSlots.Value  = saved.toolboxSlots end
 		if saved.Inventory then
 			for id, qty in pairs(saved.Inventory) do
 				local item = Instance.new("IntValue")
 				item.Name   = id
 				item.Value  = qty
 				item.Parent = Inventory
+			end
+		end
+		if saved.loadout then
+			for i = 1, 5 do
+				local key  = "Slot_" .. i
+				local slot = loadout:FindFirstChild(key)
+				if slot and saved.loadout[key] then
+					slot.Value = saved.loadout[key]
+				end
 			end
 		end
 	elseif not ok then
